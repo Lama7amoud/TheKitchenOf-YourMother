@@ -1,5 +1,3 @@
-
-https://github.com/user-attachments/assets/00ab10dd-e868-4fb3-be0d-b2888a7259f3
 ## Lama Hamoud - 324839984
 ## Falah Abu Raya - 212530034
 
