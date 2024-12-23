@@ -70,6 +70,7 @@ public class SimpleClient extends AbstractClient {
 			TurnInfo data = (TurnInfo) msg;
 			EventBus.getDefault().post(data);
 		}else if(msg instanceof String) {
+
 			if(msg.toString().startsWith("Yess , you are player X"))
 					symbol = "X";
 				else{

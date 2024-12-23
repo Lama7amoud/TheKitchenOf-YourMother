@@ -7,13 +7,14 @@ import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
+
 
 
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
 	public static ConnectionToClient player1 = null;
-	public int player1flag = (int) (Math.random() * 2);;
+	public int player1symbol = 1;
+	public int player2symbol = 0;
 	public static ConnectionToClient player2 = null;
 
 	public SimpleServer(int port) {
@@ -99,10 +100,10 @@ public class SimpleServer extends AbstractServer {
 	protected void clientConnected(ConnectionToClient client) {
 		try {
 			if (player1 == null) {
-				assignPlayer(client, "player1");
+				playersymbol(client, "player1");
 				notifyCompetitor(player2, "playerTurn");
 			} else if (player2 == null) {
-				assignPlayer(client, "player2");
+				playersymbol(client, "player2");
 				notifyCompetitor(player1, "playerTurn");
 			} else {
 				notifyClientAndClose(client, "Game is full. Please try again later.");
@@ -112,13 +113,13 @@ public class SimpleServer extends AbstractServer {
 		}
 	}
 
-	private void assignPlayer(ConnectionToClient client, String playerRole) throws IOException {
+	private void playersymbol(ConnectionToClient client, String playerRole) throws IOException {
 		if ("player1".equals(playerRole)) {
 			player1 = client;
-			player1.sendToClient(player1flag == 1 ? "Yess , you are player X" : "Yess , you are player O");
+			player1.sendToClient(player1symbol == 1 ? "Yess , you are player X" : "Yess , you are player O");
 		} else if ("player2".equals(playerRole)) {
 			player2 = client;
-			player2.sendToClient(player1flag == 1 ? "Yess , you are player O" : "Yess , you are player X");
+			player2.sendToClient(player2symbol == 0 ? "Yess , you are player O" : "Yess , you are player X");
 		}
 	}
 
