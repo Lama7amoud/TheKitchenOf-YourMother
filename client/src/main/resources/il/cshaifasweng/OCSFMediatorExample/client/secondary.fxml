@@ -22,6 +22,5 @@
          <font>
             <Font name="System Bold" size="16.0" />
          </font></Text>
-        <Text fx:id="Warningtext" layoutX="200.0" layoutY="180.0" strokeType="OUTSIDE" strokeWidth="0.0" />
     </children>
 </AnchorPane>

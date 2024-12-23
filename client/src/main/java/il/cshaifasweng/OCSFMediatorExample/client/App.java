@@ -47,8 +47,6 @@ public class App extends Application {
 
     @Override
     public void stop() {
-        System.out.println("Stopped");
-
         if (stop) {
             return;
         }

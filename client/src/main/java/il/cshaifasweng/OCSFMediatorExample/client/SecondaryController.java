@@ -15,9 +15,6 @@ public class SecondaryController {
     private Text Port;
 
     @FXML
-    private Text Warningtext;
-
-    @FXML
     private TextField ip;
 
     @FXML
