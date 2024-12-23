@@ -2,9 +2,12 @@
 ## Falah Abu Raya - 212530034
 
 
-[2 computers video.mp4](../../Downloads/2%20computers%20video.mp4)
+
+
+![2 computers pic](https://github.com/user-attachments/assets/612d2775-45cf-40f9-8093-ac9d7dd8ca8c)
 
 
 
-![2 computers pic.jpeg](../../Downloads/2%20computers%20pic.jpeg)
+https://github.com/user-attachments/assets/08091553-88fa-4ecf-9a03-f2b69f9c0dad
+
 
