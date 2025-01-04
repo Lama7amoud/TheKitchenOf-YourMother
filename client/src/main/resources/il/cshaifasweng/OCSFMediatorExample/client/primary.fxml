@@ -1,43 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<GridPane fx:id="gameBoardGrid" alignment="CENTER" hgap="10" prefHeight="390.0" prefWidth="416.0" style="-fx-padding: 20; -fx-background-color: #ADD8E6;" vgap="10" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.PrimaryController">
-
-   <Label fx:id="statusLabel" alignment="CENTER" prefHeight="27.0" prefWidth="365.0" style="-fx-font-size: 18; -fx-text-fill: #333;" text="Awaiting connection from  the competitor  " GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+<AnchorPane prefHeight="491.0" prefWidth="706.0" style="-fx-background-size: cover; -fx-background-color: #63a4c7; -fx-background-position: center;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.PrimaryController">
+   <!-- Example UI components inside AnchorPane -->   <Text layoutX="84.0" layoutY="66.0" style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-fill: black; -fx-font-family: Impact;" text="A Warm Welcome to Mom's Kitchen" wrappingWidth="651.09375">
       <font>
-         <Font name="System Bold" size="8.0" />
-      </font></Label>
+         <Font name="System Italic" size="12.0" />
+      </font></Text>
+   <Text layoutX="120" layoutY="121.0" style="-fx-font-size: 25px; -fx-fill: black; -fx-font-family: Gabriola;" text="Good food, warm hearts, and the love of mom in every bite." wrappingWidth="454.250732421875" />
 
-   <Button fx:id="btn0" onAction="#BtnClickFunc" prefHeight="84.0" prefWidth="85.0" style="-fx-font-size: 20; -fx-pref-width: 100; -fx-pref-height: 100;" GridPane.rowIndex="3" />
-   <Button fx:id="btn3" onAction="#BtnClickFunc" prefHeight="85.0" prefWidth="80.0" style="-fx-font-size: 20; -fx-pref-width: 100; -fx-pref-height: 100;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-   <Button fx:id="btn6" onAction="#BtnClickFunc" style="-fx-font-size: 20; -fx-pref-width: 100; -fx-pref-height: 100;" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-
-   <Button fx:id="btn1" onAction="#BtnClickFunc" style="-fx-font-size: 20; -fx-pref-width: 100; -fx-pref-height: 100;" GridPane.rowIndex="4" />
-   <Button fx:id="btn4" onAction="#BtnClickFunc" style="-fx-font-size: 20; -fx-pref-width: 100; -fx-pref-height: 100;" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-   <Button fx:id="btn7" onAction="#BtnClickFunc" style="-fx-font-size: 20; -fx-pref-width: 100; -fx-pref-height: 100;" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-
-   <Button fx:id="btn2" onAction="#BtnClickFunc" style="-fx-font-size: 20; -fx-pref-width: 100; -fx-pref-height: 100;" GridPane.rowIndex="5" />
-   <Button fx:id="btn5" onAction="#BtnClickFunc" style="-fx-font-size: 20; -fx-pref-width: 100; -fx-pref-height: 100;" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-   <Button fx:id="btn8" onAction="#BtnClickFunc" style="-fx-font-size: 20; -fx-pref-width: 100; -fx-pref-height: 100;" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-   <Button fx:id="playAgain" disable="true" mnemonicParsing="false" onAction="#playAgain" text="Play Again" GridPane.rowIndex="6" />
-   <columnConstraints>
-      <ColumnConstraints />
-      <ColumnConstraints />
-      <ColumnConstraints />
-   </columnConstraints>
-   <rowConstraints>
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-   </rowConstraints>
-</GridPane>
+   <Button fx:id="menuButton" layoutX="309.0" layoutY="231.0" onAction="#showMenu" style="-fx-font-size: 16px; -fx-background-color: green; -fx-text-fill: white;" text="Browse Menu" />
+   <ImageView fitHeight="200.0" fitWidth="200.0" layoutX="39.0" layoutY="249.0">
+      <image>
+         <Image url="@../../../../../../../../bg0.png" />
+      </image>
+   </ImageView>
+</AnchorPane>
