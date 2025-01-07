@@ -7,62 +7,50 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane prefHeight="348.0" prefWidth="850.0" style="-fx-background-color: #63a4c7;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MenuController">
-    <GridPane fx:id="menuGrid" gridLinesVisible="true" layoutX="50.0" layoutY="50.0">
+<AnchorPane prefHeight="445.0" prefWidth="769.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MenuController">
+    <GridPane fx:id="menuGrid" gridLinesVisible="true" layoutX="50.0" layoutY="50.0" prefHeight="327.0" prefWidth="632.0">
         <!-- First Row -->
-        <TextField fx:id="textField00" />
-        <TextField fx:id="textField01" GridPane.columnIndex="1" />
-        <TextField fx:id="textField02" GridPane.columnIndex="2" />
-        <TextField fx:id="textField03" GridPane.columnIndex="3" />
-        <TextField fx:id="textField04" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+        <TextField fx:id="textField00" text="Meal Name" />
+        <TextField fx:id="textField01" text="Cost" GridPane.columnIndex="1" />
+        <TextField fx:id="textField02" text="Ingredients" GridPane.columnIndex="2" />
+        <TextField fx:id="textField03" text="Personal Prefrences" GridPane.columnIndex="3" />
 
         <!-- Second Row -->
-        <TextField fx:id="textField20" GridPane.rowIndex="2" />
-        <TextField fx:id="textField11" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        <TextField fx:id="textField12" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-        <TextField fx:id="textField13" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+        <TextField fx:id="textField20" prefHeight="48.0" prefWidth="159.0" GridPane.rowIndex="3" />
+        <TextField fx:id="textField11" prefHeight="47.0" prefWidth="155.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <TextField fx:id="textField12" prefHeight="47.0" prefWidth="162.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+        <TextField fx:id="textField13" prefHeight="47.0" prefWidth="147.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
         <!-- Third Row -->
-        <TextField fx:id="textField30" GridPane.rowIndex="3" />
-        <TextField fx:id="textField21" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-        <TextField fx:id="textField22" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-        <TextField fx:id="textField23" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+        <TextField fx:id="textField30" prefHeight="54.0" prefWidth="163.0" GridPane.rowIndex="4" />
+        <TextField fx:id="textField21" prefHeight="48.0" prefWidth="155.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+        <TextField fx:id="textField22" prefHeight="49.0" prefWidth="159.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+        <TextField fx:id="textField23" prefHeight="47.0" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="3" />
 
         <!-- Fourth Row -->
-        <TextField fx:id="textField40" GridPane.rowIndex="4" />
-        <TextField fx:id="textField31" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-        <TextField fx:id="textField32" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-        <TextField fx:id="textField33" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+        <TextField fx:id="textField40" prefHeight="42.0" prefWidth="158.0" GridPane.rowIndex="5" />
+        <TextField fx:id="textField31" prefHeight="55.0" prefWidth="164.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+        <TextField fx:id="textField32" prefHeight="55.0" prefWidth="167.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+        <TextField fx:id="textField33" prefHeight="51.0" prefWidth="149.0" GridPane.columnIndex="3" GridPane.rowIndex="4" />
 
         <!-- Fifth Row -->
-        <TextField fx:id="textField60" GridPane.rowIndex="6" />
-        <TextField fx:id="textField41" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-        <TextField fx:id="textField42" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-        <TextField fx:id="textField43" GridPane.columnIndex="3" GridPane.rowIndex="4" />
-
-        <!-- Sixth Row -->
-        <TextField fx:id="textField70" GridPane.rowIndex="7" />
-        <TextField fx:id="textField71" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-        <TextField fx:id="textField72" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-        <TextField fx:id="textField73" GridPane.columnIndex="3" GridPane.rowIndex="7" />
-      <Button fx:id="editMeal2" mnemonicParsing="false" onAction="#edit2" text="edit " GridPane.columnIndex="4" GridPane.rowIndex="2" />
-      <Button fx:id="editMeal3" mnemonicParsing="false" onAction="#edit3" text="edit" GridPane.columnIndex="4" GridPane.rowIndex="3" />
-      <Button fx:id="editMeal4" mnemonicParsing="false" onAction="#edit4" text="edit" GridPane.columnIndex="4" GridPane.rowIndex="4" />
-      <Button fx:id="editMeal7" mnemonicParsing="false" onAction="#edit7" text="edit" GridPane.columnIndex="4" GridPane.rowIndex="7" />
-      <Button fx:id="editMeal1" mnemonicParsing="false" onAction="#edit1" text="edit " GridPane.columnIndex="4" GridPane.rowIndex="1" />
-      <TextField fx:id="textField10" GridPane.rowIndex="1" />
-      <TextField fx:id="textField04" GridPane.columnIndex="4" />
-      <TextField fx:id="textField50" GridPane.rowIndex="5" />
-      <TextField fx:id="textField51" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-      <TextField fx:id="textField52" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-      <TextField fx:id="textField53" GridPane.columnIndex="3" GridPane.rowIndex="5" />
-      <Button fx:id="editMeal5" mnemonicParsing="false" onAction="#edit5" text="edit" GridPane.columnIndex="4" GridPane.rowIndex="5" />
-      <TextField fx:id="textField61" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-      <TextField fx:id="textField62" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-      <TextField fx:id="textField63" GridPane.columnIndex="3" GridPane.rowIndex="6" />
-      <Button fx:id="editMeal6" mnemonicParsing="false" onAction="#edit6" text="edit" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+        <TextField fx:id="textField60" prefHeight="40.0" prefWidth="167.0" GridPane.rowIndex="7" />
+        <TextField fx:id="textField41" prefHeight="41.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+        <TextField fx:id="textField42" prefHeight="44.0" prefWidth="165.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+        <TextField fx:id="textField43" prefHeight="42.0" prefWidth="148.0" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+      <TextField fx:id="textField10" prefHeight="48.0" prefWidth="154.0" GridPane.rowIndex="1" />
+      <TextField fx:id="textField50" prefHeight="41.0" prefWidth="162.0" GridPane.rowIndex="6" />
+      <TextField fx:id="textField51" prefHeight="38.0" prefWidth="155.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+      <TextField fx:id="textField52" prefHeight="40.0" prefWidth="158.0" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+      <TextField fx:id="textField53" prefHeight="42.0" prefWidth="146.0" GridPane.columnIndex="3" GridPane.rowIndex="6" />
+      <TextField fx:id="textField61" prefHeight="38.0" prefWidth="153.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+      <TextField fx:id="textField62" prefHeight="36.0" prefWidth="154.0" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+      <TextField fx:id="textField63" prefHeight="37.0" prefWidth="152.0" GridPane.columnIndex="3" GridPane.rowIndex="7" />
+      <TextField fx:id="textField70" prefHeight="35.0" prefWidth="169.0" GridPane.rowIndex="8" />
+      <TextField fx:id="textField71" prefHeight="35.0" prefWidth="169.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+      <TextField fx:id="textField72" prefHeight="35.0" prefWidth="169.0" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+      <TextField fx:id="textField73" prefHeight="38.0" prefWidth="152.0" GridPane.columnIndex="3" GridPane.rowIndex="8" />
       <columnConstraints>
-         <ColumnConstraints />
          <ColumnConstraints />
          <ColumnConstraints />
          <ColumnConstraints />
@@ -77,6 +65,15 @@
          <RowConstraints />
          <RowConstraints />
          <RowConstraints />
+         <RowConstraints minHeight="10.0" prefHeight="30.0" />
       </rowConstraints>
     </GridPane>
+   <Button fx:id="savebtn" layoutX="597.0" layoutY="393.0" mnemonicParsing="false" onAction="#saveFunc" style="-fx-background-color: red;" text="save" />
+   <Button fx:id="editMeal4" layoutX="691.0" layoutY="223.0" mnemonicParsing="false" onAction="#edit4" text="edit" />
+   <Button fx:id="editMeal5" layoutX="691.0" layoutY="268.0" mnemonicParsing="false" onAction="#edit5" text="edit" />
+   <Button fx:id="editMeal6" layoutX="691.0" layoutY="310.0" mnemonicParsing="false" onAction="#edit6" text="edit" />
+   <Button fx:id="editMeal7" layoutX="691.0" layoutY="346.0" mnemonicParsing="false" onAction="#edit7" text="edit" />
+   <Button fx:id="editMeal3" layoutX="693.0" layoutY="181.0" mnemonicParsing="false" onAction="#edit3" text="edit" />
+   <Button fx:id="editMeal1" layoutX="693.0" layoutY="85.0" minWidth="39.0" mnemonicParsing="false" onAction="#edit1" prefHeight="30.0" prefWidth="54.0" text="edit " />
+   <Button fx:id="editMeal2" layoutX="694.0" layoutY="131.0" mnemonicParsing="false" onAction="#edit2" text="edit " />
 </AnchorPane>

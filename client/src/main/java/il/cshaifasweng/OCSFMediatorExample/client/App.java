@@ -17,7 +17,7 @@ import org.greenrobot.eventbus.Subscribe;
  * JavaFX App
  */
 public class App extends Application {
-    private RestaurantClient client;
+    private Client client;
     private static Scene scene;
     private boolean stop = false;
 
@@ -51,7 +51,7 @@ public class App extends Application {
         stop = true;
 
         try {
-            RestaurantClient clientInstance = RestaurantClient.getClient("0", 0);
+            Client clientInstance = Client.getClient("0", 0);
 
             if (clientInstance != null && clientInstance.isConnected()) {
                 clientInstance.sendToServer("remove client");

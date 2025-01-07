@@ -33,6 +33,9 @@ public class MenuController {
     private GridPane menuGrid;
 
     @FXML
+    private Button savebtn;
+
+    @FXML
     private TextField textField00;
 
     @FXML
@@ -43,9 +46,6 @@ public class MenuController {
 
     @FXML
     private TextField textField03;
-
-    @FXML
-    private TextField textField04;
 
     @FXML
     private TextField textField10;
@@ -163,6 +163,11 @@ public class MenuController {
 
     @FXML
     void edit7(ActionEvent event) {
+
+    }
+
+    @FXML
+    void saveFunc(ActionEvent event) {
 
     }
 

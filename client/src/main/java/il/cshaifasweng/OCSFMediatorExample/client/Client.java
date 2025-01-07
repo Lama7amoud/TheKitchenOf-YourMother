@@ -35,18 +35,18 @@ public class Client extends AbstractClient {
             EventBus.getDefault().post(new WarningEvent((Warning) msg));
             return;
         }
-        if (msg.toString().equals()) {
-            EventBus.getDefault().post();
-        }
-        if (msg.toString().equals()) {
-            EventBus.getDefault().post();
-        }
-        if (msg.toString().equals()) {
-            EventBus.getDefault().post();
-        }
-        if (msg.toString().equals()) {
-            EventBus.getDefault().post();
-        }
+       // if (msg.toString().equals()) {
+           // EventBus.getDefault().post();
+       // }
+       // if (msg.toString().equals()) {
+            //EventBus.getDefault().post();
+      //  }
+       // if (msg.toString().equals()) {
+           // EventBus.getDefault().post();
+       // }
+        //if (msg.toString().equals()) {
+           // EventBus.getDefault().post();
+        //}
     }
 
 }
