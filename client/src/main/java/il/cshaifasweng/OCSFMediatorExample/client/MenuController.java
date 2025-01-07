@@ -5,6 +5,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import org.greenrobot.eventbus.EventBus;
+
+import java.io.IOException;
 
 public class MenuController {
 
@@ -132,38 +135,104 @@ public class MenuController {
     private TextField textField73;
 
     @FXML
+    void initialize() {
+      // EventBus.getDefault().register(this);
+        //editMeal1.setDisable(true);
+
+
+
+    }
+
+    @FXML
     void edit1(ActionEvent event) {
+     editMeal2.setDisable(true);
+     editMeal3.setDisable(true);
+     editMeal4.setDisable(true);
+     editMeal5.setDisable(true);
+     editMeal6.setDisable(true);
+     editMeal7.setDisable(true);
+     savebtn.setVisible(true);
+     textField13.setEditable(true);
+     editMeal1.setDisable(true);
 
     }
 
     @FXML
     void edit2(ActionEvent event) {
-
+        editMeal1.setDisable(true);
+        editMeal3.setDisable(true);
+        editMeal4.setDisable(true);
+        editMeal5.setDisable(true);
+        editMeal6.setDisable(true);
+        editMeal7.setDisable(true);
+        savebtn.setVisible(true);
+        textField23.setEditable(true);
+        editMeal2.setDisable(true);
     }
 
     @FXML
     void edit3(ActionEvent event) {
-
+        editMeal1.setDisable(true);
+        editMeal2.setDisable(true);
+        editMeal4.setDisable(true);
+        editMeal5.setDisable(true);
+        editMeal6.setDisable(true);
+        editMeal7.setDisable(true);
+        savebtn.setVisible(true);
+        textField33.setEditable(true);
+        editMeal3.setDisable(true);
     }
 
     @FXML
     void edit4(ActionEvent event) {
-
+        editMeal1.setDisable(true);
+        editMeal2.setDisable(true);
+        editMeal3.setDisable(true);
+        editMeal5.setDisable(true);
+        editMeal6.setDisable(true);
+        editMeal7.setDisable(true);
+        savebtn.setVisible(true);
+        textField43.setEditable(true);
+        editMeal4.setDisable(true);
     }
 
     @FXML
     void edit5(ActionEvent event) {
-
+        editMeal1.setDisable(true);
+        editMeal2.setDisable(true);
+        editMeal3.setDisable(true);
+        editMeal4.setDisable(true);
+        editMeal6.setDisable(true);
+        editMeal7.setDisable(true);
+        savebtn.setVisible(true);
+        textField53.setEditable(true);
+        editMeal5.setDisable(true);
     }
 
     @FXML
     void edit6(ActionEvent event) {
-
+        editMeal1.setDisable(true);
+        editMeal2.setDisable(true);
+        editMeal3.setDisable(true);
+        editMeal4.setDisable(true);
+        editMeal5.setDisable(true);
+        editMeal7.setDisable(true);
+        savebtn.setVisible(true);
+        textField63.setEditable(true);
+        editMeal6.setDisable(true);
     }
 
     @FXML
     void edit7(ActionEvent event) {
-
+        editMeal1.setDisable(true);
+        editMeal2.setDisable(true);
+        editMeal3.setDisable(true);
+        editMeal4.setDisable(true);
+        editMeal5.setDisable(true);
+        editMeal6.setDisable(true);
+        savebtn.setVisible(true);
+        textField73.setEditable(true);
+        editMeal7.setDisable(true);
     }
 
     @FXML
