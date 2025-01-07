@@ -11,14 +11,13 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 /**
  * JavaFX App
  */
 public class App extends Application {
-    private SimpleClient client;
+    private RestaurantClient client;
     private static Scene scene;
     private boolean stop = false;
 
@@ -52,7 +51,7 @@ public class App extends Application {
         stop = true;
 
         try {
-            SimpleClient clientInstance = SimpleClient.getClient("0", 0);
+            RestaurantClient clientInstance = RestaurantClient.getClient("0", 0);
 
             if (clientInstance != null && clientInstance.isConnected()) {
                 clientInstance.sendToServer("remove client");

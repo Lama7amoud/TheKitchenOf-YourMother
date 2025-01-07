@@ -4,14 +4,14 @@ import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
 import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
 
-public class SimpleClient extends AbstractClient {
+public class RestaurantClient extends AbstractClient {
 
-	private static SimpleClient client = null;
+	private static RestaurantClient client = null;
 	private String host ;
 	private int port ;
 	private String symbol ;
 
-	public SimpleClient(String host, int port) {
+	public RestaurantClient(String host, int port) {
 		super(host, port);
 		this.host = host;
 		this.port = port;
@@ -21,9 +21,9 @@ public class SimpleClient extends AbstractClient {
 		return this.symbol;
 	}
 
-	public static SimpleClient getClient(String host, int port) {
+	public static RestaurantClient getClient(String host, int port) {
 		if (client == null) {
-			client = new SimpleClient(host, port);
+			client = new RestaurantClient(host, port);
 		}
 		return client;
 	}

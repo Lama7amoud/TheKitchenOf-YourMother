@@ -3,24 +3,80 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="309.0" prefWidth="513.0" style="-fx-background-color: #ADD8E6;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MenueController">
-    <children>
-        <Button fx:id="startGame" layoutX="202.0" layoutY="205.0" mnemonicParsing="false" onAction="#startGame" text="Start game">
-         <font>
-            <Font name="System Bold" size="13.0" />
-         </font></Button>
-        <TextField fx:id="ip" layoutX="208.0" layoutY="80.0" />
-        <Text fx:id="IP" layoutX="155.0" layoutY="97.0" strokeType="OUTSIDE" strokeWidth="0.0" text="IP">
-         <font>
-            <Font name="System Bold" size="17.0" />
-         </font></Text>
-        <TextField fx:id="port" layoutX="208.0" layoutY="123.0" />
-        <Text fx:id="Port" layoutX="145.0" layoutY="140.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Port">
-         <font>
-            <Font name="System Bold" size="16.0" />
-         </font></Text>
-    </children>
+<AnchorPane prefHeight="348.0" prefWidth="850.0" style="-fx-background-color: #63a4c7;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MenuController">
+    <GridPane fx:id="menuGrid" gridLinesVisible="true" layoutX="50.0" layoutY="50.0">
+        <!-- First Row -->
+        <TextField fx:id="textField00" />
+        <TextField fx:id="textField01" GridPane.columnIndex="1" />
+        <TextField fx:id="textField02" GridPane.columnIndex="2" />
+        <TextField fx:id="textField03" GridPane.columnIndex="3" />
+        <TextField fx:id="textField04" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+
+        <!-- Second Row -->
+        <TextField fx:id="textField20" GridPane.rowIndex="2" />
+        <TextField fx:id="textField11" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <TextField fx:id="textField12" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+        <TextField fx:id="textField13" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+        <!-- Third Row -->
+        <TextField fx:id="textField30" GridPane.rowIndex="3" />
+        <TextField fx:id="textField21" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+        <TextField fx:id="textField22" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+        <TextField fx:id="textField23" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+
+        <!-- Fourth Row -->
+        <TextField fx:id="textField40" GridPane.rowIndex="4" />
+        <TextField fx:id="textField31" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+        <TextField fx:id="textField32" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+        <TextField fx:id="textField33" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+
+        <!-- Fifth Row -->
+        <TextField fx:id="textField60" GridPane.rowIndex="6" />
+        <TextField fx:id="textField41" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+        <TextField fx:id="textField42" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+        <TextField fx:id="textField43" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+
+        <!-- Sixth Row -->
+        <TextField fx:id="textField70" GridPane.rowIndex="7" />
+        <TextField fx:id="textField71" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+        <TextField fx:id="textField72" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+        <TextField fx:id="textField73" GridPane.columnIndex="3" GridPane.rowIndex="7" />
+      <Button fx:id="editMeal2" mnemonicParsing="false" onAction="#edit2" text="edit " GridPane.columnIndex="4" GridPane.rowIndex="2" />
+      <Button fx:id="editMeal3" mnemonicParsing="false" onAction="#edit3" text="edit" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+      <Button fx:id="editMeal4" mnemonicParsing="false" onAction="#edit4" text="edit" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+      <Button fx:id="editMeal7" mnemonicParsing="false" onAction="#edit7" text="edit" GridPane.columnIndex="4" GridPane.rowIndex="7" />
+      <Button fx:id="editMeal1" mnemonicParsing="false" onAction="#edit1" text="edit " GridPane.columnIndex="4" GridPane.rowIndex="1" />
+      <TextField fx:id="textField10" GridPane.rowIndex="1" />
+      <TextField fx:id="textField04" GridPane.columnIndex="4" />
+      <TextField fx:id="textField50" GridPane.rowIndex="5" />
+      <TextField fx:id="textField51" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+      <TextField fx:id="textField52" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+      <TextField fx:id="textField53" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+      <Button fx:id="editMeal5" mnemonicParsing="false" onAction="#edit5" text="edit" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+      <TextField fx:id="textField61" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+      <TextField fx:id="textField62" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+      <TextField fx:id="textField63" GridPane.columnIndex="3" GridPane.rowIndex="6" />
+      <Button fx:id="editMeal6" mnemonicParsing="false" onAction="#edit6" text="edit" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+      <columnConstraints>
+         <ColumnConstraints />
+         <ColumnConstraints />
+         <ColumnConstraints />
+         <ColumnConstraints />
+         <ColumnConstraints />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+      </rowConstraints>
+    </GridPane>
 </AnchorPane>
