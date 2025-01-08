@@ -56,6 +56,7 @@ public class SimpleServer extends AbstractServer {
 			}
 
 		}
+
 		else if (msgString.startsWith("Update price")) {
 			// Remove the "Update price" prefix
 			String details = msgString.substring("Update price".length()).trim();
@@ -70,10 +71,13 @@ public class SimpleServer extends AbstractServer {
 			try {
 				// Call the DataManager function to update the meal price
 				if(DataManager.updateMealPrice(mealName, mealPrice) != 1){
+					System.out.println("Update meal failed");
 					client.sendToClient(mealName + " price update has failed");
 				}
 				else {
 					client.sendToClient(mealName + " price has updated successfully");
+					System.out.println("price has updated successfully");
+
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -83,8 +87,17 @@ public class SimpleServer extends AbstractServer {
 					ioException.printStackTrace();
 				}
 			}
-		}
-		else{
+		} else if (msgString.startsWith("Remove client")) {
+			if(!SubscribersList.isEmpty()){
+				for (SubscribedClient subscribedClient : SubscribersList) {
+					if (subscribedClient.getClient().equals(client)) {
+						SubscribersList.remove(subscribedClient);
+						break;
+					}
+				}
+			}
+
+		} else{
 			System.out.println("The server didn't recognize this " + msgString + " signal");
 		}
 	}
