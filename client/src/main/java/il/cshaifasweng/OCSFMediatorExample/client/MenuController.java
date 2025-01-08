@@ -152,7 +152,10 @@ public class MenuController {
       Client client = Client.getClient();
       client.openConnection();
       client.sendToServer("add client");
-       client.sendToServer("Request menu");
+      System.out.println("111111111111111111111111111111111");
+      client.sendToServer("Request menu");
+      System.out.println("111111111111111111111111111111111");
+
 
        } catch (IOException e) {
         e.printStackTrace();
@@ -167,6 +170,8 @@ public class MenuController {
             try {
                 if (msg instanceof List) {
                     Menu = (List<Meal>) msg;
+                    System.out.println(Menu.get(1).getMealName());
+
 
                 }
             } catch (Exception e) {
