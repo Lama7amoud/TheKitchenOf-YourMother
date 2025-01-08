@@ -24,8 +24,6 @@ public class DataManager {
         Configuration configuration = new Configuration();
         // Override the password
         configuration.setProperty("hibernate.connection.password", password);
-
-        // Add ALL of your entities here. You can also try adding a whole package.
         configuration.addAnnotatedClass(Meal.class);
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         return configuration.buildSessionFactory(serviceRegistry);
@@ -35,13 +33,13 @@ public class DataManager {
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Meal> query = builder.createQuery(Meal.class);
         query.from(Meal.class);
+
         List<Meal> data = session.createQuery(query).getResultList();
         return data;
     }
 
+
     private static void generateData() throws Exception {
-        // Check if there are existing meals in the menu
-        List<Meal> menu = getMenu();
 
         // Create Italian meals
         Meal meal1 = new Meal("Margherita Pizza", "Classic pizza with fresh mozzarella and basil", "Vegetarian", 10.99);
@@ -66,23 +64,26 @@ public class DataManager {
     }
 
     static List<Meal> requestMenu(){
+        SessionFactory sessionFactory = getSessionFactory(password);
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+
         try {
-            List<Meal> menu = getMenu();
-            return menu;
+            return getMenu();
 
         } catch (Exception exception) {
             System.err.println("An error occured");
             exception.printStackTrace();
+            return null;
         } finally {
             if (session != null) {
                 session.close();
+                System.out.println("session closed");
             }
         }
-        return null;
     }
 
     static int updateMealPrice(String mealName, int mealPrice) {
-        Session session = null;
         try {
             // Start a session and transaction
             SessionFactory sessionFactory = getSessionFactory(password);
@@ -116,13 +117,13 @@ public class DataManager {
         }
     }
 
-
-
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter database password: ");
+        password = scanner.nextLine();
+        if(!requestMenu().isEmpty())
+            return;
         try {
-            Scanner scanner = new Scanner(System.in);
-            System.out.print("Enter database password: ");
-            password = scanner.nextLine();
 
             SessionFactory sessionFactory = getSessionFactory(password);
             session = sessionFactory.openSession();

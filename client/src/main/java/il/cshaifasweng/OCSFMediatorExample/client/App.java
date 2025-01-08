@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 /**
@@ -25,7 +26,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
     	//EventBus.getDefault().register(this);
-        //client = SimpleClient.getClient("0", 0);
+        //client = Client.getClient("0", 0);
         //client.openConnection();
         scene = new Scene(loadFXML("primary"), 640, 480);
         stage.setScene(scene);
@@ -51,7 +52,7 @@ public class App extends Application {
         stop = true;
 
         try {
-            Client clientInstance = Client.getClient("0", 0);
+            Client clientInstance = Client.getClient();
 
             if (clientInstance != null && clientInstance.isConnected()) {
                 clientInstance.sendToServer("remove client");

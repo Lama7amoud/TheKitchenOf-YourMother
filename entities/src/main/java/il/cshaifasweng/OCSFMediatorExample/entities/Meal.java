@@ -1,13 +1,17 @@
 package il.cshaifasweng.OCSFMediatorExample.entities;
 
 import javax.persistence.*;
-import java.util.List;
-import java.util.ArrayList;
+import java.io.Serial;
+import java.io.Serializable;
+
 
 @Entity
 @Table(name = "menu")
+public class Meal implements Serializable {
 
-public class Meal {
+    // Ensure a serialVersionUID is defined to handle versioning
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,7 +65,18 @@ public class Meal {
     }
 
     public void setMealPrice(double mealPrice) {
+
         this.mealPrice = mealPrice;
     }
 
+    @Override
+    public String toString() {
+        return "Meal{" +
+                "id=" + id +
+                ", mealName='" + mealName + '\'' +
+                ", mealDescription='" + mealDescription + '\'' +
+                ", mealPreferences='" + mealPreferences + '\'' +
+                ", mealPrice=" + mealPrice +
+                '}' + '\n';
+    }
 }

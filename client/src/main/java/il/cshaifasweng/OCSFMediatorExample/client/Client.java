@@ -3,15 +3,17 @@ package il.cshaifasweng.OCSFMediatorExample.client;
 import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
 import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
+import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
+import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
 
+import java.util.List;
 
 
 public class Client extends AbstractClient {
 
     private static Client client = null;
-    private String host;
-    private int port;
-    private String symbol;
+    public static String host;
+    public static int port;
 
     public Client(String host, int port) {
         super(host, port);
@@ -19,11 +21,8 @@ public class Client extends AbstractClient {
         this.port = port;
     }
 
-    public String getSymbol() {
-        return this.symbol;
-    }
 
-    public static Client getClient(String host, int port) {
+    public static Client getClient() {
         if (client == null) {
             client = new Client(host, port);
         }
@@ -32,23 +31,17 @@ public class Client extends AbstractClient {
 
     @Override
     protected void handleMessageFromServer(Object msg) {
+        System.out.println(msg);
         if (msg instanceof Warning) {
             // Handle warning message
             EventBus.getDefault().post(new WarningEvent((Warning) msg));
             return;
         }
-        if (msg instance of list<Meal>) {
-            EventBus.getDefault().post("Request menu");
+        else if (msg instanceof List) {
+            List<Meal> menu = (List<Meal>) msg;
+            System.out.println(msg.toString());
+            EventBus.getDefault().post(menu);
         }
-        //if () {
-            //EventBus.getDefault().post("Update price "meal name" "price"");
-      //  }
-       // if (msg.toString().equals()) {
-           // EventBus.getDefault().post();
-       // }
-        //if (msg.toString().equals()) {
-           // EventBus.getDefault().post();
-        //}
     }
 
 }

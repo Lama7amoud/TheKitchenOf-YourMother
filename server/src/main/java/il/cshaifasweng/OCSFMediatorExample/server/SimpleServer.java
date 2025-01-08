@@ -7,10 +7,8 @@ import il.cshaifasweng.OCSFMediatorExample.server.ocsf.ConnectionToClient;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
-import org.greenrobot.eventbus.EventBus;
 
 
 public class SimpleServer extends AbstractServer {
@@ -24,6 +22,7 @@ public class SimpleServer extends AbstractServer {
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		String msgString = msg.toString();
+		System.out.println(msgString);
 		if (msgString.startsWith("#warning")) {
 			Warning warning = new Warning("Warning from server!");
 			try {
@@ -45,17 +44,19 @@ public class SimpleServer extends AbstractServer {
 		else if (msgString.equals("Request menu")) {
 			try {
 				List<Meal> menu = DataManager.requestMenu();
-				if(menu != null) {
+				if(menu != null && !menu.isEmpty()) {
 					client.sendToClient(menu);
 				}
 				else{
+					System.out.println("empty menu");
 					client.sendToClient("No menu available");
 				}
 			} catch (Exception exception){
 				exception.printStackTrace();
 			}
 
-		} else if (msgString.startsWith("Update price")) {
+		}
+		else if (msgString.startsWith("Update price")) {
 			// Remove the "Update price" prefix
 			String details = msgString.substring("Update price".length()).trim();
 
@@ -84,7 +85,7 @@ public class SimpleServer extends AbstractServer {
 			}
 		}
 		else{
-			System.out.println("The server didn't recognize this signal");
+			System.out.println("The server didn't recognize this " + msgString + " signal");
 		}
 	}
 
