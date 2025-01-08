@@ -149,9 +149,9 @@ public class MenuController {
       EventBus.getDefault().register(this);
       Client.host = "127.0.0.1";
       Client.port = 3000;
-        Client client = Client.getClient();
-        client.openConnection();
-       client.sendToServer("add client");
+      Client client = Client.getClient();
+      client.openConnection();
+      client.sendToServer("add client");
        client.sendToServer("Request menu");
 
        } catch (IOException e) {
