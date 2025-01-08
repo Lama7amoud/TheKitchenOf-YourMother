@@ -4,6 +4,8 @@ import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
 import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
 
+
+
 public class Client extends AbstractClient {
 
     private static Client client = null;
@@ -35,11 +37,11 @@ public class Client extends AbstractClient {
             EventBus.getDefault().post(new WarningEvent((Warning) msg));
             return;
         }
-       // if (msg.toString().equals()) {
-           // EventBus.getDefault().post();
-       // }
-       // if (msg.toString().equals()) {
-            //EventBus.getDefault().post();
+        if (msg instance of list<Meal>) {
+            EventBus.getDefault().post("Request menu");
+        }
+        //if () {
+            //EventBus.getDefault().post("Update price "meal name" "price"");
       //  }
        // if (msg.toString().equals()) {
            // EventBus.getDefault().post();

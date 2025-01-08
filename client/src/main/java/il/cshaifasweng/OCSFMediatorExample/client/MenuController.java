@@ -3,11 +3,16 @@ package il.cshaifasweng.OCSFMediatorExample.client;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import javafx.application.Platform;
 
 import java.io.IOException;
+
+
 
 public class MenuController {
 
@@ -37,6 +42,9 @@ public class MenuController {
 
     @FXML
     private Button savebtn;
+
+    @FXML
+    private Label afterSaveMsg;
 
     @FXML
     private TextField textField00;
@@ -135,11 +143,8 @@ public class MenuController {
     private TextField textField73;
 
     @FXML
-    void initialize() {
-      // EventBus.getDefault().register(this);
-        //editMeal1.setDisable(true);
-
-
+     void initialize() {
+      //EventBus.getDefault().register(this);
 
     }
 
@@ -153,7 +158,9 @@ public class MenuController {
      editMeal7.setDisable(true);
      savebtn.setVisible(true);
      textField13.setEditable(true);
+     textField13.setStyle("-fx-background-color: #D3D3D3 ;");
      editMeal1.setDisable(true);
+
 
     }
 
@@ -167,6 +174,7 @@ public class MenuController {
         editMeal7.setDisable(true);
         savebtn.setVisible(true);
         textField23.setEditable(true);
+        textField23.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal2.setDisable(true);
     }
 
@@ -180,6 +188,7 @@ public class MenuController {
         editMeal7.setDisable(true);
         savebtn.setVisible(true);
         textField33.setEditable(true);
+        textField33.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal3.setDisable(true);
     }
 
@@ -193,6 +202,7 @@ public class MenuController {
         editMeal7.setDisable(true);
         savebtn.setVisible(true);
         textField43.setEditable(true);
+        textField43.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal4.setDisable(true);
     }
 
@@ -206,6 +216,7 @@ public class MenuController {
         editMeal7.setDisable(true);
         savebtn.setVisible(true);
         textField53.setEditable(true);
+        textField53.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal5.setDisable(true);
     }
 
@@ -219,6 +230,7 @@ public class MenuController {
         editMeal7.setDisable(true);
         savebtn.setVisible(true);
         textField63.setEditable(true);
+        textField63.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal6.setDisable(true);
     }
 
@@ -232,12 +244,20 @@ public class MenuController {
         editMeal6.setDisable(true);
         savebtn.setVisible(true);
         textField73.setEditable(true);
+        textField73.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal7.setDisable(true);
     }
 
     @FXML
     void saveFunc(ActionEvent event) {
-
+        editMeal1.setDisable(true);
+        editMeal2.setDisable(true);
+        editMeal3.setDisable(true);
+        editMeal4.setDisable(true);
+        editMeal5.setDisable(true);
+        editMeal6.setDisable(true);
+        editMeal7.setDisable(true);
+        afterSaveMsg.setVisible(true);
     }
 
 }

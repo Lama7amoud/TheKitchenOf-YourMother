@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane prefHeight="445.0" prefWidth="769.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MenuController">
+<AnchorPane prefHeight="448.0" prefWidth="804.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MenuController">
     <GridPane fx:id="menuGrid" gridLinesVisible="true" layoutX="50.0" layoutY="50.0" prefHeight="327.0" prefWidth="632.0">
         <!-- First Row -->
-        <TextField fx:id="textField00" editable="false" text="Meal Name" style="-fx-font-weight: bold;" />
-        <TextField fx:id="textField01" editable="false" text="Personal Prefrences" GridPane.columnIndex="1" style="-fx-font-weight: bold;" />
-        <TextField fx:id="textField02" editable="false" text="Ingredients" GridPane.columnIndex="2" style="-fx-font-weight: bold;"/>
-        <TextField fx:id="textField03" editable="false" text="Price" GridPane.columnIndex="3" style="-fx-font-weight: bold;"/>
+        <TextField fx:id="textField00" editable="false" style="-fx-font-weight: bold;" text="Meal Name" />
+        <TextField fx:id="textField01" editable="false" style="-fx-font-weight: bold;" text="Personal Prefrences" GridPane.columnIndex="1" />
+        <TextField fx:id="textField02" editable="false" style="-fx-font-weight: bold;" text="Ingredients" GridPane.columnIndex="2" />
+        <TextField fx:id="textField03" editable="false" style="-fx-font-weight: bold;" text="Price" GridPane.columnIndex="3" />
 
         <!-- Second Row -->
         <TextField fx:id="textField20" editable="false" prefHeight="48.0" prefWidth="159.0" GridPane.rowIndex="3" />
@@ -69,11 +70,12 @@
       </rowConstraints>
     </GridPane>
    <Button fx:id="savebtn" layoutX="597.0" layoutY="393.0" mnemonicParsing="false" onAction="#saveFunc" style="-fx-background-color: red;" text="save" visible="false" />
-   <Button fx:id="editMeal1" layoutX="694.0" layoutY="85.0" mnemonicParsing="false" onAction="#edit1" text="edit " />
-   <Button fx:id="editMeal2" layoutX="694.0" layoutY="129.0" mnemonicParsing="false" onAction="#edit2" text="edit " />
-   <Button fx:id="editMeal3" layoutX="694.0" layoutY="183.0" mnemonicParsing="false" onAction="#edit3" text="edit " />
-   <Button fx:id="editMeal4" layoutX="694.0" layoutY="223.0" mnemonicParsing="false" onAction="#edit4" text="edit " />
-   <Button fx:id="editMeal5" layoutX="694.0" layoutY="272.0" mnemonicParsing="false" onAction="#edit5" text="edit " />
-   <Button fx:id="editMeal6" layoutX="694.0" layoutY="310.0" mnemonicParsing="false" onAction="#edit6" text="edit " />
-   <Button fx:id="editMeal7" layoutX="694.0" layoutY="346.0" mnemonicParsing="false" onAction="#edit7" text="edit " />
+   <Button fx:id="editMeal1" layoutX="694.0" layoutY="85.0" mnemonicParsing="false" onAction="#edit1" text="edit price " />
+   <Button fx:id="editMeal2" layoutX="694.0" layoutY="129.0" mnemonicParsing="false" onAction="#edit2" text="edit price " />
+   <Button fx:id="editMeal4" layoutX="694.0" layoutY="223.0" mnemonicParsing="false" onAction="#edit4" text="edit price " />
+   <Button fx:id="editMeal5" layoutX="694.0" layoutY="272.0" mnemonicParsing="false" onAction="#edit5" text="edit price " />
+   <Button fx:id="editMeal6" layoutX="694.0" layoutY="310.0" mnemonicParsing="false" onAction="#edit6" text="edit price " />
+   <Button fx:id="editMeal7" layoutX="694.0" layoutY="346.0" mnemonicParsing="false" onAction="#edit7" text="edit price " />
+   <Label fx:id="afterSaveMsg" layoutX="410.0" layoutY="399.0" style="-fx-text-fill: red" text="Handled by the server..." visible="false" />
+   <Button fx:id="editMeal3" layoutX="694.0" layoutY="175.0" mnemonicParsing="false" onAction="#edit3" text="edit price " />
 </AnchorPane>
