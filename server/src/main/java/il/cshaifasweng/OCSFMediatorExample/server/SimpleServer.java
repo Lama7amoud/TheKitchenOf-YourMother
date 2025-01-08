@@ -48,7 +48,6 @@ public class SimpleServer extends AbstractServer {
 					client.sendToClient(menu);
 				}
 				else{
-					System.out.println("empty menu");
 					client.sendToClient("No menu available");
 				}
 			} catch (Exception exception){
@@ -57,6 +56,7 @@ public class SimpleServer extends AbstractServer {
 
 		}
 		else if (msgString.startsWith("Update price")) {
+			System.out.println("update price else if");
 			// Remove the "Update price" prefix
 			String details = msgString.substring("Update price".length()).trim();
 
@@ -68,6 +68,7 @@ public class SimpleServer extends AbstractServer {
 			int mealPrice = Integer.parseInt(parts[2].trim());
 
 			try {
+				System.out.println("entered try in server in update price");
 				// Call the DataManager function to update the meal price
 				if(DataManager.updateMealPrice(mealName, mealPrice) != 1){
 					client.sendToClient(mealName + " price update has failed");
@@ -81,6 +82,15 @@ public class SimpleServer extends AbstractServer {
 					client.sendToClient(mealName + " price update has failed");
 				} catch (IOException ioException) {
 					ioException.printStackTrace();
+				}
+			}
+		}else if(msgString.startsWith("remove client")){
+			if(!SubscribersList.isEmpty()){
+				for(SubscribedClient subscribedClient: SubscribersList){
+					if(subscribedClient.getClient().equals(client)){
+						SubscribersList.remove(subscribedClient);
+						break;
+					}
 				}
 			}
 		}

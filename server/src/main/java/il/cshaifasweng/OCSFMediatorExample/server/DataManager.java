@@ -85,11 +85,14 @@ public class DataManager {
 
     static int updateMealPrice(String mealName, int mealPrice) {
         try {
+            System.out.println("update method reached");
             // Start a session and transaction
             SessionFactory sessionFactory = getSessionFactory(password);
             session = sessionFactory.openSession();
             session.beginTransaction();
 
+            System.out.println("meal name in update function" + mealName);
+            System.out.println("meal price in update function" + mealPrice);
             // Build the query to update the meal price
             CriteriaBuilder builder = session.getCriteriaBuilder();
             CriteriaUpdate<Meal> updateQuery = builder.createCriteriaUpdate(Meal.class);
