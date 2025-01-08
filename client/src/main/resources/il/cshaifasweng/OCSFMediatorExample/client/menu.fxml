@@ -18,9 +18,9 @@
 
         <!-- Second Row -->
         <TextField fx:id="textField20" editable="false" prefHeight="48.0" prefWidth="159.0" GridPane.rowIndex="3" />
-        <TextField fx:id="textField11" editable="false" prefHeight="47.0" prefWidth="155.0" text="AAAA" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        <TextField fx:id="textField12" editable="false" prefHeight="47.0" prefWidth="162.0" text="AAAA" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-        <TextField fx:id="textField13" editable="false" prefHeight="47.0" prefWidth="147.0" text="AAAA" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+        <TextField fx:id="textField11" editable="false" prefHeight="47.0" prefWidth="155.0"  GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <TextField fx:id="textField12" editable="false" prefHeight="47.0" prefWidth="162.0"  GridPane.columnIndex="2" GridPane.rowIndex="1" />
+        <TextField fx:id="textField13" editable="false" prefHeight="47.0" prefWidth="147.0"  GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
         <!-- Third Row -->
         <TextField fx:id="textField30" editable="false" prefHeight="54.0" prefWidth="163.0" GridPane.rowIndex="4" />
@@ -39,7 +39,7 @@
         <TextField fx:id="textField41" editable="false" prefHeight="41.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
         <TextField fx:id="textField42" editable="false" prefHeight="44.0" prefWidth="165.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
         <TextField fx:id="textField43" editable="false" prefHeight="42.0" prefWidth="148.0" GridPane.columnIndex="3" GridPane.rowIndex="5" />
-      <TextField fx:id="textField10" editable="false" prefHeight="48.0" prefWidth="154.0" text="AAAA" GridPane.rowIndex="1" />
+      <TextField fx:id="textField10" editable="false" prefHeight="48.0" prefWidth="154.0"  GridPane.rowIndex="1" />
       <TextField fx:id="textField50" editable="false" prefHeight="41.0" prefWidth="162.0" GridPane.rowIndex="6" />
       <TextField fx:id="textField51" editable="false" prefHeight="38.0" prefWidth="155.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
       <TextField fx:id="textField52" editable="false" prefHeight="40.0" prefWidth="158.0" GridPane.columnIndex="2" GridPane.rowIndex="6" />

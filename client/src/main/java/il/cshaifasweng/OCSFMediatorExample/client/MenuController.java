@@ -152,7 +152,8 @@ public class MenuController {
       Client client = Client.getClient();
       client.openConnection();
       client.sendToServer("add client");
-       client.sendToServer("Request menu");
+      client.sendToServer("Request menu");
+
 
        } catch (IOException e) {
         e.printStackTrace();
@@ -167,7 +168,7 @@ public class MenuController {
             try {
                 if (msg instanceof List) {
                     Menu = (List<Meal>) msg;
-
+                    menuOrder(Menu);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -213,7 +214,8 @@ public class MenuController {
     }
 
     private String mealName ;
-    private String price ;
+    private int flag=0 ;
+    private String price;
 
 
     @FXML
@@ -229,7 +231,7 @@ public class MenuController {
      textField13.setStyle("-fx-background-color: #D3D3D3 ;");
      editMeal1.setDisable(true);
      mealName = textField10.getText();
-     price = textField13.getText();
+     flag = 1;
     }
 
     @FXML
@@ -245,7 +247,7 @@ public class MenuController {
         textField23.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal2.setDisable(true);
         mealName = textField20.getText();
-        price = textField23.getText();
+       // price = textField23.getText();
     }
 
     @FXML
@@ -261,7 +263,7 @@ public class MenuController {
         textField33.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal3.setDisable(true);
         mealName = textField30.getText();
-        price = textField33.getText();
+        //price = textField33.getText();
     }
 
     @FXML
@@ -277,7 +279,7 @@ public class MenuController {
         textField43.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal4.setDisable(true);
         mealName = textField40.getText();
-        price = textField43.getText();
+       // price = textField43.getText();
     }
 
     @FXML
@@ -293,7 +295,7 @@ public class MenuController {
         textField53.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal5.setDisable(true);
         mealName = textField50.getText();
-        price = textField53.getText();
+        //price = textField53.getText();
     }
 
     @FXML
@@ -309,7 +311,7 @@ public class MenuController {
         textField63.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal6.setDisable(true);
         mealName = textField60.getText();
-        price = textField63.getText();
+        //price = textField63.getText();
     }
 
     @FXML
@@ -325,7 +327,7 @@ public class MenuController {
         textField73.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal7.setDisable(true);
         mealName = textField70.getText();
-        price = textField73.getText();
+       // price = textField73.getText();
     }
 
     @FXML
@@ -338,19 +340,19 @@ public class MenuController {
         editMeal6.setDisable(true);
         editMeal7.setDisable(true);
         afterSaveMsg.setVisible(true);
+        if(flag == 1)
+        {
+            price=textField13.getText();
+        }
         try {
             Client.getClient().sendToServer("Update price " + mealName + " " + price);
+            Client.getClient().sendToServer("Request menu");
+            System.out.println(Menu.get(0).getMealPrice());
+            menuOrder(Menu);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
 
-        try{
-            Client.getClient().sendToServer("Request menu");
-        }
-        catch (Exception e) { e.printStackTrace();}
-
-        menuOrder(Menu);
-
-    }
+}
 }

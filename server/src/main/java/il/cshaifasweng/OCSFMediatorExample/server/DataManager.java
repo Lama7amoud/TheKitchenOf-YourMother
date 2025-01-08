@@ -100,6 +100,7 @@ public class DataManager {
             updateQuery.set("mealPrice", String.valueOf(mealPrice)) // Update the meal price
                     .where(builder.equal(root.get("mealName"), mealName)); // Find the meal by name
 
+
             // Execute the update
             int rowsUpdated = session.createQuery(updateQuery).executeUpdate();
 
