@@ -77,6 +77,18 @@ public class SimpleServer extends AbstractServer {
 				}
 				else {
 					client.sendToClient(mealName + " price has updated successfully");
+					try {
+						List<Meal> menu = DataManager.requestMenu();
+						if(menu != null && !menu.isEmpty()) {
+							sendToAllClients(menu); // update to all clients
+						}
+						else{
+							System.out.println("empty menu");
+							client.sendToClient("No menu available");
+						}
+					} catch (Exception exception){
+						exception.printStackTrace();
+					}
 					System.out.println("price has updated successfully");
 
 				}
@@ -103,7 +115,7 @@ public class SimpleServer extends AbstractServer {
 		}
 	}
 
-	public void sendToAllClients(String message) {
+	public void sendToAllClients(Object message) {
 		try {
 			for (SubscribedClient subscribedClient : SubscribersList) {
 				subscribedClient.getClient().sendToClient(message);

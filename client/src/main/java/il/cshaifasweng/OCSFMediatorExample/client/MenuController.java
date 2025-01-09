@@ -382,8 +382,6 @@ public class MenuController {
         }
         try {
             Client.getClient().sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
-            Client.getClient().sendToServer("Request menu");
-            menuOrder(Menu);
         }
         catch (Exception e) {
             e.printStackTrace();
