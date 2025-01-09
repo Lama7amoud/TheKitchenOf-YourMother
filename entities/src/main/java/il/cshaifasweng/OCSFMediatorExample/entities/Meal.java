@@ -4,7 +4,6 @@ import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 
-
 @Entity
 @Table(name = "menu")
 public class Meal implements Serializable {

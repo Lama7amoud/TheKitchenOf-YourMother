@@ -17,3 +17,4 @@
    <Button fx:id="menuButton" layoutX="309.0" layoutY="231.0" onAction="#showMenu" style="-fx-font-size: 16px; -fx-background-color: green; -fx-text-fill: white;" text="Browse Menu" />
 
 </AnchorPane>
+

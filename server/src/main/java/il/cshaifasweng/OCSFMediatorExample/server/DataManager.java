@@ -60,7 +60,6 @@ public class DataManager {
         session.save(meal7);
 
         session.flush();
-
     }
 
     static List<Meal> requestMenu(){

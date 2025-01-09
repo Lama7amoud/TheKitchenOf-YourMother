@@ -10,7 +10,6 @@ import java.util.List;
 import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
 
-
 public class SimpleServer extends AbstractServer {
 
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
