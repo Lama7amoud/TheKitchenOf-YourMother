@@ -2,9 +2,11 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
 import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
+import javafx.application.Platform;
 import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -30,14 +32,26 @@ public class Client extends AbstractClient {
 
     @Override
     protected void handleMessageFromServer(Object msg) {
-        if (msg instanceof Warning) {
+        if(msg instanceof String) {
+            System.out.println(msg);
+            if(msg.equals("client added successfully")){
+                Platform.runLater(() -> {
+                    try {
+                        App.setRoot("primary");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        } else if (msg instanceof Warning) {
             // Handle warning message
             EventBus.getDefault().post(new WarningEvent((Warning) msg));
             return;
-        }
-        if (msg instanceof List) {
-            List<Meal> Menu = (List<Meal>) msg;
-            EventBus.getDefault().post(Menu);
+        } else if (msg instanceof List) {
+            System.out.println("menu reached client");
+            List<Meal> menu = (List<Meal>) msg;
+            System.out.println(menu);
+            EventBus.getDefault().post(menu);
         }
 
     }

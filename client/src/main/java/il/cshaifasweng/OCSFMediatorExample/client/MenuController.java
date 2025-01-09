@@ -145,20 +145,9 @@ public class MenuController {
 
     @FXML
      void initialize() throws IOException {
-       try {
-      EventBus.getDefault().register(this);
-      Client.host = "127.0.0.1";
-      Client.port = 3000;
-      Client client = Client.getClient();
-      client.openConnection();
-      client.sendToServer("add client");
-      client.sendToServer("Request menu");
-
-
-       } catch (IOException e) {
-        e.printStackTrace();
-    }
-
+        EventBus.getDefault().register(this);
+        Client client = Client.getClient();
+        client.sendToServer("Request menu");
     }
    private List<Meal> Menu ;
 
@@ -345,7 +334,7 @@ public class MenuController {
             price=textField13.getText();
         }
         try {
-            Client.getClient().sendToServer("Update price " + mealName + " " + price);
+            Client.getClient().sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
             Client.getClient().sendToServer("Request menu");
             System.out.println(Menu.get(0).getMealPrice());
             menuOrder(Menu);
@@ -354,5 +343,5 @@ public class MenuController {
             e.printStackTrace();
         }
 
-}
+    }
 }

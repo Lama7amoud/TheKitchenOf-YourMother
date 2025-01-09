@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
@@ -12,10 +13,12 @@ public class PrimaryController {
 
 	@FXML
 	private void showMenu()throws IOException {
-		App.setRoot("menu");
+		Platform.runLater(() -> {
+            try {
+                App.setRoot("menu");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 		}
-
-
-
-
 }

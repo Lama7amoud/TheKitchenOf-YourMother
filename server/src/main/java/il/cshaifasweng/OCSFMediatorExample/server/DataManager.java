@@ -83,7 +83,7 @@ public class DataManager {
         }
     }
 
-    static int updateMealPrice(String mealName, int mealPrice) {
+    static int updateMealPrice(String mealName, double mealPrice) {
         try {
             System.out.println("update method reached");
             // Start a session and transaction
@@ -97,7 +97,7 @@ public class DataManager {
             CriteriaBuilder builder = session.getCriteriaBuilder();
             CriteriaUpdate<Meal> updateQuery = builder.createCriteriaUpdate(Meal.class);
             Root<Meal> root = updateQuery.from(Meal.class);
-            updateQuery.set("mealPrice", String.valueOf(mealPrice)) // Update the meal price
+            updateQuery.set("mealPrice", mealPrice) // Use mealPrice directly
                     .where(builder.equal(root.get("mealName"), mealName)); // Find the meal by name
 
 
@@ -125,6 +125,7 @@ public class DataManager {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter database password: ");
         password = scanner.nextLine();
+
         if(!requestMenu().isEmpty())
             return;
         try {

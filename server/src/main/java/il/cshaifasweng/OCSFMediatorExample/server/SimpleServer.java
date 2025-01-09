@@ -58,6 +58,7 @@ public class SimpleServer extends AbstractServer {
 		}
 
 		else if (msgString.startsWith("Update price")) {
+
 			// Remove the "Update price" prefix
 			String details = msgString.substring("Update price".length()).trim();
 
@@ -65,8 +66,9 @@ public class SimpleServer extends AbstractServer {
 			String[] parts = details.split("\"");
 
 			// Extract meal name (inside the first quotes) and meal price (inside the second quotes)
+			// Remember that parts[] now looks like this: ["","meal name","","meal price"]
 			String mealName = parts[1];
-			int mealPrice = Integer.parseInt(parts[2].trim());
+			double mealPrice = Double.parseDouble(parts[3].trim());
 
 			try {
 				// Call the DataManager function to update the meal price
@@ -87,7 +89,7 @@ public class SimpleServer extends AbstractServer {
 					ioException.printStackTrace();
 				}
 			}
-		} else if (msgString.startsWith("Remove client")) {
+		} else if (msgString.startsWith("remove client")) {
 			if(!SubscribersList.isEmpty()){
 				for (SubscribedClient subscribedClient : SubscribersList) {
 					if (subscribedClient.getClient().equals(client)) {

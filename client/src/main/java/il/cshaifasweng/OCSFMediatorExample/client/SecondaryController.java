@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -26,15 +27,21 @@ public class SecondaryController {
     private TextField port;
 
     @FXML
-    void connect(ActionEvent event) throws IOException {
-        Client client = Client.getClient();
-        try {
-            client.openConnection();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        App.setRoot("primary");
+    void connect(ActionEvent event) {
+        Platform.runLater(() -> {
+            try {
+                // Updating the instance variables
+                Client.port = Integer.parseInt(port.getText());
+                Client.host = ip.getText();
+                // Create client
+                Client currentClient = Client.getClient();
+                currentClient.openConnection();
+                Client.getClient().sendToServer("add client");
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        });
     }
-
 }
 
