@@ -48,9 +48,7 @@ public class Client extends AbstractClient {
             EventBus.getDefault().post(new WarningEvent((Warning) msg));
             return;
         } else if (msg instanceof List) {
-            System.out.println("menu reached client");
             List<Meal> menu = (List<Meal>) msg;
-            System.out.println(menu);
             EventBus.getDefault().post(menu);
         }
 

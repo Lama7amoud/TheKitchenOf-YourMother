@@ -41,11 +41,9 @@ public class MenuController {
     @FXML
     private GridPane menuGrid;
 
-    @FXML
-    private Button savebtn;
 
     @FXML
-    private Label afterSaveMsg;
+    private Button savebtn;
 
     @FXML
     private TextField textField00;
@@ -215,10 +213,10 @@ public class MenuController {
      editMeal5.setDisable(true);
      editMeal6.setDisable(true);
      editMeal7.setDisable(true);
-     savebtn.setVisible(true);
      textField13.setEditable(true);
      textField13.setStyle("-fx-background-color: #D3D3D3 ;");
      editMeal1.setDisable(true);
+     savebtn.setVisible(true);
      mealName = textField10.getText();
      flag = 1;
     }
@@ -236,7 +234,9 @@ public class MenuController {
         textField23.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal2.setDisable(true);
         mealName = textField20.getText();
-       // price = textField23.getText();
+        flag = 2;
+
+
     }
 
     @FXML
@@ -252,7 +252,8 @@ public class MenuController {
         textField33.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal3.setDisable(true);
         mealName = textField30.getText();
-        //price = textField33.getText();
+        flag = 3;
+
     }
 
     @FXML
@@ -268,7 +269,9 @@ public class MenuController {
         textField43.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal4.setDisable(true);
         mealName = textField40.getText();
-       // price = textField43.getText();
+        flag = 4;
+
+
     }
 
     @FXML
@@ -284,7 +287,9 @@ public class MenuController {
         textField53.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal5.setDisable(true);
         mealName = textField50.getText();
-        //price = textField53.getText();
+        flag = 5;
+
+
     }
 
     @FXML
@@ -294,13 +299,15 @@ public class MenuController {
         editMeal3.setDisable(true);
         editMeal4.setDisable(true);
         editMeal5.setDisable(true);
-        editMeal7.setDisable(true);
         savebtn.setVisible(true);
+        editMeal7.setDisable(true);
         textField63.setEditable(true);
         textField63.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal6.setDisable(true);
         mealName = textField60.getText();
-        //price = textField63.getText();
+        flag = 6;
+
+
     }
 
     @FXML
@@ -316,7 +323,7 @@ public class MenuController {
         textField73.setStyle("-fx-background-color: #D3D3D3 ;");
         editMeal7.setDisable(true);
         mealName = textField70.getText();
-       // price = textField73.getText();
+        flag = 7;
     }
 
     @FXML
@@ -328,20 +335,70 @@ public class MenuController {
         editMeal5.setDisable(true);
         editMeal6.setDisable(true);
         editMeal7.setDisable(true);
-        afterSaveMsg.setVisible(true);
         if(flag == 1)
         {
             price=textField13.getText();
+            textField13.setStyle("-fx-background-color:  white ;");
+        }
+        if(flag == 2)
+        {
+            price=textField23.getText();
+            textField23.setStyle("-fx-background-color:  white ;");
+
+        }
+        if(flag == 3)
+        {
+            price=textField33.getText();
+            textField33.setStyle("-fx-background-color:  white ;");
+
+        }
+        if(flag == 4)
+        {
+            price=textField43.getText();
+            textField43.setStyle("-fx-background-color:  white ;");
+
+        }
+        if(flag == 5)
+        {
+            price=textField53.getText();
+            textField53.setStyle("-fx-background-color:  white ;");
+
+        }
+        if(flag == 6)
+        {
+            price=textField63.getText();
+            textField63.setStyle("-fx-background-color:  white ;");
+
+        }
+        if(flag == 7)
+        {
+            price=textField73.getText();
+            textField73.setStyle("-fx-background-color:  white ;");
+
+        }
+        if(price.equals("") )
+        {
+            price="0";
         }
         try {
             Client.getClient().sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
             Client.getClient().sendToServer("Request menu");
-            System.out.println(Menu.get(0).getMealPrice());
             menuOrder(Menu);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
+        editMeal1.setDisable(false);
+        editMeal2.setDisable(false);
+        editMeal3.setDisable(false);
+        editMeal4.setDisable(false);
+        editMeal5.setDisable(false);
+        editMeal6.setDisable(false);
+        editMeal7.setDisable(false);
+        savebtn.setVisible(false);
+
+
+
 
     }
 }

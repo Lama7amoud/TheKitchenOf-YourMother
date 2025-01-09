@@ -15,9 +15,5 @@
    <Text layoutX="120" layoutY="121.0" style="-fx-font-size: 25px; -fx-fill: black; -fx-font-family: Gabriola;" text="Good food, warm hearts, and the love of mom in every bite." wrappingWidth="454.250732421875" />
 
    <Button fx:id="menuButton" layoutX="309.0" layoutY="231.0" onAction="#showMenu" style="-fx-font-size: 16px; -fx-background-color: green; -fx-text-fill: white;" text="Browse Menu" />
-   <ImageView fitHeight="200.0" fitWidth="200.0" layoutX="39.0" layoutY="249.0">
-      <image>
-         <Image url="@../../../../../../../../bg0.png" />
-      </image>
-   </ImageView>
+
 </AnchorPane>
