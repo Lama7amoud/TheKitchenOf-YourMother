@@ -1,5 +1,6 @@
 
 package il.cshaifasweng.OCSFMediatorExample.client;
+import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
 import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
 import javafx.application.Platform;
@@ -15,6 +16,7 @@ public class Client extends AbstractClient {
     private static Client client = null;
     public static String host;
     public static int port;
+    static AuthorizedUser userAtt;
 
     public Client(String host, int port) {
         super(host, port);
@@ -27,7 +29,22 @@ public class Client extends AbstractClient {
         if (client == null) {
             client = new Client(host, port);
         }
+        if (userAtt == null) {
+            userAtt = new AuthorizedUser();
+        }
         return client;
+    }
+
+    public static void resetClientAttributes(){
+        userAtt.resetAttributes();
+    }
+
+    public static String getClientUsername(){
+        if (userAtt.getUsername() != null)
+        {
+            return userAtt.getUsername();
+        }
+        return null;
     }
 
     @Override
@@ -37,7 +54,7 @@ public class Client extends AbstractClient {
             if(msg.equals("client added successfully")){
                 Platform.runLater(() -> {
                     try {
-                        App.setRoot("primary");
+                        App.setRoot("logIn");
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -50,6 +67,15 @@ public class Client extends AbstractClient {
         } else if (msg instanceof List) {
             List<Meal> menu = (List<Meal>) msg;
             EventBus.getDefault().post(menu);
+        }
+        else if (msg instanceof AuthorizedUser) {
+            userAtt.copyUser((AuthorizedUser) msg);
+            if(!(userAtt.getMessageToServer().equals("Login successful"))){
+                userAtt.setUsername("Costumer");
+            }
+            System.out.println("response: " + userAtt.getMessageToServer());
+            String response = "Authorized user request:" + userAtt.getMessageToServer();
+            EventBus.getDefault().post(response);
         }
 
     }

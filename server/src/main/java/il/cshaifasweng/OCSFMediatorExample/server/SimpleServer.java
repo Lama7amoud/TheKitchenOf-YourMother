@@ -1,14 +1,17 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
+import il.cshaifasweng.OCSFMediatorExample.client.Client;
+import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
+import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
+
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.ConnectionToClient;
+import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
-import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
 
 public class SimpleServer extends AbstractServer {
 
@@ -36,6 +39,14 @@ public class SimpleServer extends AbstractServer {
 			SubscribersList.add(connection);
 			try {
 				client.sendToClient("client added successfully");
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		else if(msgString.startsWith("logIn:")){
+			AuthorizedUser currentUser = DataManager.checkPermission(msgString);
+			try {
+				client.sendToClient(currentUser);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -101,6 +112,11 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 		} else if (msgString.startsWith("remove client")) {
+			int index = msgString.indexOf(";");
+			String username = msgString.substring(index + 1).trim();
+			if(!(username.equals("Costumer"))){
+				DataManager.disconnectUser(username);
+			}
 			if(!SubscribersList.isEmpty()){
 				for (SubscribedClient subscribedClient : SubscribersList) {
 					if (subscribedClient.getClient().equals(client)) {
@@ -110,7 +126,12 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 
-		} else{
+		}else if(msgString.startsWith("log out")){
+			int index = msgString.indexOf(";");
+			String username = msgString.substring(index + 1).trim();
+			DataManager.disconnectUser(username);
+		}
+		else {
 			System.out.println("The server didn't recognize this " + msgString + " signal");
 		}
 	}

@@ -25,9 +25,6 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-    	//EventBus.getDefault().register(this);
-        //client = Client.getClient("0", 0);
-        //client.openConnection();
         scene = new Scene(loadFXML("mainPage"), 790, 480);
         stage.setScene(scene);
 
@@ -55,7 +52,7 @@ public class App extends Application {
             Client clientInstance = Client.getClient();
 
             if (clientInstance != null && clientInstance.isConnected()) {
-                clientInstance.sendToServer("remove client");
+                clientInstance.sendToServer("remove client;" + Client.getClientUsername());
             }
             clientInstance.closeConnection();
                 super.stop();

@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -7,6 +8,7 @@ import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.util.Scanner;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
+import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -25,6 +27,7 @@ public class DataManager {
         // Override the password
         configuration.setProperty("hibernate.connection.password", password);
         configuration.addAnnotatedClass(Meal.class);
+        configuration.addAnnotatedClass(AuthorizedUser.class);
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         return configuration.buildSessionFactory(serviceRegistry);
     }
@@ -81,6 +84,120 @@ public class DataManager {
             }
         }
     }
+
+    static AuthorizedUser checkPermission(String details) {
+        try {
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            int spaceIndex = details.indexOf(" ");
+            details = details.substring(spaceIndex + 1);
+
+            String[] parts = details.split(";");
+            System.out.println(Arrays.toString(parts));
+            if (parts.length < 2) {
+                AuthorizedUser errorUser = new AuthorizedUser();
+                errorUser.setMessageToServer("Invalid input format. Expected 'username;password'");
+                return errorUser;
+            }
+
+            String username = parts[0].trim();
+            String password = parts[1].trim();
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<AuthorizedUser> query = builder.createQuery(AuthorizedUser.class);
+            Root<AuthorizedUser> root = query.from(AuthorizedUser.class);
+
+            // Search for user by username
+            query.select(root).where(builder.equal(root.get("username"), username));
+            AuthorizedUser user = session.createQuery(query).uniqueResult();
+
+            if (user == null) {
+                AuthorizedUser errorUser = new AuthorizedUser();
+                errorUser.setMessageToServer("User does not exist");
+                return errorUser;
+            }
+
+            // Verify password
+            if (!user.getPassword().equals(password)) {
+                AuthorizedUser errorUser = new AuthorizedUser();
+                errorUser.setMessageToServer("Incorrect password");
+                return errorUser;
+            }
+
+            // Check if the user is already connected
+            if (user.isConnected()) {
+                AuthorizedUser errorUser = new AuthorizedUser();
+                errorUser.setMessageToServer("You are already connected with this user on another device. Multiple connections are not allowed.");
+                return errorUser;
+            }
+
+            user.setConnected(true);
+            session.update(user);
+            session.getTransaction().commit();
+
+            AuthorizedUser currentUser = new AuthorizedUser();
+            currentUser.copyUser(user);
+            currentUser.setMessageToServer("Login successful");
+
+            return currentUser;
+
+        } catch (Exception exception) {
+            System.err.println("An error occurred");
+            exception.printStackTrace();
+            AuthorizedUser errorUser = new AuthorizedUser();
+            errorUser.setMessageToServer("An error occurred while checking permissions");
+            return errorUser;
+        } finally {
+            if (session != null) {
+                session.close();
+                System.out.println("Session closed");
+            }
+        }
+    }
+
+    static void disconnectUser(String username) {
+        try {
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<AuthorizedUser> query = builder.createQuery(AuthorizedUser.class);
+            Root<AuthorizedUser> root = query.from(AuthorizedUser.class);
+
+            // Search for user by username
+            query.select(root).where(builder.equal(root.get("username"), username));
+
+            // Get the user object from the query result
+            AuthorizedUser user = session.createQuery(query).uniqueResult();
+
+            if (user != null) {
+                // Set isConnected to false
+                user.setConnected(false);
+                // Update the user in the database
+                session.update(user);
+                session.getTransaction().commit();
+                System.out.println("The user " + username + " disconnected successfully.");
+            } else {
+                System.out.println("The user " + username + " not found. May it's a costumer");
+            }
+        } catch (Exception exception) {
+            System.err.println("An error occurred");
+            exception.printStackTrace();
+            if (session != null && session.isOpen()) {
+                session.getTransaction().rollback();  // Rollback transaction on error
+            }
+        } finally {
+            if (session != null) {
+                session.close();
+                System.out.println("Session closed");
+            }
+        }
+    }
+
+
 
     static int updateMealPrice(String mealName, double mealPrice) {
         try {
