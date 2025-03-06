@@ -78,17 +78,10 @@ public class logInController {
                 } else {
                     connectingMessageLabel.setStyle("-fx-text-fill: green;");  // Set text color to green for success
                     connectingMessageLabel.setText(response);  // Set the text
-                    try {
-                        App.setRoot("primary");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    finally {
-                        connectButton.setDisable(false);
-                        customerButton.setDisable(false);
-                    }
+                    App.switchScreen("Primary Page");
                 }
-
+                connectButton.setDisable(false);
+                customerButton.setDisable(false);
             });
         }
     }

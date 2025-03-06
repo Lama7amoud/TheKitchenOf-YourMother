@@ -10,7 +10,6 @@ import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
 import java.io.IOException;
 import java.util.List;
 
-
 public class Client extends AbstractClient {
 
     private static Client client = null;
@@ -39,6 +38,14 @@ public class Client extends AbstractClient {
         userAtt.resetAttributes();
     }
 
+    public static AuthorizedUser getClientAttributes(){
+        if (userAtt != null)
+        {
+            return userAtt;
+        }
+        return null;
+    }
+
     public static String getClientUsername(){
         if (userAtt.getUsername() != null)
         {
@@ -52,13 +59,7 @@ public class Client extends AbstractClient {
         if(msg instanceof String) {
             System.out.println(msg);
             if(msg.equals("client added successfully")){
-                Platform.runLater(() -> {
-                    try {
-                        App.setRoot("logIn");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                App.switchScreen("Log In Page");
             }
         } else if (msg instanceof Warning) {
             // Handle warning message

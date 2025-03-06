@@ -7,15 +7,16 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
+
+import java.io.File;
 import java.io.IOException;
 
 import static il.cshaifasweng.OCSFMediatorExample.client.Client.*;
 
 public class PrimaryController {
 
+    int numOfImages = 3;
 
     @FXML
     private ComboBox<String> ChooseRestaurantBox;
@@ -29,9 +30,9 @@ public class PrimaryController {
     @FXML
     private Button menuButton;
 
-	@FXML
-	private void showMenu(ActionEvent event){
-		Platform.runLater(() -> {
+    @FXML
+    private void showMenu(ActionEvent event) {
+        Platform.runLater(() -> {
             try {
                 App.setRoot("menu");
             } catch (IOException e) {
@@ -41,7 +42,7 @@ public class PrimaryController {
     }
 
     @FXML
-    private void toPersonalArea(ActionEvent event){
+    private void toPersonalArea(ActionEvent event) {
         Platform.runLater(() -> {
             try {
                 App.setRoot("personalAreaPage");
@@ -52,11 +53,16 @@ public class PrimaryController {
     }
 
     @FXML
-    private void logOut(ActionEvent event){
+    private void logOut(ActionEvent event) {
         Platform.runLater(() -> {
             try {
                 Client client = Client.getClient();
-                client.sendToServer("log out;" + getClientUsername());
+                String username = getClientUsername();
+
+                if (username != null && !username.equals("Customer")) {
+                    client.sendToServer("log out;" + getClientUsername());
+                }
+
                 resetClientAttributes();
                 App.setRoot("logIn");
                 App.setRoot("logIn");
@@ -67,8 +73,18 @@ public class PrimaryController {
     }
 
     @FXML
-    void initialize(){
+    void initialize() {
         Platform.runLater(() -> {
+            try {
+                images = new Image[numOfImages];
+                for (int i = 0; i < numOfImages; i++) {
+                    File file = new File("C:\\Users\\User\\IdeaProjects\\JFXApps\\src\\main\\resources\\images\\" + i + ".jpg");
+                    images[i] = new Image(file.toURI().toString());
+                }
+                imageView.setImage(images[j]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             ObservableList<String> restaurantList = FXCollections.observableArrayList(
                     "Haifa Branch", "Tel-Aviv Branch", "Nahariya Branch"
             );
@@ -76,12 +92,13 @@ public class PrimaryController {
             ChooseRestaurantBox.setItems(restaurantList);
             ChooseRestaurantBox.setStyle("-fx-text-fill: white;");
 
-            if(userAtt.getPermissionLevel() == 0){
-                logOutButton.setVisible(false);
-                PersonalAreaButton.setVisible(false);
-            }
-            else {
+            if (userAtt.getPermissionLevel() == 0) {
                 logOutButton.setVisible(true);
+                logOutButton.setText("Back");
+                PersonalAreaButton.setVisible(false);
+            } else {
+                logOutButton.setVisible(true);
+                logOutButton.setText("Log Out");
                 PersonalAreaButton.setVisible(true);
             }
         });
