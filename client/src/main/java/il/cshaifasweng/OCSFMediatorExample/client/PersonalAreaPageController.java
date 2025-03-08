@@ -28,7 +28,7 @@ public class PersonalAreaPageController {
     private Label firstnameLabel;
 
     @FXML
-    private Label genderLabel;
+    private Label IDNumLabel;
 
     @FXML
     private ImageView imageView;
@@ -43,7 +43,7 @@ public class PersonalAreaPageController {
     private Button leftImageButton;
 
     @FXML
-    private Button managerPageButton;
+    private Button advancedPageButton;
 
     @FXML
     private Label passwordLabel;
@@ -99,8 +99,8 @@ public class PersonalAreaPageController {
             String page = "";
 
             // Check which button triggered the event
-            if (event.getSource() == managerPageButton) {
-                page = "Manager Page";
+            if (event.getSource() == advancedPageButton) {
+                page = "Management Page";
             } else if (event.getSource() == backButton) {
                 page = "Main Page";
             }
@@ -145,11 +145,11 @@ public class PersonalAreaPageController {
                 e.printStackTrace();
             }
 
-            if(user != null && user.getPermissionLevel() < 3){
-                managerPageButton.setVisible(false);
+            if(user != null && user.getPermissionLevel() == 1 ){
+                advancedPageButton.setVisible(false);
             }
             else {
-                managerPageButton.setVisible(true);
+                advancedPageButton.setVisible(true);
             }
 
             welcomeLabel.setText("Hello " + user.getFirstname());
@@ -157,16 +157,27 @@ public class PersonalAreaPageController {
             passwordLabel.setText("Password: " + user.getPassword());
             firstnameLabel.setText("Firstname: " + user.getFirstname());
             lastnameLabel.setText("Lastname: " + user.getLastname());
-            genderLabel.setText("Gender: " + user.getGender());
+            IDNumLabel.setText("IDNum: " + user.getIDNum());
             ageLabel.setText("Age: " + user.getAge());
             restaurantIDLabel.setText("Restaurant ID: " + user.getRestaurantId());
-            jobPositionLabel.setText("Job Position: " + switch (user.getPermissionLevel()) {
+            short userPermissionLevel = user.getPermissionLevel();
+            jobPositionLabel.setText("Job Position: " + switch (userPermissionLevel) {
                 case 1 -> "Employee";
                 case 2 -> "Service";
                 case 3 -> "Branch Manager";
                 case 4 -> "Restaurant Manager";
+                case 5 -> "Dietitian";
                 default -> "Unknown";
             });
+            if(userPermissionLevel == 2){
+                advancedPageButton.setText("Customer Service Page");
+            }
+            else if(userPermissionLevel == 3 || userPermissionLevel == 4){
+                advancedPageButton.setText("Manager Page");
+            }
+            else if(userPermissionLevel == 5){
+                advancedPageButton.setText("Dietitian Page");
+            }
         });
     }
 }

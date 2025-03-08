@@ -49,7 +49,10 @@ public class App extends Application {
                 "Log In Page", "logIn",
                 "Menu Page", "menu",
                 "Personal Area Page", "personalAreaPage",
-                "Manager Page", "managerPage"
+                "Management Page", "managerPage",
+                "Feedback Page", "feedbackPage",
+                "Order Tables Page", "orderTablesPage",
+                "Branch Page" , "branchPage"
         );
 
         String contentName = screenMappings.get(screenName);

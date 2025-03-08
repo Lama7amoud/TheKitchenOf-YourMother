@@ -19,7 +19,7 @@ public class AuthorizedUser implements Serializable {
     private String password;
     private String firstname;
     private String lastname;
-    private String gender;
+    private String IDNum;
     private short age;
     private short restaurantId;
     private boolean isConnected;
@@ -74,12 +74,12 @@ public class AuthorizedUser implements Serializable {
         this.lastname = lastname;
     }
 
-    public String getGender() {
-        return gender;
+    public String getIDNum() {
+        return IDNum;
     }
 
-    public void setGender(String gender) {
-        this.gender = gender;
+    public void setIDNum(String IDNum) {
+        this.IDNum = IDNum;
     }
 
     public short getAge() {
@@ -130,7 +130,7 @@ public class AuthorizedUser implements Serializable {
         this.setPassword(user.getPassword());
         this.setFirstname(user.getFirstname());
         this.setLastname(user.getLastname());
-        this.setGender(user.getGender());
+        this.setIDNum(user.getIDNum());
         this.setAge(user.getAge());
         this.setRestaurantId(user.getRestaurantId());
         this.setConnected(user.isConnected());
@@ -145,7 +145,7 @@ public class AuthorizedUser implements Serializable {
         this.setPassword(null);
         this.setFirstname(null);
         this.setLastname(null);
-        this.setGender(null);
+        this.setIDNum(null);
         this.setAge((short) 0);
         this.setRestaurantId((short) 0);
         this.setConnected(false);

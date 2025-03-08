@@ -25,10 +25,14 @@
             <Label fx:id="restaurantIDLabel" layoutX="13.0" layoutY="281.0" prefHeight="18.0" prefWidth="215.0" style="-fx-font-style: italic;" text="RestaurantID:" textFill="ORANGE" />
             <Label fx:id="jobPositionLabel" layoutX="13.0" layoutY="308.0" prefHeight="18.0" prefWidth="215.0" style="-fx-font-style: italic;" text="Job Position:" textFill="ORANGE" />
             <Label fx:id="passwordLabel" layoutX="13.0" layoutY="150.0" prefHeight="18.0" prefWidth="215.0" style="-fx-font-style: italic;" text="Password: " textFill="ORANGE" />
-            <Label fx:id="genderLabel" layoutX="13.0" layoutY="226.0" prefHeight="18.0" prefWidth="215.0" style="-fx-font-style: italic;" text="Gender:" textFill="ORANGE" />
-            <Label fx:id="ageLabel" layoutX="13.0" layoutY="254.0" prefHeight="18.0" prefWidth="215.0" style="-fx-font-style: italic;" text="Age:" textFill="ORANGE" />
-            <Button fx:id="backButton" layoutX="13.0" layoutY="361.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold;" text="Back" textFill="WHITE" />
-            <Button fx:id="managerPageButton" layoutX="83.0" layoutY="361.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: #9493b5; -fx-font-style: italic; -fx-font-weight: bold;" text="Go to Manager Page" textFill="WHITE" />
+            <Label fx:id="IDNumLabel" layoutX="12.0" layoutY="255.0" prefHeight="18.0" prefWidth="215.0" style="-fx-font-style: italic;" text="IDNum:" textFill="ORANGE" />
+            <Label fx:id="ageLabel" layoutX="13.0" layoutY="228.0" prefHeight="18.0" prefWidth="215.0" style="-fx-font-style: italic;" text="Age:" textFill="ORANGE" />
+            <Button fx:id="backButton" layoutX="13.0" layoutY="361.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold;" text="Back" textFill="WHITE" AnchorPane.leftAnchor="12.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </Button>
+            <Button fx:id="advancedPageButton" layoutX="109.0" layoutY="361.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: #9493b5; -fx-font-style: italic; -fx-font-weight: bold;" text="Advanced Page" textFill="WHITE" AnchorPane.rightAnchor="12.0" />
          </children>
       </AnchorPane>
    </left>

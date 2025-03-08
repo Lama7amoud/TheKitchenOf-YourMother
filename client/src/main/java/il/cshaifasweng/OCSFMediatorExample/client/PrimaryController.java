@@ -31,6 +31,9 @@ public class PrimaryController {
     private Button PersonalAreaButton;
 
     @FXML
+    private Button feedbackButton;
+
+    @FXML
     private ImageView imageView;
 
     @FXML
@@ -38,6 +41,12 @@ public class PrimaryController {
 
     @FXML
     private Button menuButton;
+
+    @FXML
+    private Button orderTablesButton;
+
+    @FXML
+    private Text RestaurantDetailsInstructionLabel;
 
     @FXML
     void switchPage(ActionEvent event) {
@@ -49,6 +58,15 @@ public class PrimaryController {
                 page = "Menu Page";
             } else if (event.getSource() == PersonalAreaButton) {
                 page = "Personal Area Page";
+            }
+            else if(event.getSource() == feedbackButton){
+                page = "Feedback Page";
+            }
+            else if(event.getSource() == orderTablesButton){
+                page = "Order Tables Page";
+            }
+            else if(event.getSource() == imageView){
+                page = "Branch Page";
             }
 
             App.switchScreen(page);
@@ -80,7 +98,10 @@ public class PrimaryController {
         String selectedRestaurant = ChooseRestaurantBox.getValue();
 
         if (selectedRestaurant != null) {
-            ComboChoiceRequestLabel.setVisible(false);
+            ComboChoiceRequestLabel.setVisible(false); // making the label that tells the user to choose a restaurant to invisible
+            RestaurantDetailsInstructionLabel.setVisible(true);
+            imageView.setVisible(true);
+
             switch (selectedRestaurant) {
                 case "Haifa Branch":
                     imageView.setImage(images[0]);
@@ -99,6 +120,8 @@ public class PrimaryController {
     @FXML
     void initialize() {
         Platform.runLater(() -> {
+            RestaurantDetailsInstructionLabel.setVisible(false);
+            imageView.setVisible(false);
             try {
                 images = new Image[numOfImages];
 
