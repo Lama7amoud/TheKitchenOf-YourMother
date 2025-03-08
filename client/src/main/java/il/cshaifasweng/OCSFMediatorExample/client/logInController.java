@@ -52,16 +52,10 @@ public class logInController {
             customerButton.setDisable(true);
             connectButton.setDisable(true);
 
-            try {
-                App.setRoot("Primary");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            App.switchScreen("Main Page");
+            connectButton.setDisable(false);
+            customerButton.setDisable(false);
 
-            finally {
-                connectButton.setDisable(false);
-                customerButton.setDisable(false);
-            }
         });
     }
 
@@ -78,7 +72,7 @@ public class logInController {
                 } else {
                     connectingMessageLabel.setStyle("-fx-text-fill: green;");  // Set text color to green for success
                     connectingMessageLabel.setText(response);  // Set the text
-                    App.switchScreen("Primary Page");
+                    App.switchScreen("Main Page");
                 }
                 connectButton.setDisable(false);
                 customerButton.setDisable(false);

@@ -29,7 +29,7 @@ public class Client extends AbstractClient {
             client = new Client(host, port);
         }
         if (userAtt == null) {
-            userAtt = new AuthorizedUser();
+            userAtt = getClientAttributes();
         }
         return client;
     }
@@ -39,11 +39,11 @@ public class Client extends AbstractClient {
     }
 
     public static AuthorizedUser getClientAttributes(){
-        if (userAtt != null)
+        if (userAtt == null)
         {
-            return userAtt;
+            return userAtt = new AuthorizedUser();
         }
-        return null;
+        return userAtt;
     }
 
     public static String getClientUsername(){

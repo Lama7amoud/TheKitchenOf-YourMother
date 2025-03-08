@@ -10,6 +10,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -42,18 +43,25 @@ public class App extends Application {
         appStage.show();
     }
 
-    public static void switchScreen (String screenName){
-        switch (screenName){
-            case "clock":
-                Platform.runLater(() -> {
-                    setWindowTitle("My Clock");
-                    try {
-                        setContent("/Clock");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-                break;
+    public static void switchScreen(String screenName) {
+        Map<String, String> screenMappings = Map.of(
+                "Main Page", "primary",
+                "Log In Page", "logIn",
+                "Menu Page", "menu",
+                "Personal Area Page", "personalAreaPage",
+                "Manager Page", "managerPage"
+        );
+
+        String contentName = screenMappings.get(screenName);
+        if (contentName != null) {
+            Platform.runLater(() -> {
+                setWindowTitle(screenName);
+                try {
+                    setContent(contentName);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         }
     }
 

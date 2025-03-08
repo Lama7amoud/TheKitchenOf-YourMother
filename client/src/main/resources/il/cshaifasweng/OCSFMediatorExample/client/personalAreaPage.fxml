@@ -13,7 +13,7 @@
    <left>
       <AnchorPane prefHeight="200.0" prefWidth="235.0" style="-fx-background-color: #FDF8E2;" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="welcomeLabel" alignment="CENTER" layoutX="4.0" layoutY="33.0" prefHeight="30.0" prefWidth="226.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Welcome" textFill="ORANGE">
+            <Label fx:id="welcomeLabel" alignment="CENTER" layoutX="4.0" layoutY="33.0" prefHeight="30.0" prefWidth="226.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Hello..." textFill="ORANGE">
                <font>
                   <Font size="22.0" />
                </font>
@@ -27,24 +27,34 @@
             <Label fx:id="passwordLabel" layoutX="13.0" layoutY="150.0" prefHeight="18.0" prefWidth="215.0" style="-fx-font-style: italic;" text="Password: " textFill="ORANGE" />
             <Label fx:id="genderLabel" layoutX="13.0" layoutY="226.0" prefHeight="18.0" prefWidth="215.0" style="-fx-font-style: italic;" text="Gender:" textFill="ORANGE" />
             <Label fx:id="ageLabel" layoutX="13.0" layoutY="254.0" prefHeight="18.0" prefWidth="215.0" style="-fx-font-style: italic;" text="Age:" textFill="ORANGE" />
-            <Button fx:id="backButton" layoutX="13.0" layoutY="361.0" mnemonicParsing="false" onAction="#backToMainPage" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold;" text="Back" textFill="WHITE" />
-            <Button fx:id="managerPageButton" layoutX="83.0" layoutY="361.0" mnemonicParsing="false" style="-fx-background-color: #9493b5; -fx-font-style: italic; -fx-font-weight: bold;" text="Go to Manager Page" textFill="WHITE" />
+            <Button fx:id="backButton" layoutX="13.0" layoutY="361.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold;" text="Back" textFill="WHITE" />
+            <Button fx:id="managerPageButton" layoutX="83.0" layoutY="361.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: #9493b5; -fx-font-style: italic; -fx-font-weight: bold;" text="Go to Manager Page" textFill="WHITE" />
          </children>
       </AnchorPane>
    </left>
    <right>
       <AnchorPane prefHeight="400.0" prefWidth="368.0" BorderPane.alignment="CENTER">
          <children>
-            <Label alignment="CENTER" layoutX="64.0" layoutY="35.0" prefHeight="32.0" prefWidth="235.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Personal Area Page" textAlignment="CENTER" textFill="ORANGE">
+            <Label alignment="CENTER" layoutX="35.0" layoutY="28.0" prefHeight="46.0" prefWidth="296.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Personal Area Page" textAlignment="CENTER" textFill="ORANGE">
                <font>
-                  <Font size="22.0" />
+                  <Font size="30.0" />
                </font>
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
             </Label>
-            <ImageView fitHeight="198.0" fitWidth="269.0" layoutX="47.0" layoutY="172.0" pickOnBounds="true" preserveRatio="true" />
-            <Label layoutX="16.0" layoutY="128.0" prefHeight="18.0" prefWidth="127.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Your restaurant Map:" textFill="ORANGE" />
+            <ImageView fx:id="imageView" fitHeight="198.0" fitWidth="269.0" layoutX="48.0" layoutY="170.0" pickOnBounds="true" />
+            <Label fx:id="restaurantMapTitle" layoutX="16.0" layoutY="128.0" prefHeight="18.0" prefWidth="270.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Your restaurant Map:" textFill="ORANGE" />
+            <Button fx:id="leftImageButton" layoutX="14.0" layoutY="253.0" mnemonicParsing="false" onAction="#ToLeftImage" style="-fx-background-color: transparent;" text="&lt;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Button>
+            <Button fx:id="rightImageButton" layoutX="317.0" layoutY="253.0" mnemonicParsing="false" onAction="#ToRightImage" style="-fx-background-color: transparent;" text="&gt;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Button>
          </children>
       </AnchorPane>
    </right>
