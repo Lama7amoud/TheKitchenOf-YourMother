@@ -56,7 +56,7 @@
    <Circle fill="ORANGE" layoutX="52.0" layoutY="250.0" radius="4.0" stroke="BLACK" strokeType="INSIDE" />
    <Line endX="90.0" endY="-1.52587890625E-5" layoutX="122.0" layoutY="243.0" startX="-48.78680419921875" startY="-1.52587890625E-5" stroke="WHITE" />
    <ComboBox fx:id="ChooseRestaurantBox" layoutX="335.0" layoutY="153.0" onAction="#comboBoxChoice" prefHeight="26.0" prefWidth="235.0" promptText="Choose Restaurant" style="-fx-background-color: #ffa500; -fx-text-fill: white; -fx-font-style: italic;" />
-   <ImageView fx:id="imageView" fitHeight="200.0" fitWidth="250.0" layoutX="328.0" layoutY="195.0" onMouseClicked="#switchPage" pickOnBounds="true" />
+   <ImageView fx:id="imageView" fitHeight="200.0" fitWidth="250.0" layoutX="328.0" layoutY="195.0" onMouseClicked="#toBranchPage" pickOnBounds="true" />
    <Text fx:id="ComboChoiceRequestLabel" fill="ORANGE" layoutX="257.0" layoutY="316.0" style="-fx-font-style: italic;" text="Please choose a restaurant to see it's map" textAlignment="CENTER" wrappingWidth="391.8937988281252">
       <font>
          <Font size="15.0" />
@@ -72,7 +72,7 @@
          <Font size="15.0" />
       </font>
    </Button>
-   <Text fx:id="RestaurantDetailsInstructionLabel" fill="GREEN" layoutX="264.0" layoutY="415.0" style="-fx-font-style: italic;" text="Tap the image to see the restaurant's details" textAlignment="CENTER" wrappingWidth="391.8937988281252">
+   <Text fx:id="RestaurantDetailsInstructionLabel" fill="RED" layoutX="264.0" layoutY="415.0" style="-fx-font-style: italic;" text="Tap the image to see the restaurant's details" textAlignment="CENTER" wrappingWidth="391.8937988281252">
       <font>
          <Font size="15.0" />
       </font>

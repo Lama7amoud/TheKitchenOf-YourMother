@@ -9,9 +9,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 
-import java.io.File;
 import java.io.IOException;
 
 import static il.cshaifasweng.OCSFMediatorExample.client.Client.*;
@@ -65,12 +65,14 @@ public class PrimaryController {
             else if(event.getSource() == orderTablesButton){
                 page = "Order Tables Page";
             }
-            else if(event.getSource() == imageView){
-                page = "Branch Page";
-            }
 
             App.switchScreen(page);
         });
+    }
+
+    @FXML
+    void toBranchPage(MouseEvent event){
+        App.switchScreen("Branch Page");
     }
 
     @FXML
