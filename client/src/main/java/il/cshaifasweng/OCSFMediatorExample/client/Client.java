@@ -72,7 +72,7 @@ public class Client extends AbstractClient {
         else if (msg instanceof AuthorizedUser) {
             userAtt.copyUser((AuthorizedUser) msg);
             if(!(userAtt.getMessageToServer().equals("Login successful"))){
-                userAtt.setUsername("Costumer");
+                userAtt.setUsername("Customer");
             }
             System.out.println("response: " + userAtt.getMessageToServer());
             String response = "Authorized user request:" + userAtt.getMessageToServer();

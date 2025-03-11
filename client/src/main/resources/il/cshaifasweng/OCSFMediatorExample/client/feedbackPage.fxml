@@ -1,8 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
 
-
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.FeedbackController">
-
-</AnchorPane>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.FeedbackController">
+   <left>
+      <AnchorPane prefHeight="200.0" prefWidth="235.0" style="-fx-background-color: #FDF8E2;" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" layoutX="14.0" layoutY="41.0" prefHeight="18.0" prefWidth="206.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Help Us Improve" textFill="ORANGE">
+               <font>
+                  <Font size="15.0" />
+               </font></Label>
+            <Label layoutX="41.0" layoutY="69.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Share Your Thoughts!" textFill="ORANGE">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Button layoutX="91.0" layoutY="131.0" mnemonicParsing="false" text="Button" />
+            <Button layoutX="91.0" layoutY="207.0" mnemonicParsing="false" text="Button" />
+            <Button layoutX="91.0" layoutY="283.0" mnemonicParsing="false" text="Button" />
+         </children>
+      </AnchorPane>
+   </left>
+   <right>
+      <AnchorPane prefHeight="400.0" prefWidth="449.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" layoutX="85.0" layoutY="26.0" prefHeight="36.0" prefWidth="194.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Feedback" textFill="ORANGE">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+   </right>
+</BorderPane>

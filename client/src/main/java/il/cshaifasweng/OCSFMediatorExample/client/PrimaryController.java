@@ -52,18 +52,29 @@ public class PrimaryController {
     void switchPage(ActionEvent event) {
         Platform.runLater(() -> {
             String page = "";
+            Button sourceButton = (Button) event.getSource();
 
             // Check which button triggered the event
-            if (event.getSource() == menuButton) {
+            if (sourceButton == menuButton) {
                 page = "Menu Page";
-            } else if (event.getSource() == PersonalAreaButton) {
+            } else if (sourceButton == PersonalAreaButton) {
                 page = "Personal Area Page";
             }
-            else if(event.getSource() == feedbackButton){
+            else if(sourceButton == feedbackButton){
                 page = "Feedback Page";
             }
-            else if(event.getSource() == orderTablesButton){
+            else if(sourceButton == orderTablesButton){
                 page = "Order Tables Page";
+                if(userAtt.getUsername().equals("Customer")){
+                    String selectedRestaurant = ChooseRestaurantBox.getValue();
+                    userAtt.setRestaurantId((short) switch (selectedRestaurant) {
+                                case "Haifa Branch" -> 1;
+                                case "Tel-Aviv Branch" -> 2;
+                                case "Nahariya Branch" -> 3;
+                                default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
+                            }
+                            );
+                }
             }
 
             App.switchScreen(page);
@@ -82,7 +93,7 @@ public class PrimaryController {
                 Client client = Client.getClient();
                 String username = getClientUsername();
 
-                if (username != null && !username.equals("Costumer")) {
+                if (username != null && !username.equals("Customer")) {
                     client.sendToServer("log out;" + getClientUsername());
                 }
 

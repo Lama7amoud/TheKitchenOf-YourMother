@@ -67,12 +67,12 @@
          <Font size="15.0" />
       </font>
    </Button>
-   <Button fx:id="orderTablesButton" layoutX="533.0" layoutY="433.0" onAction="#switchPage" prefHeight="38.0" prefWidth="116.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold;" text="Order Tables" textFill="WHITE">
+   <Button fx:id="orderTablesButton" layoutX="533.0" layoutY="433.0" onAction="#switchPage" prefHeight="38.0" prefWidth="116.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold;" text="Tables Res" textFill="WHITE">
       <font>
          <Font size="15.0" />
       </font>
    </Button>
-   <Text fx:id="RestaurantDetailsInstructionLabel" fill="RED" layoutX="264.0" layoutY="415.0" style="-fx-font-style: italic;" text="Tap the image to see the restaurant's details" textAlignment="CENTER" wrappingWidth="391.8937988281252">
+   <Text fx:id="RestaurantDetailsInstructionLabel" fill="#00b400" layoutX="264.0" layoutY="415.0" style="-fx-font-style: italic;" text="Tap the image to see the restaurant's details" textAlignment="CENTER" wrappingWidth="391.8937988281252">
       <font>
          <Font size="15.0" />
       </font>

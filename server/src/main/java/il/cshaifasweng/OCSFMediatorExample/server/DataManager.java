@@ -181,7 +181,7 @@ public class DataManager {
                 session.getTransaction().commit();
                 System.out.println("The user " + username + " disconnected successfully.");
             } else {
-                System.out.println("The user " + username + " not found. May it's a costumer");
+                System.out.println("The user " + username + " not found. May it's a customer");
             }
         } catch (Exception exception) {
             System.err.println("An error occurred");

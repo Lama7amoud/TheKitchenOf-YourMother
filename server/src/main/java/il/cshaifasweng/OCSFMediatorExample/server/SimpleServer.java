@@ -114,7 +114,7 @@ public class SimpleServer extends AbstractServer {
 		} else if (msgString.startsWith("remove client")) {
 			int index = msgString.indexOf(";");
 			String username = msgString.substring(index + 1).trim();
-			if(!(username.equals("Costumer"))){
+			if(!(username.equals("Customer"))){
 				DataManager.disconnectUser(username);
 			}
 			if(!SubscribersList.isEmpty()){
