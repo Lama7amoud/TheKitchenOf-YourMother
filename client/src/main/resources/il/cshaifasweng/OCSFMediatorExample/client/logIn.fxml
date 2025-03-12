@@ -11,7 +11,6 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.logInController">
    <left>
       <AnchorPane prefHeight="400.0" prefWidth="235.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
@@ -43,7 +42,7 @@
             </Label>
             <AnchorPane layoutX="27.0" layoutY="135.0" prefHeight="253.0" prefWidth="310.0" style="-fx-background-color: white;">
                <children>
-                  <Button fx:id="connectButton" layoutX="114.0" layoutY="111.0" mnemonicParsing="false" onAction="#connectButtonClicked" prefHeight="25.0" prefWidth="180.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold;" text="Connect" textFill="WHITE" AnchorPane.bottomAnchor="111.4" AnchorPane.leftAnchor="114.0" AnchorPane.rightAnchor="13.200000000000045" AnchorPane.topAnchor="111.0">
+                  <Button fx:id="connectButton" layoutX="114.0" layoutY="111.0" mnemonicParsing="false" onAction="#connectButtonClicked" prefHeight="25.0" prefWidth="180.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Connect" textFill="WHITE" AnchorPane.bottomAnchor="111.4" AnchorPane.leftAnchor="114.0" AnchorPane.rightAnchor="13.200000000000045" AnchorPane.topAnchor="111.0">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>
@@ -60,7 +59,7 @@
                   </Label>
                   <TextField fx:id="usernameTextField" layoutX="117.0" layoutY="17.0" prefHeight="25.0" prefWidth="180.0" promptText="Username" style="-fx-border-color: transparent transparent black transparent; -fx-background-color: transparent;" />
                   <PasswordField fx:id="passwordTextField" layoutX="117.0" layoutY="55.0" prefHeight="25.0" prefWidth="180.0" promptText="Password" style="-fx-border-color: transparent transparent black transparent; -fx-background-color: transparent;" />
-                  <Button fx:id="customerButton" layoutX="4.0" layoutY="197.0" mnemonicParsing="false" onAction="#customerButtonClicked" prefHeight="30.0" prefWidth="300.0" style="-fx-background-color: green; -fx-font-style: italic; -fx-font-weight: bold;" text="continue as customer" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="6.0" AnchorPane.topAnchor="200.0">
+                  <Button fx:id="customerButton" layoutX="4.0" layoutY="197.0" mnemonicParsing="false" onAction="#customerButtonClicked" prefHeight="30.0" prefWidth="300.0" style="-fx-background-color: green; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="continue as customer" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="6.0" AnchorPane.topAnchor="200.0">
                      <font>
                         <Font name="System Bold" size="20.0" />
                      </font>

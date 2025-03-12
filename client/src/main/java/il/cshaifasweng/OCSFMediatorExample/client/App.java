@@ -52,7 +52,8 @@ public class App extends Application {
                 "Management Page", "managerPage",
                 "Feedback Page", "feedbackPage",
                 "Order Tables Page", "orderTablesPage",
-                "Branch Page" , "branchPage"
+                "Branch Page" , "branchPage",
+                "Tables Page" , "tablesViewPage"
         );
 
         String contentName = screenMappings.get(screenName);

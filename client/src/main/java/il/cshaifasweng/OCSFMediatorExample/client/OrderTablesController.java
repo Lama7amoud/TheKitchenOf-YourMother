@@ -5,7 +5,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
 import org.greenrobot.eventbus.EventBus;
 
 
@@ -41,15 +40,17 @@ public class OrderTablesController {
             } else if (sourceButton == viewMapButton) {
                 page = "Tables Page";
             }
+
+            App.switchScreen(page);
         });
     }
 
     @FXML
     void initialize(){
-        EventBus.getDefault().register(this);
+        //EventBus.getDefault().register(this);
         Client clientInstance = Client.getClient();
         try {
-            clientInstance.sendToServer("Get tables info for branch;" + userAtt.getRestaurantId());
+            //clientInstance.sendToServer("Get tables info for branch;" + userAtt.getRestaurantId());
         }
         catch (Exception e) {
             e.printStackTrace();
