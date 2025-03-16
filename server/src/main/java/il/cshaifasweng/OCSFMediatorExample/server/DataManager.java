@@ -7,8 +7,11 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.util.Scanner;
+
+import il.cshaifasweng.OCSFMediatorExample.entities.HostingTable;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
 import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
+import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -28,6 +31,8 @@ public class DataManager {
         configuration.setProperty("hibernate.connection.password", password);
         configuration.addAnnotatedClass(Meal.class);
         configuration.addAnnotatedClass(AuthorizedUser.class);
+        configuration.addAnnotatedClass(Restaurant.class);
+        configuration.addAnnotatedClass(HostingTable.class);
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         return configuration.buildSessionFactory(serviceRegistry);
     }

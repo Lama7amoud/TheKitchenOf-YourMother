@@ -65,15 +65,17 @@ public class PrimaryController {
             }
             else if(sourceButton == orderTablesButton){
                 page = "Order Tables Page";
-                if(userAtt.getUsername().equals("Customer")){
-                    String selectedRestaurant = ChooseRestaurantBox.getValue();
+            }
+            if(userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4){
+                String selectedRestaurant = ChooseRestaurantBox.getValue();
+                if(selectedRestaurant != null){
                     userAtt.setRestaurantId((short) switch (selectedRestaurant) {
                                 case "Haifa Branch" -> 1;
                                 case "Tel-Aviv Branch" -> 2;
                                 case "Nahariya Branch" -> 3;
                                 default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
                             }
-                            );
+                    );
                 }
             }
 
@@ -113,6 +115,9 @@ public class PrimaryController {
         if (selectedRestaurant != null) {
             ComboChoiceRequestLabel.setVisible(false); // making the label that tells the user to choose a restaurant to invisible
             RestaurantDetailsInstructionLabel.setVisible(true);
+            orderTablesButton.setDisable(false);
+            feedbackButton.setDisable(false);
+            menuButton.setDisable(false);
             imageView.setVisible(true);
 
             switch (selectedRestaurant) {
@@ -133,8 +138,20 @@ public class PrimaryController {
     @FXML
     void initialize() {
         Platform.runLater(() -> {
+            int user_permisson = userAtt.getPermissionLevel();
+            if((user_permisson == 0) || (user_permisson == 4)){
+                feedbackButton.setVisible(true);
+            }
+            else{
+                feedbackButton.setVisible(false);
+            }
+
             RestaurantDetailsInstructionLabel.setVisible(false);
+            orderTablesButton.setDisable(true);
+            feedbackButton.setDisable(true);
+            menuButton.setDisable(true);
             imageView.setVisible(false);
+
             try {
                 images = new Image[numOfImages];
 

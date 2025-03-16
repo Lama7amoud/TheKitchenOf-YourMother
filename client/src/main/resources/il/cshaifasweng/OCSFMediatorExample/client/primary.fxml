@@ -62,12 +62,12 @@
          <Font size="15.0" />
       </font>
    </Text>
-   <Button fx:id="feedbackButton" layoutX="257.0" layoutY="433.0" onAction="#switchPage" prefHeight="38.0" prefWidth="116.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Feedback" textFill="WHITE">
+   <Button fx:id="feedbackButton" layoutX="533.0" layoutY="433.0" onAction="#switchPage" prefHeight="38.0" prefWidth="116.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Feedback" textFill="WHITE">
       <font>
          <Font size="15.0" />
       </font>
    </Button>
-   <Button fx:id="orderTablesButton" layoutX="533.0" layoutY="433.0" onAction="#switchPage" prefHeight="38.0" prefWidth="116.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Tables Res" textFill="WHITE">
+   <Button fx:id="orderTablesButton" layoutX="257.0" layoutY="433.0" onAction="#switchPage" prefHeight="38.0" prefWidth="116.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Tables Res" textFill="WHITE">
       <font>
          <Font size="15.0" />
       </font>

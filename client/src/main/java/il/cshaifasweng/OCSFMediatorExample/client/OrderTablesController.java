@@ -47,6 +47,16 @@ public class OrderTablesController {
 
     @FXML
     void initialize(){
+        int employee_permission = userAtt.getPermissionLevel();
+
+        // For customer
+        if(employee_permission < 1){
+            viewMapButton.setVisible(false);
+        }
+        else{
+            viewMapButton.setVisible(true);
+        }
+
         //EventBus.getDefault().register(this);
         Client clientInstance = Client.getClient();
         try {

@@ -25,6 +25,10 @@ public class AuthorizedUser implements Serializable {
     private boolean isConnected;
     private short permissionLevel;
 
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Restaurant restaurant;  // The restaurant this user is associated with
+
     @Transient
     private String messageToServer;
 

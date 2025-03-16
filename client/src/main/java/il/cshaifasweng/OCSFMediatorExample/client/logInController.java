@@ -9,8 +9,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-
-import java.io.IOException;
+import static il.cshaifasweng.OCSFMediatorExample.client.Client.*;
 
 public class logInController {
 
@@ -51,7 +50,7 @@ public class logInController {
         Platform.runLater(() -> {
             customerButton.setDisable(true);
             connectButton.setDisable(true);
-
+            userAtt.setUsername("Customer");
             App.switchScreen("Main Page");
             connectButton.setDisable(false);
             customerButton.setDisable(false);

@@ -71,12 +71,11 @@ public class Client extends AbstractClient {
         }
         else if (msg instanceof AuthorizedUser) {
             userAtt.copyUser((AuthorizedUser) msg);
-            if(!(userAtt.getMessageToServer().equals("Login successful"))){
-                userAtt.setUsername("Customer");
+            if((userAtt.getMessageToServer().equals("Login successful"))){
+                System.out.println("response: " + userAtt.getMessageToServer());
+                String response = "Authorized user request:" + userAtt.getMessageToServer();
+                EventBus.getDefault().post(response);
             }
-            System.out.println("response: " + userAtt.getMessageToServer());
-            String response = "Authorized user request:" + userAtt.getMessageToServer();
-            EventBus.getDefault().post(response);
         }
 
     }
