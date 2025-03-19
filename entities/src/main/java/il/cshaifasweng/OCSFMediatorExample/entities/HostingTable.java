@@ -16,7 +16,7 @@ public class HostingTable implements Serializable {
     private int id;
 
     private int tableNumber;
-    private int seats;
+    private int seatsNumber;
     private boolean isReserved;
 
     @ManyToOne
@@ -43,12 +43,12 @@ public class HostingTable implements Serializable {
         this.tableNumber = tableNumber;
     }
 
-    public int getSeats() {
-        return seats;
+    public int getSeatsNumber() {
+        return seatsNumber;
     }
 
-    public void setSeats(int seats) {
-        this.seats = seats;
+    public void setSeatsNumber(int seatsNumber) {
+        this.seatsNumber = seatsNumber;
     }
 
     public boolean isReserved() {
@@ -71,7 +71,7 @@ public class HostingTable implements Serializable {
     public void copyTable(HostingTable table) {
         this.setId(table.getId());
         this.setTableNumber(table.getTableNumber());
-        this.setSeats(table.getSeats());
+        this.setSeatsNumber(table.getSeatsNumber());
         this.setReserved(table.isReserved());
         this.setRestaurant(table.getRestaurant());
     }
@@ -80,7 +80,7 @@ public class HostingTable implements Serializable {
     public void resetAttributes() {
         this.setId(0);
         this.setTableNumber(0);
-        this.setSeats(0);
+        this.setSeatsNumber(0);
         this.setReserved(false);
         this.setRestaurant(null);
     }

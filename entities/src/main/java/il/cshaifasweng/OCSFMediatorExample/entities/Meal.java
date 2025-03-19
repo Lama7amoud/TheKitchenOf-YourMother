@@ -3,12 +3,13 @@ package il.cshaifasweng.OCSFMediatorExample.entities;
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "menu")
 public class Meal implements Serializable {
 
-    // Ensure a serialVersionUID is defined to handle versioning
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -20,6 +21,14 @@ public class Meal implements Serializable {
     private String mealDescription;
     private String mealPreferences;
     private double mealPrice;
+
+    @ManyToMany
+    @JoinTable(
+            name = "restaurant_meals",
+            joinColumns = @JoinColumn(name = "meal_id"),
+            inverseJoinColumns = @JoinColumn(name = "restaurant_id")
+    )
+    private List<Restaurant> restaurants = new ArrayList<>();
 
     public Meal() {
     }
@@ -64,8 +73,15 @@ public class Meal implements Serializable {
     }
 
     public void setMealPrice(double mealPrice) {
-
         this.mealPrice = mealPrice;
+    }
+
+    public List<Restaurant> getRestaurants() {
+        return restaurants;
+    }
+
+    public void addRestaurant(Restaurant restaurant) {
+        this.restaurants.add(restaurant);
     }
 
     @Override
@@ -76,6 +92,7 @@ public class Meal implements Serializable {
                 ", mealDescription='" + mealDescription + '\'' +
                 ", mealPreferences='" + mealPreferences + '\'' +
                 ", mealPrice=" + mealPrice +
-                '}' + '\n';
+                ", restaurants=" + restaurants +
+                '}';
     }
 }

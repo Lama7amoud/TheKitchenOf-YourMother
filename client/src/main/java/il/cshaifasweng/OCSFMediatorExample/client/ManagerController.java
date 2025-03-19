@@ -32,7 +32,7 @@ public class ManagerController {
                     break;
 
                 case(3):
-                    managerTypeLabel.setText(restaurantTitles[user.getRestaurantId()-1] + " Branch Manger");
+                    managerTypeLabel.setText(restaurantTitles[user.getRestaurantInterest()-1] + " Branch Manger");
                     pageTitleLabel.setText("Manager Page");
                     break;
 

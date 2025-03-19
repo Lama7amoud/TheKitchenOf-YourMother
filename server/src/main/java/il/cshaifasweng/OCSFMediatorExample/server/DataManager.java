@@ -49,6 +49,32 @@ public class DataManager {
 
     private static void generateData() throws Exception {
 
+        // Create Italian restaurants
+        Restaurant restaurant1 = new Restaurant();
+        restaurant1.setName("Mom Kitchen");
+        restaurant1.setAddress("German Colony");
+        restaurant1.setLocation("Haifa");
+        restaurant1.setPhoneNumber("123-456-7890");
+
+        Restaurant restaurant2 = new Restaurant();
+        restaurant2.setName("Mom Kitchen");
+        restaurant2.setAddress("Rothschild");
+        restaurant2.setLocation("Tel-Aviv");
+        restaurant2.setPhoneNumber("987-654-3210");
+
+        Restaurant restaurant3 = new Restaurant();
+        restaurant3.setName("Mom Kitchen");
+        restaurant3.setAddress("Weizman");
+        restaurant3.setLocation("Nahariya");
+        restaurant3.setPhoneNumber("555-123-4567");
+
+        // Persist restaurants to the database
+        session.save(restaurant1);
+        session.save(restaurant2);
+        session.save(restaurant3);
+
+        session.flush();
+
         // Create Italian meals
         Meal meal1 = new Meal("Margherita Pizza", "Classic pizza with fresh mozzarella and basil", "Vegetarian", 10.99);
         Meal meal2 = new Meal("Spaghetti Carbonara", "Pasta with pancetta, eggs, and Parmesan cheese", "Contains dairy", 13.99);
@@ -57,6 +83,21 @@ public class DataManager {
         Meal meal5 = new Meal("Tiramisu", "Classic Italian dessert with coffee-soaked ladyfingers and mascarpone cream", "Contains dairy", 6.99);
         Meal meal6 = new Meal("Fettuccine Alfredo", "Pasta in a creamy Parmesan cheese sauce", "Vegetarian", 12.49);
         Meal meal7 = new Meal("Caprese Salad", "Fresh tomatoes, mozzarella, and basil with olive oil", "Vegetarian", 8.99);
+
+        // Associate meals with restaurants
+        meal1.getRestaurants().add(restaurant1);
+        meal1.getRestaurants().add(restaurant2);
+
+        meal2.getRestaurants().add(restaurant1);
+        meal2.getRestaurants().add(restaurant3);
+
+        meal3.getRestaurants().add(restaurant2);
+        meal3.getRestaurants().add(restaurant3);
+
+        meal4.getRestaurants().add(restaurant1);
+        meal5.getRestaurants().add(restaurant2);
+        meal6.getRestaurants().add(restaurant3);
+        meal7.getRestaurants().add(restaurant1);
 
         // Persist meals to the database
         session.save(meal1);
@@ -68,7 +109,77 @@ public class DataManager {
         session.save(meal7);
 
         session.flush();
+
+        // Create authorized users
+        AuthorizedUser user1 = new AuthorizedUser();
+        user1.setUsername("Sharbel");
+        user1.setPassword("password123");
+        user1.setFirstname("Sharbel");
+        user1.setLastname("Maroun");
+        user1.setIDNum("206538444");
+        user1.setAge((short) 25);
+        user1.setRestaurant(restaurant1);
+        user1.setConnected(false);
+        user1.setPermissionLevel((short) 4);
+
+        AuthorizedUser user2 = new AuthorizedUser();
+        user2.setUsername("Falah");
+        user2.setPassword("password456");
+        user2.setFirstname("Falah");
+        user2.setLastname("Abu Raya");
+        user2.setIDNum("206538446");
+        user2.setAge((short) 26);
+        user2.setRestaurant(restaurant2);
+        user2.setConnected(false);
+        user2.setPermissionLevel((short) 5);
+
+        AuthorizedUser user3 = new AuthorizedUser();
+        user3.setUsername("Mohammed");
+        user3.setPassword("password789");
+        user3.setFirstname("Mohammed");
+        user3.setLastname("Abu Saleh");
+        user3.setIDNum("206538466");
+        user3.setAge((short) 25);
+        user3.setRestaurant(restaurant3);
+        user3.setConnected(false);
+        user3.setPermissionLevel((short) 2);
+
+        // Save users in the database
+        session.save(user1);
+        session.save(user2);
+        session.save(user3);
+
+        // Insert tables for Haifa branch (13 tables)
+        for (int i = 1; i <= 13; i++) {
+            HostingTable table = new HostingTable();
+            table.setTableNumber(i);
+            table.setSeatsNumber((i % 4) + 2); // Seats between 2-5
+            table.setReserved(false);
+            table.setRestaurant(restaurant1);
+            session.save(table);
+        }
+
+        // Insert tables for Tel Aviv branch (8 tables)
+        for (int i = 1; i <= 8; i++) {
+            HostingTable table = new HostingTable();
+            table.setTableNumber(i);
+            table.setSeatsNumber((i % 4) + 2); // Seats between 2-5
+            table.setReserved(false);
+            table.setRestaurant(restaurant2);
+            session.save(table);
+        }
+
+        // Insert tables for Nahariya branch (14 tables)
+        for (int i = 1; i <= 14; i++) {
+            HostingTable table = new HostingTable();
+            table.setTableNumber(i);
+            table.setSeatsNumber((i % 4) + 2); // Seats between 2-5
+            table.setReserved(false);
+            table.setRestaurant(restaurant3);
+            session.save(table);
+        }
     }
+
 
     static List<Meal> requestMenu(){
         SessionFactory sessionFactory = getSessionFactory(password);

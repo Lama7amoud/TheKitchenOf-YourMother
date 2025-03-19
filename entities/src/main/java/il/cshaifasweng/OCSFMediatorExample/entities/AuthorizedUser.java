@@ -21,16 +21,19 @@ public class AuthorizedUser implements Serializable {
     private String lastname;
     private String IDNum;
     private short age;
-    private short restaurantId;
     private boolean isConnected;
     private short permissionLevel;
 
     @ManyToOne
-    @JoinColumn(name = "restaurant_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;  // The restaurant this user is associated with
 
     @Transient
     private String messageToServer;
+
+    @Transient
+    private short restaurantInterest;
+
 
     // Note: we assume that the users are already exist in the database so we will not create new objects
     // Default constructor (required by Hibernate!!)
@@ -94,12 +97,12 @@ public class AuthorizedUser implements Serializable {
         this.age = age;
     }
 
-    public short getRestaurantId() {
-        return restaurantId;
+    public short getRestaurantInterest() {
+        return restaurantInterest;
     }
 
-    public void setRestaurantId(short restaurantId) {
-        this.restaurantId = restaurantId;
+    public void setRestaurantInterest(short restaurantInterest) {
+        this.restaurantInterest = restaurantInterest;
     }
 
     public boolean isConnected() {
@@ -126,9 +129,20 @@ public class AuthorizedUser implements Serializable {
         this.permissionLevel = permissionLevel;
     }
 
-    // Copy user attributes from user
-    public void copyUser(AuthorizedUser user){
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
 
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
+    }
+
+    public short getRestaurantId() {
+        return (restaurant != null) ? (short) restaurant.getId() : 0;
+    }
+
+    // Copy user attributes from another user
+    public void copyUser(AuthorizedUser user) {
         this.setId(user.getId());
         this.setUsername(user.getUsername());
         this.setPassword(user.getPassword());
@@ -136,14 +150,14 @@ public class AuthorizedUser implements Serializable {
         this.setLastname(user.getLastname());
         this.setIDNum(user.getIDNum());
         this.setAge(user.getAge());
-        this.setRestaurantId(user.getRestaurantId());
+        this.setRestaurant(user.getRestaurant());
+        this.setRestaurantInterest(user.getRestaurantInterest());
         this.setConnected(user.isConnected());
         this.setMessageToServer(user.getMessageToServer());
         this.setPermissionLevel(user.getPermissionLevel());
     }
 
-    public void resetAttributes(){
-        // Reset all attributes to their default values
+    public void resetAttributes() {
         this.setId(0);
         this.setUsername(null);
         this.setPassword(null);
@@ -151,10 +165,10 @@ public class AuthorizedUser implements Serializable {
         this.setLastname(null);
         this.setIDNum(null);
         this.setAge((short) 0);
-        this.setRestaurantId((short) 0);
+        this.setRestaurant(null);
+        this.setRestaurantInterest((short) 0);
         this.setConnected(false);
         this.setMessageToServer(null);
         this.setPermissionLevel((short) 0);
     }
-
 }

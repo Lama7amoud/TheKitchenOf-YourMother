@@ -69,7 +69,7 @@ public class PrimaryController {
             if(userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4){
                 String selectedRestaurant = ChooseRestaurantBox.getValue();
                 if(selectedRestaurant != null){
-                    userAtt.setRestaurantId((short) switch (selectedRestaurant) {
+                    userAtt.setRestaurantInterest((short) switch (selectedRestaurant) {
                                 case "Haifa Branch" -> 1;
                                 case "Tel-Aviv Branch" -> 2;
                                 case "Nahariya Branch" -> 3;

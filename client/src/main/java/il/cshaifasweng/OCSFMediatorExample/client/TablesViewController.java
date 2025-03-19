@@ -254,7 +254,7 @@ public class TablesViewController {
                 );
 
                 RestaurantCombo.setItems(restaurantList);
-                RestaurantCombo.setValue(restaurantList.get(userAtt.getRestaurantId()-1));
+                RestaurantCombo.setValue(restaurantList.get(userAtt.getRestaurantInterest()-1));
             }
 
             tableButtons = new Button[14];
@@ -274,7 +274,7 @@ public class TablesViewController {
             tableButtons[12] = TableButton13;
             tableButtons[13] = TableButton14;
 
-            int restaurantId = userAtt.getRestaurantId();
+            int restaurantId = userAtt.getRestaurantInterest();
             positionTables(restaurantId); // Set the appropriate tables positions
 
             switch (restaurantId) {

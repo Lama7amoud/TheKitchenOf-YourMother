@@ -40,6 +40,9 @@ public class OrderTablesController {
             } else if (sourceButton == viewMapButton) {
                 page = "Tables Page";
             }
+            else if(sourceButton == branchDetailsButton) {
+                page = "Branch Page";
+            }
 
             App.switchScreen(page);
         });
@@ -60,7 +63,7 @@ public class OrderTablesController {
         //EventBus.getDefault().register(this);
         Client clientInstance = Client.getClient();
         try {
-            //clientInstance.sendToServer("Get tables info for branch;" + userAtt.getRestaurantId());
+            //clientInstance.sendToServer("Get tables info for branch;" + userAtt.getRestaurantInterest());
         }
         catch (Exception e) {
             e.printStackTrace();

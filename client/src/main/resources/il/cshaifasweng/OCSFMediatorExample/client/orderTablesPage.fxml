@@ -83,7 +83,7 @@
             <TextField layoutX="120.0" layoutY="298.0" prefHeight="8.0" prefWidth="50.0" />
             <Separator layoutX="18.0" layoutY="333.0" prefWidth="150.0" style="-fx-background-color: #ffa500;" />
             <Button fx:id="ConfirmOrderButton" alignment="CENTER" layoutX="221.0" layoutY="365.0" mnemonicParsing="false" style="-fx-background-color: green; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Confirm Order" textAlignment="CENTER" textFill="WHITE" />
-            <ComboBox layoutX="187.0" layoutY="246.0" prefHeight="26.0" prefWidth="165.0" promptText="Suggested Hours" style="-fx-background-color: #ffa500; -fx-border-style: italic; -fx-background-radius: 5em;" />
+            <ComboBox layoutX="187.0" layoutY="246.0" prefHeight="26.0" prefWidth="165.0" promptText="Suggested Hours" style="-fx-background-color: #ffa500; -fx-background-radius: 5em;" />
          </children>
       </AnchorPane>
    </right>
