@@ -34,8 +34,6 @@ public class AuthorizedUser implements Serializable {
     @Transient
     private short restaurantInterest;
 
-
-    // Note: we assume that the users are already exist in the database so we will not create new objects
     // Default constructor (required by Hibernate!!)
     public AuthorizedUser() {}
 

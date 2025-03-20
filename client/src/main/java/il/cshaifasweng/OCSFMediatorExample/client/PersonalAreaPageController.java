@@ -65,32 +65,36 @@ public class PersonalAreaPageController {
 
     @FXML
     void ToRightImage(){
-        j++;
-        restaurantMapTitle.setText(restaurantTitles[j] + " restaurant Map:");
-        imageView.setImage(images[j]);
+        Platform.runLater(() -> {
+            j++;
+            restaurantMapTitle.setText(restaurantTitles[j] + " restaurant Map:");
+            imageView.setImage(images[j]);
 
-        if(j == numOfImages - 1){
-            rightImageButton.setDisable(true);
-        }
+            if (j == numOfImages - 1) {
+                rightImageButton.setDisable(true);
+            }
 
-        if(j > 0){
-            leftImageButton.setDisable(false);
-        }
+            if (j > 0) {
+                leftImageButton.setDisable(false);
+            }
+        });
     }
 
     @FXML
     void ToLeftImage(){
-        j--;
-        restaurantMapTitle.setText(restaurantTitles[j] + " restaurant Map:");
-        imageView.setImage(images[j]);
+        Platform.runLater(() -> {
+            j--;
+            restaurantMapTitle.setText(restaurantTitles[j] + " restaurant Map:");
+            imageView.setImage(images[j]);
 
-        if(j == 0){
-            leftImageButton.setDisable(true);
-        }
+            if (j == 0) {
+                leftImageButton.setDisable(true);
+            }
 
-        if(j < numOfImages - 1){
-            rightImageButton.setDisable(false);
-        }
+            if (j < numOfImages - 1) {
+                rightImageButton.setDisable(false);
+            }
+        });
     }
 
     @FXML
@@ -122,7 +126,7 @@ public class PersonalAreaPageController {
                     numOfImages = 1;
                     images = new Image[numOfImages];
                     j = (user.getRestaurantInterest()-1);
-                    images[0] = new Image(String.valueOf(PrimaryController.class.getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Images/" + j + ".jpg")));
+                    images[0] = new Image(String.valueOf(PersonalAreaPageController.class.getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Maps/" + j + ".jpg")));
                     restaurantMapTitle.setText(restaurantTitles[j] + " restaurant Map:");
                     imageView.setImage(images[0]);
                 }
@@ -134,7 +138,7 @@ public class PersonalAreaPageController {
                     images = new Image[numOfImages];
 
                     for (int i = 0; i < numOfImages; i++) {
-                        images[i] = new Image(String.valueOf(PrimaryController.class.getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Images/" + i + ".jpg")));
+                        images[i] = new Image(String.valueOf(PersonalAreaPageController.class.getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Maps/" + i + ".jpg")));
                     }
                     restaurantMapTitle.setText(restaurantTitles[j] + " restaurant Map:");
                     imageView.setImage(images[j]);

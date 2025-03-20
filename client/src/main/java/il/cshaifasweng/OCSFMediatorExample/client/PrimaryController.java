@@ -85,7 +85,21 @@ public class PrimaryController {
 
     @FXML
     void toBranchPage(MouseEvent event){
-        App.switchScreen("Branch Page");
+        Platform.runLater(() -> {
+            if(userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4){
+                String selectedRestaurant = ChooseRestaurantBox.getValue();
+                if(selectedRestaurant != null){
+                    userAtt.setRestaurantInterest((short) switch (selectedRestaurant) {
+                                case "Haifa Branch" -> 1;
+                                case "Tel-Aviv Branch" -> 2;
+                                case "Nahariya Branch" -> 3;
+                                default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
+                            }
+                    );
+                }
+            }
+            App.switchScreen("Branch Page");
+        });
     }
 
     @FXML
@@ -156,7 +170,7 @@ public class PrimaryController {
                 images = new Image[numOfImages];
 
                 for (int i = 0; i < numOfImages; i++) {
-                    images[i] = new Image(String.valueOf(PrimaryController.class.getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Images/" + i + ".jpg")));
+                    images[i] = new Image(String.valueOf(PrimaryController.class.getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Maps/" + i + ".jpg")));
                 }
             }
             catch (Exception e) {

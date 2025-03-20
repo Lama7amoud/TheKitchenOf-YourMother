@@ -44,29 +44,30 @@ public class OrderTablesController {
                 page = "Branch Page";
             }
 
+            //EventBus.getDefault().unregister(this);
             App.switchScreen(page);
         });
     }
 
     @FXML
     void initialize(){
-        int employee_permission = userAtt.getPermissionLevel();
+        Platform.runLater(() -> {
+            int employee_permission = userAtt.getPermissionLevel();
 
-        // For customer
-        if(employee_permission < 1){
-            viewMapButton.setVisible(false);
-        }
-        else{
-            viewMapButton.setVisible(true);
-        }
+            // For customer
+            if (employee_permission < 1) {
+                viewMapButton.setVisible(false);
+            } else {
+                viewMapButton.setVisible(true);
+            }
 
-        //EventBus.getDefault().register(this);
-        Client clientInstance = Client.getClient();
-        try {
-            //clientInstance.sendToServer("Get tables info for branch;" + userAtt.getRestaurantInterest());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+            //EventBus.getDefault().register(this);
+            Client clientInstance = Client.getClient();
+            try {
+                //clientInstance.sendToServer("Get tables info for branch;" + userAtt.getRestaurant());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

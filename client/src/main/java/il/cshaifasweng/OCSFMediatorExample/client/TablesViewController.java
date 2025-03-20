@@ -294,7 +294,7 @@ public class TablesViewController {
                 images = new Image[numOfImages];
 
                 for (int i = 0; i < numOfImages; i++) {
-                    images[i] = new Image(String.valueOf(PrimaryController.class.getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Images/" + i + ".jpg")));
+                    images[i] = new Image(String.valueOf(TablesViewController.class.getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Maps/" + i + ".jpg")));
                 }
             } catch (Exception e) {
                 e.printStackTrace();

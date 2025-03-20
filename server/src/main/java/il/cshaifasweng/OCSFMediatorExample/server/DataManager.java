@@ -55,18 +55,22 @@ public class DataManager {
         restaurant1.setAddress("German Colony");
         restaurant1.setLocation("Haifa");
         restaurant1.setPhoneNumber("123-456-7890");
+        restaurant1.setActivityHours("Monday-Saturday: 10:00 AM - 11:00 PM");
 
         Restaurant restaurant2 = new Restaurant();
         restaurant2.setName("Mom Kitchen");
         restaurant2.setAddress("Rothschild");
         restaurant2.setLocation("Tel-Aviv");
         restaurant2.setPhoneNumber("987-654-3210");
+        restaurant2.setActivityHours("Monday-Sunday: 9:00 AM - 10:00 PM");
 
         Restaurant restaurant3 = new Restaurant();
         restaurant3.setName("Mom Kitchen");
         restaurant3.setAddress("Weizman");
         restaurant3.setLocation("Nahariya");
         restaurant3.setPhoneNumber("555-123-4567");
+        restaurant3.setActivityHours("Tuesday-Sunday: 11:00 AM - 12:00 AM");
+
 
         // Persist restaurants to the database
         session.save(restaurant1);
@@ -180,6 +184,23 @@ public class DataManager {
         }
     }
 
+    static Restaurant getRestaurant(String restaurantId){
+        SessionFactory sessionFactory = getSessionFactory(password);
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        int id = Integer.parseInt(restaurantId); // Convert String to int
+        Restaurant restaurant = session.get(Restaurant.class, id); // Fetch restaurant by ID
+
+        if (session != null) {
+            session.close();
+            System.out.println("session closed");
+        }
+
+        return restaurant;
+
+
+    }
 
     static List<Meal> requestMenu(){
         SessionFactory sessionFactory = getSessionFactory(password);

@@ -51,6 +51,7 @@ public class logInController {
             customerButton.setDisable(true);
             connectButton.setDisable(true);
             userAtt.setUsername("Customer");
+            EventBus.getDefault().unregister(this);
             App.switchScreen("Main Page");
             connectButton.setDisable(false);
             customerButton.setDisable(false);
@@ -71,6 +72,7 @@ public class logInController {
                 } else {
                     connectingMessageLabel.setStyle("-fx-text-fill: green;");  // Set text color to green for success
                     connectingMessageLabel.setText(response);  // Set the text
+                    EventBus.getDefault().unregister(this);
                     App.switchScreen("Main Page");
                 }
                 connectButton.setDisable(false);

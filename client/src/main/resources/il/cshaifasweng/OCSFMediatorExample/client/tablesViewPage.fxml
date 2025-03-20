@@ -44,7 +44,7 @@
          <children>
             <ImageView fx:id="imageView" fitHeight="400.0" fitWidth="367.0" layoutX="28.0" layoutY="43.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <image>
-                  <Image url="@Restaurant_Images/2.jpg" />
+                  <Image url="@Restaurant_Maps/2.jpg" />
                </image>
             </ImageView>
             <Button fx:id="TableButton1" alignment="CENTER" layoutX="20.0" layoutY="37.0" mnemonicParsing="false" onAction="#selectTable" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="1" textFill="ORANGE">

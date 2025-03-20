@@ -3,6 +3,7 @@ package il.cshaifasweng.OCSFMediatorExample.server;
 import il.cshaifasweng.OCSFMediatorExample.client.Client;
 import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
+import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
 import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
 
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
@@ -46,9 +47,27 @@ public class SimpleServer extends AbstractServer {
 		else if(msgString.startsWith("logIn:")){
 			AuthorizedUser currentUser = DataManager.checkPermission(msgString);
 			try {
+				System.out.println(currentUser.getMessageToServer());
 				client.sendToClient(currentUser);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
+			}
+		}
+		else if(msgString.startsWith("Get branch details")){
+			try {
+				int index = msgString.indexOf(";");
+				String restaurantId = msgString.substring(index + 1).trim();
+				Restaurant restaurant = DataManager.getRestaurant(restaurantId);
+				if(restaurant != null) {
+					client.sendToClient(restaurant);
+				}
+				else{
+					System.out.println("Restaurant not found");
+					client.sendToClient("No available restaurant details");
+				}
+			}
+			catch (Exception exception){
+				exception.printStackTrace();
 			}
 		}
 		else if (msgString.equals("Request menu")) {
@@ -68,7 +87,6 @@ public class SimpleServer extends AbstractServer {
 		}
 
 		else if (msgString.startsWith("Update price")) {
-
 			// Remove the "Update price" prefix
 			String details = msgString.substring("Update price".length()).trim();
 

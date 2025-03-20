@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.PersonalAreaPageController">
    <left>
       <AnchorPane prefHeight="200.0" prefWidth="235.0" style="-fx-background-color: #FDF8E2;" BorderPane.alignment="CENTER">
@@ -49,14 +48,14 @@
             </Label>
             <ImageView fx:id="imageView" fitHeight="198.0" fitWidth="269.0" layoutX="48.0" layoutY="170.0" pickOnBounds="true" />
             <Label fx:id="restaurantMapTitle" layoutX="16.0" layoutY="128.0" prefHeight="18.0" prefWidth="270.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Your restaurant Map:" textFill="ORANGE" />
-            <Button fx:id="leftImageButton" layoutX="14.0" layoutY="253.0" mnemonicParsing="false" onAction="#ToLeftImage" style="-fx-background-color: transparent;" text="&lt;">
+            <Button fx:id="leftImageButton" alignment="CENTER" layoutX="4.0" layoutY="243.0" mnemonicParsing="false" onAction="#ToLeftImage" style="-fx-background-color: #FDF8E2; -fx-background-radius: 5em;" text="&lt;">
                <font>
-                  <Font size="15.0" />
+                  <Font size="22.0" />
                </font>
             </Button>
-            <Button fx:id="rightImageButton" layoutX="317.0" layoutY="253.0" mnemonicParsing="false" onAction="#ToRightImage" style="-fx-background-color: transparent;" text="&gt;">
+            <Button fx:id="rightImageButton" alignment="CENTER" layoutX="317.0" layoutY="243.0" mnemonicParsing="false" onAction="#ToRightImage" style="-fx-background-color: #FDF8E2; -fx-background-radius: 5em;" text="&gt;">
                <font>
-                  <Font size="15.0" />
+                  <Font size="22.0" />
                </font>
             </Button>
          </children>

@@ -27,7 +27,7 @@
                </font>
             </Label>
             <Button fx:id="viewMapButton" alignment="CENTER" layoutX="8.0" layoutY="174.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="View tables availability in the map" textAlignment="CENTER" textFill="WHITE" />
-            <Button fx:id="branchDetailsButton" alignment="CENTER" layoutX="56.0" layoutY="315.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="124.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="See Branch Details" textAlignment="CENTER" textFill="WHITE" />
+            <Button fx:id="branchDetailsButton" alignment="CENTER" layoutX="56.0" layoutY="315.0" mnemonicParsing="false" onAction="#switchPage" prefHeight="26.0" prefWidth="124.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="See Branch Details" textAlignment="CENTER" textFill="WHITE" />
          </children>
       </AnchorPane>
    </left>

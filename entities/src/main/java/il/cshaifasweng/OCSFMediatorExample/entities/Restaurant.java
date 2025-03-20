@@ -20,6 +20,7 @@ public class Restaurant implements Serializable {
     private String address;
     private String location;
     private String phoneNumber;
+    private String activityHours;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private List<HostingTable> hostingTables;  // Reference to the HostingTable entity
@@ -71,6 +72,14 @@ public class Restaurant implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
+    public String getActivityHours() {
+        return activityHours;
+    }
+
+    public void setActivityHours(String activityHours) {
+        this.activityHours = activityHours;
+    }
+
     public List<HostingTable> getHostingTables() {
         return hostingTables;
     }
@@ -96,7 +105,9 @@ public class Restaurant implements Serializable {
         this.setId(restaurant.getId());
         this.setName(restaurant.getName());
         this.setAddress(restaurant.getAddress());
+        this.setLocation(restaurant.getLocation());
         this.setPhoneNumber(restaurant.getPhoneNumber());
+        this.setActivityHours(restaurant.getActivityHours()); // Copy activity hours
         this.setHostingTables(restaurant.getHostingTables());
         this.setMeals(restaurant.getMeals());
     }
@@ -106,7 +117,9 @@ public class Restaurant implements Serializable {
         this.setId(0);
         this.setName(null);
         this.setAddress(null);
+        this.setLocation(null);
         this.setPhoneNumber(null);
+        this.setActivityHours(null);
         this.setHostingTables(null);
         this.setMeals(null);
     }
