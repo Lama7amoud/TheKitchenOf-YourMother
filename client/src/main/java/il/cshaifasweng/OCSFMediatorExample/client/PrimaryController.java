@@ -55,9 +55,17 @@ public class PrimaryController {
             Button sourceButton = (Button) event.getSource();
 
             // Check which button triggered the event
-            if (sourceButton == menuButton) {
-                page = "Menu Page";
-            } else if (sourceButton == PersonalAreaButton) {
+            if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Haifa Branch")) {
+                page = "Haifa Menu Page";
+            }
+            else  if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Tel-Aviv Branch")) {
+                page = "TelAviv Menu Page";
+            }
+            else  if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Nahariya Branch")) {
+                page = "Nahariya Menu Page";
+            }
+
+            else if (sourceButton == PersonalAreaButton) {
                 page = "Personal Area Page";
             }
             else if(sourceButton == feedbackButton){

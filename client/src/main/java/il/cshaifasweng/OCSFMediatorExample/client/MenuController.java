@@ -4,18 +4,28 @@ import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import javafx.application.Platform;
+import javafx.scene.image.ImageView;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
 
 public class MenuController {
+
+
+    Image image1;
+    Image image2 ;
+    Image image3;
+    Image image4;
+    Image image5;
 
     @FXML
     private Button editMeal1;
@@ -118,36 +128,32 @@ public class MenuController {
     private TextField textField53;
 
     @FXML
-    private TextField textField60;
+    private ImageView imageView1;
 
     @FXML
-    private TextField textField61;
+    private ImageView imageView2;
 
     @FXML
-    private TextField textField62;
+    private ImageView imageView3;
 
     @FXML
-    private TextField textField63;
+    private ImageView imageView4;
 
     @FXML
-    private TextField textField70;
-
-    @FXML
-    private TextField textField71;
-
-    @FXML
-    private TextField textField72;
-
-    @FXML
-    private TextField textField73;
+    private ImageView imageView5;
 
     @FXML
      void initialize() throws IOException {
         EventBus.getDefault().register(this);
         Client client = Client.getClient();
         client.sendToServer("Request menu");
+
     }
+
+
+
    private List<Meal> Menu ;
+    private List<Image> images ;
 
     @Subscribe
     public void ExternalIntervention(Object msg) {
@@ -156,6 +162,7 @@ public class MenuController {
                 if (msg instanceof List) {
                     Menu = (List<Meal>) msg;
                     menuOrder(Menu);
+                    imagesOrder(Menu);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -189,17 +196,43 @@ public class MenuController {
             textField52.setText(Menu.get(4).getMealPreferences());
             textField53.setText(String.valueOf(Menu.get(4).getMealPrice()));
 
-            textField60.setText(Menu.get(5).getMealName());
-            textField61.setText(Menu.get(5).getMealDescription());
-            textField62.setText(Menu.get(5).getMealPreferences());
-            textField63.setText(String.valueOf(Menu.get(5).getMealPrice()));
-
-            textField70.setText(Menu.get(6).getMealName());
-            textField71.setText(Menu.get(6).getMealDescription());
-            textField72.setText(Menu.get(6).getMealPreferences());
-            textField73.setText(String.valueOf(Menu.get(6).getMealPrice()));
         });
     }
+
+    private void imagesOrder(List<Meal> Menu) {
+
+            Platform.runLater(() -> {
+                String imagePath1 = Menu.get(0).getImagePath();
+                String imagePath2 = Menu.get(1).getImagePath();
+                String imagePath3 = Menu.get(2).getImagePath();
+                String imagePath4 = Menu.get(3).getImagePath();
+                String imagePath5 = Menu.get(4).getImagePath();
+
+                try {
+                    Image image1 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath1)));
+                    imageView1.setImage(image1);
+
+                    Image image2 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath2)));
+                    imageView2.setImage(image2);
+
+                    Image image3 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath3)));
+                    imageView3.setImage(image3);
+
+                    Image image4 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath4)));
+                    imageView4.setImage(image4);
+
+                    Image image5 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath5)));
+                    imageView5.setImage(image5);
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.err.println("Failed to load image at index: 0");
+                }
+            });
+
+    }
+
 
     private String mealName ;
     private int flag=0 ;
@@ -296,41 +329,6 @@ public class MenuController {
         });
     }
 
-    @FXML
-    void edit6(ActionEvent event) {
-        Platform.runLater(() -> {
-            editMeal1.setDisable(true);
-            editMeal2.setDisable(true);
-            editMeal3.setDisable(true);
-            editMeal4.setDisable(true);
-            editMeal5.setDisable(true);
-            savebtn.setVisible(true);
-            editMeal7.setDisable(true);
-            textField63.setEditable(true);
-            textField63.setStyle("-fx-background-color: #D3D3D3 ;");
-            editMeal6.setDisable(true);
-            mealName = textField60.getText();
-            flag = 6;
-        });
-    }
-
-    @FXML
-    void edit7(ActionEvent event) {
-        Platform.runLater(() -> {
-            editMeal1.setDisable(true);
-            editMeal2.setDisable(true);
-            editMeal3.setDisable(true);
-            editMeal4.setDisable(true);
-            editMeal5.setDisable(true);
-            editMeal6.setDisable(true);
-            savebtn.setVisible(true);
-            textField73.setEditable(true);
-            textField73.setStyle("-fx-background-color: #D3D3D3 ;");
-            editMeal7.setDisable(true);
-            mealName = textField70.getText();
-            flag = 7;
-        });
-    }
 
     @FXML
     void saveFunc(ActionEvent event) {
@@ -366,16 +364,7 @@ public class MenuController {
                 textField53.setStyle("-fx-background-color:  white ;");
 
             }
-            if (flag == 6) {
-                price = textField63.getText();
-                textField63.setStyle("-fx-background-color:  white ;");
 
-            }
-            if (flag == 7) {
-                price = textField73.getText();
-                textField73.setStyle("-fx-background-color:  white ;");
-
-            }
             if (price.equals("")) {
                 price = "0";
             }

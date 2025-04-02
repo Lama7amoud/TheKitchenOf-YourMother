@@ -44,17 +44,24 @@ public class App extends Application {
     }
 
     public static void switchScreen(String screenName) {
-        Map<String, String> screenMappings = Map.of(
-                "Main Page", "primary",
-                "Log In Page", "logIn",
-                "Menu Page", "menu",
-                "Personal Area Page", "personalAreaPage",
-                "Management Page", "managerPage",
-                "Feedback Page", "feedbackPage",
-                "Order Tables Page", "orderTablesPage",
-                "Branch Page" , "branchPage",
-                "Tables Page" , "tablesViewPage"
-        );
+                Map<String, String> screenMappings = Map.ofEntries(
+                        Map.entry("Main Page", "primary"),
+                        Map.entry("Log In Page", "logIn"),
+                        Map.entry("Menu Page", "menu"),
+                        Map.entry("Personal Area Page", "personalAreaPage"),
+                        Map.entry("Management Page", "managerPage"),
+                        Map.entry("Feedback Page", "feedbackPage"),
+                        Map.entry("Order Tables Page", "orderTablesPage"),
+                        Map.entry("Branch Page", "branchPage"),
+                        Map.entry("Tables Page", "tablesViewPage"),
+                        Map.entry("Haifa Menu Page", "HaifaMenu"),
+                        Map.entry("TelAviv Menu Page", "Tel_AvivMenu"),
+                        Map.entry("Nahariya Menu Page" ,"NahariyaMenu")
+
+                );
+
+
+
 
         String contentName = screenMappings.get(screenName);
         if (contentName != null) {

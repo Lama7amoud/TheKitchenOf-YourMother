@@ -46,6 +46,26 @@ public class DataManager {
         return data;
     }
 
+    private static List<Meal> getMealsByRestaurantId(int restaurantId) {
+        try {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Meal> query = builder.createQuery(Meal.class);
+            Root<Meal> root = query.from(Meal.class);
+
+            // Join the meal with its associated restaurants and filter by restaurant ID
+            query.select(root).where(
+                    builder.equal(root.join("restaurants").get("id"), restaurantId)
+            );
+
+            List<Meal> meals = session.createQuery(query).getResultList();
+            return meals;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
 
     private static void generateData() throws Exception {
 
@@ -79,29 +99,50 @@ public class DataManager {
 
         session.flush();
 
-        // Create Italian meals
-        Meal meal1 = new Meal("Margherita Pizza", "Classic pizza with fresh mozzarella and basil", "Vegetarian", 10.99);
-        Meal meal2 = new Meal("Spaghetti Carbonara", "Pasta with pancetta, eggs, and Parmesan cheese", "Contains dairy", 13.99);
-        Meal meal3 = new Meal("Lasagna", "Layered pasta with rich meat sauce and creamy béchamel", "Contains dairy", 14.99);
-        Meal meal4 = new Meal("Risotto alla Milanese", "Creamy risotto with saffron and Parmesan", "Vegetarian", 12.99);
-        Meal meal5 = new Meal("Tiramisu", "Classic Italian dessert with coffee-soaked ladyfingers and mascarpone cream", "Contains dairy", 6.99);
-        Meal meal6 = new Meal("Fettuccine Alfredo", "Pasta in a creamy Parmesan cheese sauce", "Vegetarian", 12.49);
-        Meal meal7 = new Meal("Caprese Salad", "Fresh tomatoes, mozzarella, and basil with olive oil", "Vegetarian", 8.99);
+
+
+
+
+// Create Italian meals with the same image path
+        Meal meal1 = new Meal("Margherita Pizza", "Classic pizza with fresh mozzarella and basil", "Vegetarian", 10.99 , "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal0.jpg","special1");
+        Meal meal2 = new Meal("Spaghetti Carbonara", "Pasta with pancetta, eggs, and Parmesan cheese", "Contains dairy", 13.99 , "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal1.jpg","shared meal");
+        Meal meal3 = new Meal("Lasagna", "Layered pasta with rich meat sauce and creamy béchamel", "Contains dairy", 14.99,"/il/cshaifasweng/OCSFMediatorExample/client/meals/meal2.jpg","shared meal");
+        Meal meal4 = new Meal("Risotto alla Milanese", "Creamy risotto with saffron and Parmesan", "Vegetarian", 12.99,"/il/cshaifasweng/OCSFMediatorExample/client/meals/meal3.jpg","shared meal");
+        Meal meal5 = new Meal("Fettuccine Alfredo", "Pasta in a creamy Parmesan cheese sauce", "Vegetarian", 12.49,"/il/cshaifasweng/OCSFMediatorExample/client/meals/meal4.jpg","shared meal");
+        Meal meal6 = new Meal("Penne Arrabbiata", "Penne pasta with a spicy tomato and garlic sauce", "Vegan, Spicy", 11.99, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal5.jpg","special2");
+        Meal meal7 = new Meal("Ravioli Ricotta e Spinaci", "Pasta pockets filled with ricotta cheese and spinach", "Vegetarian", 13.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal6.jpg","special3");
+        Meal meal8 = new Meal("Calzone Classico", "Folded pizza with ham, mozzarella, and mushrooms", "Contains pork and dairy", 13.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal7.jpg","special1");
+        Meal meal9 = new Meal("Arancini", "Fried risotto balls stuffed with cheese and peas", "Contains dairy", 8.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal8.jpg","special2");
+        Meal meal10 = new Meal("Polenta ai Funghi", "Creamy polenta topped with sautéed wild mushrooms", "Vegetarian", 11.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal9.jpg","special3");
+
+
+
 
         // Associate meals with restaurants
         meal1.getRestaurants().add(restaurant1);
-        meal1.getRestaurants().add(restaurant2);
 
         meal2.getRestaurants().add(restaurant1);
+        meal2.getRestaurants().add(restaurant2);
         meal2.getRestaurants().add(restaurant3);
 
+        meal3.getRestaurants().add(restaurant1);
         meal3.getRestaurants().add(restaurant2);
         meal3.getRestaurants().add(restaurant3);
 
         meal4.getRestaurants().add(restaurant1);
+        meal4.getRestaurants().add(restaurant2);
+        meal4.getRestaurants().add(restaurant3);
+
+        meal5.getRestaurants().add(restaurant1);
         meal5.getRestaurants().add(restaurant2);
-        meal6.getRestaurants().add(restaurant3);
-        meal7.getRestaurants().add(restaurant1);
+        meal5.getRestaurants().add(restaurant3);
+
+        meal6.getRestaurants().add(restaurant2);
+        meal7.getRestaurants().add(restaurant3);
+        meal8.getRestaurants().add(restaurant1);
+        meal9.getRestaurants().add(restaurant2);
+        meal10.getRestaurants().add(restaurant3);
+
 
         // Persist meals to the database
         session.save(meal1);
@@ -111,6 +152,9 @@ public class DataManager {
         session.save(meal5);
         session.save(meal6);
         session.save(meal7);
+        session.save(meal8);
+        session.save(meal9);
+        session.save(meal10);
 
         session.flush();
 
@@ -221,6 +265,67 @@ public class DataManager {
             }
         }
     }
+
+    static List<Meal> requestHaifaMenu(){
+        SessionFactory sessionFactory = getSessionFactory(password);
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        try {
+            return getMealsByRestaurantId(1);
+
+        } catch (Exception exception) {
+            System.err.println("An error occured");
+            exception.printStackTrace();
+            return null;
+        } finally {
+            if (session != null) {
+                session.close();
+                System.out.println("session closed");
+            }
+        }
+    }
+
+    static List<Meal> requestTelAvivMenu(){
+        SessionFactory sessionFactory = getSessionFactory(password);
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        try {
+            return getMealsByRestaurantId(2);
+
+        } catch (Exception exception) {
+            System.err.println("An error occured");
+            exception.printStackTrace();
+            return null;
+        } finally {
+            if (session != null) {
+                session.close();
+                System.out.println("session closed");
+            }
+        }
+    }
+
+    static List<Meal> requestNahariyaMenu(){
+        SessionFactory sessionFactory = getSessionFactory(password);
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        try {
+            return getMealsByRestaurantId(3);
+
+        } catch (Exception exception) {
+            System.err.println("An error occured");
+            exception.printStackTrace();
+            return null;
+        } finally {
+            if (session != null) {
+                session.close();
+                System.out.println("session closed");
+            }
+        }
+    }
+
 
     static AuthorizedUser checkPermission(String details) {
         try {

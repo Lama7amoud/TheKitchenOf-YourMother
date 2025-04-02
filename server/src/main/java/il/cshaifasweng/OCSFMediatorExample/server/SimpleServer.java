@@ -85,6 +85,47 @@ public class SimpleServer extends AbstractServer {
 			}
 
 		}
+		else if (msgString.equals("Request Haifa menu")) {
+			try {
+				List<Meal> HaifaMenu = DataManager.requestHaifaMenu();
+				if (HaifaMenu != null && !HaifaMenu.isEmpty()) {
+					client.sendToClient(HaifaMenu);
+				} else {
+					System.out.println("empty menu");
+					client.sendToClient("No menu available");
+				}
+			} catch (Exception exception) {
+				exception.printStackTrace();
+			}
+		}
+
+		else if (msgString.equals("Request Tel-Aviv menu")) {
+			try {
+				List<Meal> TelAvivMenu = DataManager.requestTelAvivMenu();
+				if (TelAvivMenu != null && !TelAvivMenu.isEmpty()) {
+					client.sendToClient(TelAvivMenu);
+				} else {
+					System.out.println("empty menu");
+					client.sendToClient("No menu available");
+				}
+			} catch (Exception exception) {
+				exception.printStackTrace();
+			}
+		}
+
+		else if (msgString.equals("Request Nahariya menu")) {
+			try {
+				List<Meal> NahariyaMenu = DataManager.requestNahariyaMenu();
+				if (NahariyaMenu != null && !NahariyaMenu.isEmpty()) {
+					client.sendToClient(NahariyaMenu);
+				} else {
+					System.out.println("empty menu");
+					client.sendToClient("No menu available");
+				}
+			} catch (Exception exception) {
+				exception.printStackTrace();
+			}
+		}
 
 		else if (msgString.startsWith("Update price")) {
 			// Remove the "Update price" prefix
