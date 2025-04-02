@@ -48,6 +48,21 @@ public class PrimaryController {
     @FXML
     private Text RestaurantDetailsInstructionLabel;
 
+    void updateResInterest(){
+        Platform.runLater(() -> {
+            String selectedRestaurant = ChooseRestaurantBox.getValue();
+            if(selectedRestaurant != null){
+                userAtt.setRestaurantInterest((short) switch (selectedRestaurant) {
+                            case "Haifa Branch" -> 1;
+                            case "Tel-Aviv Branch" -> 2;
+                            case "Nahariya Branch" -> 3;
+                            default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
+                        }
+                );
+            }
+        });
+    }
+
     @FXML
     void switchPage(ActionEvent event) {
         Platform.runLater(() -> {
@@ -66,38 +81,17 @@ public class PrimaryController {
             else if(sourceButton == orderTablesButton){
                 page = "Order Tables Page";
             }
-            if(userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4){
-                String selectedRestaurant = ChooseRestaurantBox.getValue();
-                if(selectedRestaurant != null){
-                    userAtt.setRestaurantInterest((short) switch (selectedRestaurant) {
-                                case "Haifa Branch" -> 1;
-                                case "Tel-Aviv Branch" -> 2;
-                                case "Nahariya Branch" -> 3;
-                                default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
-                            }
-                    );
-                }
-            }
 
+            updateResInterest();
             App.switchScreen(page);
         });
     }
 
+
     @FXML
     void toBranchPage(MouseEvent event){
         Platform.runLater(() -> {
-            if(userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4){
-                String selectedRestaurant = ChooseRestaurantBox.getValue();
-                if(selectedRestaurant != null){
-                    userAtt.setRestaurantInterest((short) switch (selectedRestaurant) {
-                                case "Haifa Branch" -> 1;
-                                case "Tel-Aviv Branch" -> 2;
-                                case "Nahariya Branch" -> 3;
-                                default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
-                            }
-                    );
-                }
-            }
+            updateResInterest();
             App.switchScreen("Branch Page");
         });
     }
