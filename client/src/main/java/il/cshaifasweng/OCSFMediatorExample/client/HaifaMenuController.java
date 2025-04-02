@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,7 +12,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,30 +19,44 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static il.cshaifasweng.OCSFMediatorExample.client.Client.userAtt;
-
 
 public class HaifaMenuController {
 
+    @FXML
+    private Button editPrice1;
 
     @FXML
-    private Button editPrice;
+    private Button editPrice2;
 
     @FXML
-    private GridPane menuGrid;
-
-
-    @FXML
-    private TextField textField00;
+    private Button editPrice3;
 
     @FXML
-    private TextField textField01;
+    private Button editPrice4;
 
     @FXML
-    private TextField textField02;
+    private Button editPrice5;
 
     @FXML
-    private TextField textField03;
+    private Button editPrice6;
+
+    @FXML
+    private Button editPrice7;
+
+    @FXML
+    private Button editPrice11;
+
+    @FXML
+    private Button editPrice22;
+
+    @FXML
+    private Button editPrice33;
+
+    @FXML
+    private Button editPrice44;
+
+    @FXML
+    private Button editPrice55;
 
     @FXML
     private TextField textField10;
@@ -90,8 +104,6 @@ public class HaifaMenuController {
     @FXML
     private TextField textField23;
 
-    @FXML
-    private TextField textField24;
 
     @FXML
     private TextField textField30;
@@ -105,8 +117,6 @@ public class HaifaMenuController {
     @FXML
     private TextField textField33;
 
-    @FXML
-    private TextField textField34;
 
     @FXML
     private TextField textField40;
@@ -120,8 +130,6 @@ public class HaifaMenuController {
     @FXML
     private TextField textField43;
 
-    @FXML
-    private TextField textField44;
 
     @FXML
     private TextField textField50;
@@ -135,8 +143,6 @@ public class HaifaMenuController {
     @FXML
     private TextField textField53;
 
-    @FXML
-    private TextField textField54;
 
     @FXML
     private TextField textField60;
@@ -150,8 +156,6 @@ public class HaifaMenuController {
     @FXML
     private TextField textField63;
 
-    @FXML
-    private TextField textField64;
 
     @FXML
     private TextField textField70;
@@ -181,192 +185,76 @@ public class HaifaMenuController {
     private ImageView imageView51;
 
     @FXML
-    private GridPane menuGrid1;
-
-
-    @FXML
-    private TextField textField001;
-
-
-    @FXML
-    private TextField textField011;
-
-
-    @FXML
-    private TextField textField021;
-
-
-    @FXML
-    private TextField textField031;
-
-    @FXML
-    private TextField textField04;
-
-    @FXML
-    private TextField textField041;
-
+    private Button savebtn;
 
     @FXML
     private TextField textField101;
 
     @FXML
-    private TextField textField10112;
-
-    @FXML
-    private TextField textField101121;
-
-
-    @FXML
     private TextField textField111;
-
-
 
     @FXML
     private TextField textField121;
 
-
-
     @FXML
     private TextField textField131;
-
-
 
     @FXML
     private TextField textField201;
 
-
-
     @FXML
     private TextField textField211;
-
-
 
     @FXML
     private TextField textField221;
 
-
-
     @FXML
     private TextField textField231;
-
-
 
     @FXML
     private TextField textField301;
 
-
-
     @FXML
     private TextField textField311;
-
-
 
     @FXML
     private TextField textField321;
 
-
-
     @FXML
     private TextField textField331;
-
 
     @FXML
     private TextField textField401;
 
-
-
     @FXML
     private TextField textField411;
-
-
-
     @FXML
     private TextField textField421;
-
 
     @FXML
     private TextField textField431;
 
-
     @FXML
     private TextField textField501;
-
 
     @FXML
     private TextField textField511;
 
-
     @FXML
     private TextField textField521;
-
 
     @FXML
     private TextField textField531;
 
     @FXML
-    private Button savebtn;
-
-    @FXML
-    private Button editPrice1;
-
-    @FXML
-    private Button editPrice2;
-
-    @FXML
-    private Button editPrice3;
-
-    @FXML
-    private Button editPrice4;
-
-    @FXML
-    private Button editPrice5;
-
-    @FXML
-    private Button editPrice6;
-
-    @FXML
-    private Button editPrice7;
-
-    @FXML
-    private Button editPrice11;
-
-    @FXML
-    private Button editPrice22;
-
-    @FXML
-    private Button editPrice33;
-
-    @FXML
-    private Button editPrice44;
-
-    @FXML
-    private Button editPrice55;
-
-
-
-
-
-    @FXML
     void initialize() throws IOException {
-
-
-            EventBus.getDefault().register(this);
-            Client client = Client.getClient();
-            try {
-                client.sendToServer("Request Haifa menu");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-
-
+        EventBus.getDefault().register(this);
+        Client client = Client.getClient();
+        client.sendToServer("Request Tel-Aviv menu");
 
     }
 
-
-
     private List<Meal> Menu ;
-    private List<Image> images ;
 
     @Subscribe
     public void ExternalIntervention(Object msg) {
@@ -377,6 +265,7 @@ public class HaifaMenuController {
                     menuOrder(Menu);
                     imagesOrder(Menu);
                     isDietitian();
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -427,7 +316,7 @@ public class HaifaMenuController {
                 }
 
             }
-            });
+        });
     }
     int crt1;
     private List<Meal> sharedList(List<Meal>Menu) {
@@ -443,23 +332,23 @@ public class HaifaMenuController {
     }
 
     int crt2;
-    private List<Meal> special1List(List<Meal>Menu) {
+    private List<Meal> special2List(List<Meal>Menu) {
         crt2=0;
-        List<Meal> special1List = new ArrayList<>();
+        List<Meal> special2List = new ArrayList<>();
         for (Meal meal : Menu) {
-            if (meal.getMealCategory().equals("special1")) {
-                special1List.add(meal);
+            if (meal.getMealCategory().equals("special2")) {
+                special2List.add(meal);
                 crt2++;
             }
 
         }
-        return special1List;
+        return special2List;
     }
 
     private void menuOrder(List<Meal>Menu) {
         Platform.runLater(() -> {
             List<Meal> sharedList = sharedList(Menu);
-            List<Meal> special1List = special1List(Menu);
+            List<Meal> special2List = special2List(Menu);
             int i;
 
             for( i=0 ; i<crt1 ; i++) {
@@ -514,35 +403,35 @@ public class HaifaMenuController {
             }
             for (i=0 ; i<crt2 ; i++) {
                 if (i==0) {
-                    textField101.setText(special1List.get(0).getMealName());
-                    textField111.setText(special1List.get(0).getMealDescription());
-                    textField121.setText(special1List.get(0).getMealPreferences());
-                    textField131.setText(String.valueOf(special1List.get(0).getMealPrice()));
+                    textField101.setText(special2List.get(0).getMealName());
+                    textField111.setText(special2List.get(0).getMealDescription());
+                    textField121.setText(special2List.get(0).getMealPreferences());
+                    textField131.setText(String.valueOf(special2List.get(0).getMealPrice()));
                 }
                 if (i==1) {
-                    textField201.setText(special1List.get(1).getMealName());
-                    textField211.setText(special1List.get(1).getMealDescription());
-                    textField221.setText(special1List.get(1).getMealPreferences());
-                    textField231.setText(String.valueOf(special1List.get(1).getMealPrice()));
+                    textField201.setText(special2List.get(1).getMealName());
+                    textField211.setText(special2List.get(1).getMealDescription());
+                    textField221.setText(special2List.get(1).getMealPreferences());
+                    textField231.setText(String.valueOf(special2List.get(1).getMealPrice()));
                 }
                 if (i==2) {
-                    textField301.setText(special1List.get(2).getMealName());
-                    textField311.setText(special1List.get(2).getMealDescription());
-                    textField321.setText(special1List.get(2).getMealPreferences());
-                    textField331.setText(String.valueOf(special1List.get(2).getMealPrice()));
+                    textField301.setText(special2List.get(2).getMealName());
+                    textField311.setText(special2List.get(2).getMealDescription());
+                    textField321.setText(special2List.get(2).getMealPreferences());
+                    textField331.setText(String.valueOf(special2List.get(2).getMealPrice()));
 
                 }
                 if (i==3) {
-                    textField401.setText(special1List.get(3).getMealName());
-                    textField411.setText(special1List.get(3).getMealDescription());
-                    textField421.setText(special1List.get(3).getMealPreferences());
-                    textField431.setText(String.valueOf(special1List.get(3).getMealPrice()));
+                    textField401.setText(special2List.get(3).getMealName());
+                    textField411.setText(special2List.get(3).getMealDescription());
+                    textField421.setText(special2List.get(3).getMealPreferences());
+                    textField431.setText(String.valueOf(special2List.get(3).getMealPrice()));
                 }
                 if (i==4) {
-                    textField501.setText(special1List.get(4).getMealName());
-                    textField511.setText(special1List.get(4).getMealDescription());
-                    textField521.setText(special1List.get(4).getMealPreferences());
-                    textField531.setText(String.valueOf(special1List.get(4).getMealPrice()));
+                    textField501.setText(special2List.get(4).getMealName());
+                    textField511.setText(special2List.get(4).getMealDescription());
+                    textField521.setText(special2List.get(4).getMealPreferences());
+                    textField531.setText(String.valueOf(special2List.get(4).getMealPrice()));
                 }
 
             }
@@ -554,7 +443,7 @@ public class HaifaMenuController {
 
         Platform.runLater(() -> {
             List<Meal> sharedList = sharedList(Menu);
-            List<Meal> special1List = special1List(Menu);
+            List<Meal> special2List = special2List(Menu);
             int i;
             for( i=0 ; i<crt1 ; i++) {
                 if(i==0) {
@@ -639,7 +528,7 @@ public class HaifaMenuController {
 
             for (i=0 ; i<crt2 ; i++) {
                 if(i==0) {
-                    String imagePath1 = special1List.get(0).getImagePath();
+                    String imagePath1 = special2List.get(0).getImagePath();
                     try {
                         Image image1 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath1)));
                         imageView11.setImage(image1);
@@ -650,7 +539,7 @@ public class HaifaMenuController {
                     }
                 }
                 if (i==1) {
-                    String imagePath2 = special1List.get(1).getImagePath();
+                    String imagePath2 = special2List.get(1).getImagePath();
                     try {
                         Image image2 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath2)));
                         imageView21.setImage(image2);
@@ -661,7 +550,7 @@ public class HaifaMenuController {
                     }
                 }
                 if (i==2) {
-                    String imagePath3 = special1List.get(2).getImagePath();
+                    String imagePath3 = special2List.get(2).getImagePath();
                     try {
                         Image image3 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath3)));
                         imageView31.setImage(image3);
@@ -672,7 +561,7 @@ public class HaifaMenuController {
                     }
                 }
                 if (i==3) {
-                    String imagePath4 = special1List.get(3).getImagePath();
+                    String imagePath4 = special2List.get(3).getImagePath();
                     try {
                         Image image4 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath4)));
                         imageView41.setImage(image4);
@@ -683,7 +572,7 @@ public class HaifaMenuController {
                     }
                 }
                 if (i==4) {
-                    String imagePath5 = special1List.get(4).getImagePath();
+                    String imagePath5 = special2List.get(4).getImagePath();
                     try {
                         Image image5 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath5)));
                         imageView51.setImage(image5);
@@ -694,7 +583,6 @@ public class HaifaMenuController {
                     }
                 }
             }
-
 
         });
 
@@ -717,7 +605,7 @@ public class HaifaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField13.setEditable(true);
-            textField13.setStyle("-fx-background-color: orange;");
+            textField13.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
             editPrice1.setVisible(false);
             mealName = textField10.getText();
             flag = 1;
@@ -735,7 +623,7 @@ public class HaifaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField23.setEditable(true);
-            textField23.setStyle("-fx-background-color: orange ;");
+            textField23.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
             editPrice2.setVisible(false);
             mealName = textField20.getText();
             flag = 2;
@@ -753,7 +641,7 @@ public class HaifaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField33.setEditable(true);
-            textField33.setStyle("-fx-background-color: orange ;");
+            textField33.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
             editPrice3.setVisible(false);
             mealName = textField30.getText();
             flag = 3;
@@ -771,7 +659,7 @@ public class HaifaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField43.setEditable(true);
-            textField43.setStyle("-fx-background-color: orange ;");
+            textField43.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
             editPrice4.setVisible(false);
             mealName = textField40.getText();
             flag = 4;
@@ -789,7 +677,7 @@ public class HaifaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField53.setEditable(true);
-            textField53.setStyle("-fx-background-color: orange ;");
+            textField53.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
             editPrice5.setVisible(false);
             mealName = textField50.getText();
             flag = 5;
@@ -808,7 +696,7 @@ public class HaifaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField63.setEditable(true);
-            textField63.setStyle("-fx-background-color: orange ;");
+            textField63.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
             editPrice6.setVisible(false);
             mealName = textField60.getText();
             flag = 6;
@@ -826,7 +714,7 @@ public class HaifaMenuController {
             editPrice6.setVisible(false);
             savebtn.setVisible(true);
             textField73.setEditable(true);
-            textField73.setStyle("-fx-background-color: orange ;");
+            textField73.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
             editPrice7.setVisible(false);
             mealName = textField70.getText();
             flag = 7;
@@ -850,7 +738,7 @@ public class HaifaMenuController {
 
             savebtn.setVisible(true);
             textField131.setEditable(true);
-            textField131.setStyle("-fx-background-color: orange;");
+            textField131.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
             editPrice11.setVisible(false);
             mealName = textField101.getText();
             flag = 8;
@@ -873,7 +761,7 @@ public class HaifaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField231.setEditable(true);
-            textField231.setStyle("-fx-background-color: orange ;");
+            textField231.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
             editPrice22.setVisible(false);
             mealName = textField201.getText();
             flag = 9;
@@ -896,7 +784,7 @@ public class HaifaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField331.setEditable(true);
-            textField331.setStyle("-fx-background-color: orange ;");
+            textField331.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
             editPrice33.setVisible(false);
             mealName = textField301.getText();
             flag = 10;
@@ -919,7 +807,7 @@ public class HaifaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField431.setEditable(true);
-            textField431.setStyle("-fx-background-color: orange ;");
+            textField431.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
             editPrice44.setVisible(false);
             mealName = textField401.getText();
             flag = 11;
@@ -942,7 +830,8 @@ public class HaifaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField531.setEditable(true);
-            textField531.setStyle("-fx-background-color: orange ;");
+            textField531.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
+
             editPrice55.setVisible(false);
             mealName = textField501.getText();
             flag = 12;
@@ -956,46 +845,59 @@ public class HaifaMenuController {
 
             if (flag == 1) {
                 price = textField13.getText();
+                textField13.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
+
             }
             if (flag == 2) {
                 price = textField23.getText();
+                textField23.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
             }
             if (flag == 3) {
                 price = textField33.getText();
+                textField33.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
             }
             if (flag == 4) {
                 price = textField43.getText();
+                textField43.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
             }
             if (flag == 5) {
                 price = textField53.getText();
+                textField53.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
             }
             if (flag == 6) {
                 price = textField63.getText();
+                textField63.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
             }
             if (flag == 7) {
                 price = textField73.getText();
+                textField73.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
             }
             if (flag == 8) {
                 price = textField131.getText();
+                textField131.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
             }
             if (flag == 9) {
                 price = textField231.getText();
+                textField231.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
             }
             if (flag == 10) {
                 price = textField331.getText();
+                textField331.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
             }
             if (flag == 11) {
                 price = textField431.getText();
+                textField431.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
             }
             if (flag == 12) {
                 price = textField531.getText();
+                textField531.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
+
             }
             if (price.equals("")) {
                 price = "0";
             }
             try {
                 Client.getClient().sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
-                System.out.println(price);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1012,21 +914,14 @@ public class HaifaMenuController {
             textField63.setEditable(false);
             textField73.setEditable(false);
 
-            editPrice1.setVisible(true);
-            editPrice2.setVisible(true);
-            editPrice3.setVisible(true);
-            editPrice4.setVisible(true);
-            editPrice5.setVisible(true);
-            editPrice6.setVisible(true);
-            editPrice7.setVisible(true);
-            editPrice11.setVisible(true);
-            editPrice22.setVisible(true);
-            editPrice33.setVisible(true);
-            editPrice44.setVisible(true);
-            editPrice55.setVisible(true);
             savebtn.setVisible(false);
+            isDietitian();
         });
     }
+
+
+
+
 
 
 
