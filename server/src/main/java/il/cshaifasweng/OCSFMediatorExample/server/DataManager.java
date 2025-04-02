@@ -159,6 +159,7 @@ public class DataManager {
         session.flush();
 
         // Create authorized users
+        //mnhelt resht
         AuthorizedUser user1 = new AuthorizedUser();
         user1.setUsername("Sharbel");
         user1.setPassword("password123");
@@ -170,6 +171,7 @@ public class DataManager {
         user1.setConnected(false);
         user1.setPermissionLevel((short) 4);
 
+        //ditanit
         AuthorizedUser user2 = new AuthorizedUser();
         user2.setUsername("Falah");
         user2.setPassword("password456");
@@ -181,6 +183,7 @@ public class DataManager {
         user2.setConnected(false);
         user2.setPermissionLevel((short) 5);
 
+        //30fedt kshre lko7ot
         AuthorizedUser user3 = new AuthorizedUser();
         user3.setUsername("Mohammed");
         user3.setPassword("password789");
@@ -188,14 +191,95 @@ public class DataManager {
         user3.setLastname("Abu Saleh");
         user3.setIDNum("206538466");
         user3.setAge((short) 25);
-        user3.setRestaurant(restaurant3);
+        user3.setRestaurant(restaurant1);
         user3.setConnected(false);
         user3.setPermissionLevel((short) 2);
 
+        //mnhlot snefem
+        AuthorizedUser user4 = new AuthorizedUser();
+        user4.setUsername("Lama");
+        user4.setPassword("password777");
+        user4.setFirstname("Lama");
+        user4.setLastname("Hamoud");
+        user4.setIDNum("222334455");
+        user4.setAge((short) 22);
+        user4.setRestaurant(restaurant1);
+        user4.setConnected(false);
+        user4.setPermissionLevel((short) 3);
+
+        AuthorizedUser user6 = new AuthorizedUser();
+        user6.setUsername("Malki");
+        user6.setPassword("password111");
+        user6.setFirstname("Malki");
+        user6.setLastname("Grossman");
+        user6.setIDNum("123456789");
+        user6.setAge((short) 30);
+        user6.setRestaurant(restaurant2);
+        user6.setConnected(false);
+        user6.setPermissionLevel((short) 3);
+
+        AuthorizedUser user7 = new AuthorizedUser();
+        user7.setUsername("Abedalftah");
+        user7.setPassword("password222");
+        user7.setFirstname("Abedalftah");
+        user7.setLastname("Abedalftah");
+        user7.setIDNum("987654321");
+        user7.setAge((short) 30);
+        user7.setRestaurant(restaurant3);
+        user7.setConnected(false);
+        user7.setPermissionLevel((short) 3);
+
+
+        //30fdot
+        AuthorizedUser user5 = new AuthorizedUser();
+        user5.setUsername("Oraib");
+        user5.setPassword("password888");
+        user5.setFirstname("Oraib");
+        user5.setLastname("Marzook");
+        user5.setIDNum("111223344");
+        user5.setAge((short) 29);
+        user5.setRestaurant(restaurant1);
+        user5.setConnected(false);
+        user5.setPermissionLevel((short) 1);
+
+        AuthorizedUser user8 = new AuthorizedUser();
+        user8.setUsername("Rasha");
+        user8.setPassword("password333");
+        user8.setFirstname("Rasha");
+        user8.setLastname("Odeh");
+        user8.setIDNum("910229304");
+        user8.setAge((short) 25);
+        user8.setRestaurant(restaurant2);
+        user8.setConnected(false);
+        user8.setPermissionLevel((short) 1);
+
+        AuthorizedUser user9 = new AuthorizedUser();
+        user9.setUsername("Waleed");
+        user9.setPassword("password666");
+        user9.setFirstname("Waleed");
+        user9.setLastname("Messi");
+        user9.setIDNum("101010100");
+        user9.setAge((short) 25);
+        user9.setRestaurant(restaurant3);
+        user9.setConnected(false);
+        user9.setPermissionLevel((short) 1);
+
+        //System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+        //System.out.println(restaurant2.getId());
         // Save users in the database
         session.save(user1);
         session.save(user2);
         session.save(user3);
+        session.save(user4);
+        session.save(user5);
+        session.save(user6);
+        session.save(user7);
+        session.save(user8);
+        session.save(user9);
+        //session.save(user10);
+
+        //session.flush();
+        //session.getTransaction().commit();
 
         // Insert tables for Haifa branch (13 tables)
         for (int i = 1; i <= 13; i++) {

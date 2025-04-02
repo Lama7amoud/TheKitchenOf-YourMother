@@ -342,6 +342,8 @@ public class HaifaMenuController {
     @FXML
     private Button editPrice55;
 
+    @FXML
+    private Button back;
 
 
 
@@ -1029,7 +1031,13 @@ public class HaifaMenuController {
     }
 
 
+    @FXML
+    void back_func(ActionEvent event) {
+            //String page = "Organization Page";
+            String page = "Main Page";
+            App.switchScreen(page);
 
+    }
 
 
 }
