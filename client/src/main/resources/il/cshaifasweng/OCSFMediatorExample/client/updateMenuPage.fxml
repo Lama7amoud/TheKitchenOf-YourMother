@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="541.0" prefWidth="638.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.updateMenuPageController">
+   <left>
+      <AnchorPane prefHeight="446.0" prefWidth="231.0" style="-fx-background-color: PINK;" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="helloTitleLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="8.0" layoutY="41.0" prefHeight="32.0" prefWidth="219.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Hello ..." textFill="#0b0000">
+               <font>
+                  <Font size="22.0" />
+               </font>
+               <padding>
+                  <Insets left="10.0" right="10.0" />
+               </padding>
+            </Label>
+            <Label fx:id="managerTypeLabel" alignment="CENTER" layoutX="8.0" layoutY="88.0" prefHeight="27.0" prefWidth="220.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Manager type" textAlignment="CENTER">
+               <font>
+                  <Font size="18.0" />
+               </font>
+               <padding>
+                  <Insets left="10.0" right="10.0" />
+               </padding>
+            </Label>
+            <Button fx:id="getTelavivMenuButton" alignment="CENTER" layoutX="92.0" layoutY="187.0" mnemonicParsing="false" onAction="#get_telaviv_menu_func" prefHeight="25.0" prefWidth="97.0" text="Tel-Aviv Menu" />
+            <Button fx:id="getNahariyaMenuButton" alignment="CENTER" layoutX="92.0" layoutY="228.0" mnemonicParsing="false" onAction="#get_nahariya_menu_func" prefHeight="25.0" prefWidth="98.0" text="Nahariya Menu" />
+            <Button layoutX="40.0" layoutY="349.0" mnemonicParsing="false" onAction="#backFunc" text="back" />
+            <Button fx:id="getHaifaMenuButton" alignment="CENTER" layoutX="91.0" layoutY="145.0" mnemonicParsing="false" onAction="#get_haifa_menu_func" prefHeight="25.0" prefWidth="99.0" text="Haifa Menu" />
+         </children>
+      </AnchorPane>
+   </left>
+   <right>
+      <AnchorPane prefHeight="541.0" prefWidth="409.0" BorderPane.alignment="CENTER">
+         <children>
+            <TextField fx:id="addMealName" layoutX="14.0" layoutY="82.0" prefHeight="25.0" prefWidth="132.0" />
+            <TextField fx:id="mealDescription" layoutX="14.0" layoutY="134.0" prefHeight="25.0" prefWidth="332.0" />
+            <TextField fx:id="mealPreferences" layoutX="185.0" layoutY="82.0" />
+            <Button fx:id="addMealButton" layoutX="253.0" layoutY="221.0" mnemonicParsing="false" onAction="#add_meal_func" prefHeight="25.0" prefWidth="98.0" text="Add Meal" />
+            <TextField fx:id="mealCategory" layoutX="14.0" layoutY="187.0" />
+            <TextField fx:id="mealPrice" layoutX="191.0" layoutY="187.0" />
+            <Label layoutX="16.0" layoutY="60.0" prefHeight="17.0" prefWidth="107.0" text="Meal Name" />
+            <Label layoutX="194.0" layoutY="60.0" prefHeight="17.0" prefWidth="131.0" text="Preferences" />
+            <Label layoutX="17.0" layoutY="117.0" prefHeight="17.0" prefWidth="97.0" text="Description" />
+            <Label layoutX="16.0" layoutY="167.0" prefHeight="17.0" prefWidth="93.0" text="Category" />
+            <Label layoutX="195.0" layoutY="167.0" prefHeight="17.0" prefWidth="83.0" text="Price" />
+            <Button fx:id="removeMealButton" layoutX="254.0" layoutY="307.0" mnemonicParsing="false" onAction="#remove_meal_func" prefHeight="25.0" prefWidth="94.0" text="Remove Meal" />
+            <Label alignment="CENTER" layoutX="66.0" layoutY="258.0" prefHeight="43.0" prefWidth="219.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="REMOVE MEAL" textAlignment="CENTER" textFill="#9493b5">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Label>
+            <Label layoutX="10.0" layoutY="311.0" prefHeight="17.0" prefWidth="108.0" text="Meal Name" />
+            <TextField fx:id="removeMealName" layoutX="87.0" layoutY="307.0" />
+            <Label alignment="CENTER" layoutX="17.0" layoutY="361.0" prefHeight="43.0" prefWidth="337.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="CHANGE MEAL CATEGORY" textAlignment="CENTER" textFill="#9493b5">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Label>
+            <Label layoutX="10.0" layoutY="404.0" prefHeight="17.0" prefWidth="107.0" text="Meal Name" />
+            <TextField fx:id="changeCategoryMealName" layoutX="87.0" layoutY="400.0" />
+            <Label layoutX="14.0" layoutY="441.0" prefHeight="17.0" prefWidth="39.0" text="from" />
+            <ChoiceBox layoutX="86.0" layoutY="437.0" prefWidth="150.0" />
+            <Label layoutX="14.0" layoutY="479.0" text="to" />
+            <ChoiceBox layoutX="88.0" layoutY="475.0" prefWidth="150.0" />
+            <Button fx:id="changeButton" layoutX="279.0" layoutY="500.0" mnemonicParsing="false" text="Change" />
+            <Label alignment="CENTER" layoutX="75.0" layoutY="14.0" prefHeight="43.0" prefWidth="219.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="ADD MEAL" textAlignment="CENTER" textFill="#9493b5">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+   </right>
+</BorderPane>

@@ -56,8 +56,8 @@ public class App extends Application {
                         Map.entry("Tables Page", "tablesViewPage"),
                         Map.entry("Haifa Menu Page", "HaifaMenu"),
                         Map.entry("TelAviv Menu Page", "Tel_AvivMenu"),
-                        Map.entry("Nahariya Menu Page" ,"NahariyaMenu")
-
+                        Map.entry("Nahariya Menu Page" ,"NahariyaMenu"),
+                        Map.entry("Update Menu Page" ,"updateMenuPage")
                 );
 
 
