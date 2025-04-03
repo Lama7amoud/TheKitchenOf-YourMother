@@ -1,6 +1,5 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,6 +11,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
+import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,44 +19,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static il.cshaifasweng.OCSFMediatorExample.client.Client.userAtt;
+
 
 public class NahariyaMenuController {
 
-    @FXML
-    private Button editPrice1;
-
-    @FXML
-    private Button editPrice2;
-
-    @FXML
-    private Button editPrice3;
-
-    @FXML
-    private Button editPrice4;
-
-    @FXML
-    private Button editPrice5;
-
-    @FXML
-    private Button editPrice6;
-
-    @FXML
-    private Button editPrice7;
-
-    @FXML
-    private Button editPrice11;
-
-    @FXML
-    private Button editPrice22;
-
-    @FXML
-    private Button editPrice33;
-
-    @FXML
-    private Button editPrice44;
-
-    @FXML
-    private Button editPrice55;
 
     @FXML
     private TextField textField10;
@@ -104,7 +71,6 @@ public class NahariyaMenuController {
     @FXML
     private TextField textField23;
 
-
     @FXML
     private TextField textField30;
 
@@ -116,7 +82,6 @@ public class NahariyaMenuController {
 
     @FXML
     private TextField textField33;
-
 
     @FXML
     private TextField textField40;
@@ -130,7 +95,6 @@ public class NahariyaMenuController {
     @FXML
     private TextField textField43;
 
-
     @FXML
     private TextField textField50;
 
@@ -143,7 +107,6 @@ public class NahariyaMenuController {
     @FXML
     private TextField textField53;
 
-
     @FXML
     private TextField textField60;
 
@@ -155,7 +118,6 @@ public class NahariyaMenuController {
 
     @FXML
     private TextField textField63;
-
 
     @FXML
     private TextField textField70;
@@ -183,9 +145,6 @@ public class NahariyaMenuController {
 
     @FXML
     private ImageView imageView51;
-
-    @FXML
-    private Button savebtn;
 
     @FXML
     private TextField textField101;
@@ -228,33 +187,89 @@ public class NahariyaMenuController {
 
     @FXML
     private TextField textField411;
+
     @FXML
     private TextField textField421;
+
 
     @FXML
     private TextField textField431;
 
+
     @FXML
     private TextField textField501;
+
 
     @FXML
     private TextField textField511;
 
+
     @FXML
     private TextField textField521;
+
 
     @FXML
     private TextField textField531;
 
     @FXML
+    private Button savebtn;
+
+    @FXML
+    private Button editPrice1;
+
+    @FXML
+    private Button editPrice2;
+
+    @FXML
+    private Button editPrice3;
+
+    @FXML
+    private Button editPrice4;
+
+    @FXML
+    private Button editPrice5;
+
+    @FXML
+    private Button editPrice6;
+
+    @FXML
+    private Button editPrice7;
+
+    @FXML
+    private Button editPrice11;
+
+    @FXML
+    private Button editPrice22;
+
+    @FXML
+    private Button editPrice33;
+
+    @FXML
+    private Button editPrice44;
+
+    @FXML
+    private Button editPrice55;
+
+
+
+
+
+    @FXML
     void initialize() throws IOException {
+
+
         EventBus.getDefault().register(this);
         Client client = Client.getClient();
-        client.sendToServer("Request Tel-Aviv menu");
-
+        try {
+            client.sendToServer("Request Nahariya menu");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
+
     private List<Meal> Menu ;
+    private List<Image> images ;
 
     @Subscribe
     public void ExternalIntervention(Object msg) {
@@ -265,7 +280,6 @@ public class NahariyaMenuController {
                     menuOrder(Menu);
                     imagesOrder(Menu);
                     isDietitian();
-
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -332,23 +346,23 @@ public class NahariyaMenuController {
     }
 
     int crt2;
-    private List<Meal> special2List(List<Meal>Menu) {
+    private List<Meal> special3List(List<Meal>Menu) {
         crt2=0;
-        List<Meal> special2List = new ArrayList<>();
+        List<Meal> special3List = new ArrayList<>();
         for (Meal meal : Menu) {
-            if (meal.getMealCategory().equals("special2")) {
-                special2List.add(meal);
+            if (meal.getMealCategory().equals("special3")) {
+                special3List.add(meal);
                 crt2++;
             }
 
         }
-        return special2List;
+        return special3List;
     }
 
     private void menuOrder(List<Meal>Menu) {
         Platform.runLater(() -> {
             List<Meal> sharedList = sharedList(Menu);
-            List<Meal> special2List = special2List(Menu);
+            List<Meal> special3List = special3List(Menu);
             int i;
 
             for( i=0 ; i<crt1 ; i++) {
@@ -403,35 +417,35 @@ public class NahariyaMenuController {
             }
             for (i=0 ; i<crt2 ; i++) {
                 if (i==0) {
-                    textField101.setText(special2List.get(0).getMealName());
-                    textField111.setText(special2List.get(0).getMealDescription());
-                    textField121.setText(special2List.get(0).getMealPreferences());
-                    textField131.setText(String.valueOf(special2List.get(0).getMealPrice()));
+                    textField101.setText(special3List.get(0).getMealName());
+                    textField111.setText(special3List.get(0).getMealDescription());
+                    textField121.setText(special3List.get(0).getMealPreferences());
+                    textField131.setText(String.valueOf(special3List.get(0).getMealPrice()));
                 }
                 if (i==1) {
-                    textField201.setText(special2List.get(1).getMealName());
-                    textField211.setText(special2List.get(1).getMealDescription());
-                    textField221.setText(special2List.get(1).getMealPreferences());
-                    textField231.setText(String.valueOf(special2List.get(1).getMealPrice()));
+                    textField201.setText(special3List.get(1).getMealName());
+                    textField211.setText(special3List.get(1).getMealDescription());
+                    textField221.setText(special3List.get(1).getMealPreferences());
+                    textField231.setText(String.valueOf(special3List.get(1).getMealPrice()));
                 }
                 if (i==2) {
-                    textField301.setText(special2List.get(2).getMealName());
-                    textField311.setText(special2List.get(2).getMealDescription());
-                    textField321.setText(special2List.get(2).getMealPreferences());
-                    textField331.setText(String.valueOf(special2List.get(2).getMealPrice()));
+                    textField301.setText(special3List.get(2).getMealName());
+                    textField311.setText(special3List.get(2).getMealDescription());
+                    textField321.setText(special3List.get(2).getMealPreferences());
+                    textField331.setText(String.valueOf(special3List.get(2).getMealPrice()));
 
                 }
                 if (i==3) {
-                    textField401.setText(special2List.get(3).getMealName());
-                    textField411.setText(special2List.get(3).getMealDescription());
-                    textField421.setText(special2List.get(3).getMealPreferences());
-                    textField431.setText(String.valueOf(special2List.get(3).getMealPrice()));
+                    textField401.setText(special3List.get(3).getMealName());
+                    textField411.setText(special3List.get(3).getMealDescription());
+                    textField421.setText(special3List.get(3).getMealPreferences());
+                    textField431.setText(String.valueOf(special3List.get(3).getMealPrice()));
                 }
                 if (i==4) {
-                    textField501.setText(special2List.get(4).getMealName());
-                    textField511.setText(special2List.get(4).getMealDescription());
-                    textField521.setText(special2List.get(4).getMealPreferences());
-                    textField531.setText(String.valueOf(special2List.get(4).getMealPrice()));
+                    textField501.setText(special3List.get(4).getMealName());
+                    textField511.setText(special3List.get(4).getMealDescription());
+                    textField521.setText(special3List.get(4).getMealPreferences());
+                    textField531.setText(String.valueOf(special3List.get(4).getMealPrice()));
                 }
 
             }
@@ -443,7 +457,7 @@ public class NahariyaMenuController {
 
         Platform.runLater(() -> {
             List<Meal> sharedList = sharedList(Menu);
-            List<Meal> special2List = special2List(Menu);
+            List<Meal> special3List = special3List(Menu);
             int i;
             for( i=0 ; i<crt1 ; i++) {
                 if(i==0) {
@@ -528,7 +542,7 @@ public class NahariyaMenuController {
 
             for (i=0 ; i<crt2 ; i++) {
                 if(i==0) {
-                    String imagePath1 = special2List.get(0).getImagePath();
+                    String imagePath1 = special3List.get(0).getImagePath();
                     try {
                         Image image1 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath1)));
                         imageView11.setImage(image1);
@@ -539,7 +553,7 @@ public class NahariyaMenuController {
                     }
                 }
                 if (i==1) {
-                    String imagePath2 = special2List.get(1).getImagePath();
+                    String imagePath2 = special3List.get(1).getImagePath();
                     try {
                         Image image2 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath2)));
                         imageView21.setImage(image2);
@@ -550,7 +564,7 @@ public class NahariyaMenuController {
                     }
                 }
                 if (i==2) {
-                    String imagePath3 = special2List.get(2).getImagePath();
+                    String imagePath3 = special3List.get(2).getImagePath();
                     try {
                         Image image3 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath3)));
                         imageView31.setImage(image3);
@@ -561,7 +575,7 @@ public class NahariyaMenuController {
                     }
                 }
                 if (i==3) {
-                    String imagePath4 = special2List.get(3).getImagePath();
+                    String imagePath4 = special3List.get(3).getImagePath();
                     try {
                         Image image4 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath4)));
                         imageView41.setImage(image4);
@@ -572,7 +586,7 @@ public class NahariyaMenuController {
                     }
                 }
                 if (i==4) {
-                    String imagePath5 = special2List.get(4).getImagePath();
+                    String imagePath5 = special3List.get(4).getImagePath();
                     try {
                         Image image5 = new Image(String.valueOf(PrimaryController.class.getResource(imagePath5)));
                         imageView51.setImage(image5);
@@ -583,6 +597,7 @@ public class NahariyaMenuController {
                     }
                 }
             }
+
 
         });
 
@@ -605,7 +620,7 @@ public class NahariyaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField13.setEditable(true);
-            textField13.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
+            textField13.setStyle("-fx-background-color: orange;-fx-border-color: blue");
             editPrice1.setVisible(false);
             mealName = textField10.getText();
             flag = 1;
@@ -623,7 +638,7 @@ public class NahariyaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField23.setEditable(true);
-            textField23.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
+            textField23.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
             editPrice2.setVisible(false);
             mealName = textField20.getText();
             flag = 2;
@@ -641,7 +656,7 @@ public class NahariyaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField33.setEditable(true);
-            textField33.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
+            textField33.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
             editPrice3.setVisible(false);
             mealName = textField30.getText();
             flag = 3;
@@ -659,7 +674,7 @@ public class NahariyaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField43.setEditable(true);
-            textField43.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
+            textField43.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
             editPrice4.setVisible(false);
             mealName = textField40.getText();
             flag = 4;
@@ -677,7 +692,7 @@ public class NahariyaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField53.setEditable(true);
-            textField53.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
+            textField53.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
             editPrice5.setVisible(false);
             mealName = textField50.getText();
             flag = 5;
@@ -696,7 +711,7 @@ public class NahariyaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField63.setEditable(true);
-            textField63.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
+            textField63.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
             editPrice6.setVisible(false);
             mealName = textField60.getText();
             flag = 6;
@@ -714,7 +729,7 @@ public class NahariyaMenuController {
             editPrice6.setVisible(false);
             savebtn.setVisible(true);
             textField73.setEditable(true);
-            textField73.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
+            textField73.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
             editPrice7.setVisible(false);
             mealName = textField70.getText();
             flag = 7;
@@ -738,7 +753,7 @@ public class NahariyaMenuController {
 
             savebtn.setVisible(true);
             textField131.setEditable(true);
-            textField131.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
+            textField131.setStyle("-fx-background-color: orange;-fx-border-color: blue");
             editPrice11.setVisible(false);
             mealName = textField101.getText();
             flag = 8;
@@ -761,7 +776,7 @@ public class NahariyaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField231.setEditable(true);
-            textField231.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
+            textField231.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
             editPrice22.setVisible(false);
             mealName = textField201.getText();
             flag = 9;
@@ -784,7 +799,7 @@ public class NahariyaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField331.setEditable(true);
-            textField331.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
+            textField331.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
             editPrice33.setVisible(false);
             mealName = textField301.getText();
             flag = 10;
@@ -807,7 +822,7 @@ public class NahariyaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField431.setEditable(true);
-            textField431.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
+            textField431.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
             editPrice44.setVisible(false);
             mealName = textField401.getText();
             flag = 11;
@@ -830,8 +845,7 @@ public class NahariyaMenuController {
             editPrice7.setVisible(false);
             savebtn.setVisible(true);
             textField531.setEditable(true);
-            textField531.setStyle("-fx-border-color:blue; -fx-background-color:orange;");
-
+            textField531.setStyle("-fx-background-color: orange ; -fx-border-color: blue");
             editPrice55.setVisible(false);
             mealName = textField501.getText();
             flag = 12;
@@ -845,52 +859,61 @@ public class NahariyaMenuController {
 
             if (flag == 1) {
                 price = textField13.getText();
-                textField13.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
-
+                textField13.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
             }
             if (flag == 2) {
                 price = textField23.getText();
-                textField23.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
+                textField23.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+
             }
             if (flag == 3) {
                 price = textField33.getText();
-                textField33.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
+                textField33.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
             }
             if (flag == 4) {
                 price = textField43.getText();
-                textField43.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
+                textField43.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
             }
             if (flag == 5) {
                 price = textField53.getText();
-                textField53.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
+                textField53.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
             }
             if (flag == 6) {
                 price = textField63.getText();
-                textField63.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
+                textField63.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
             }
             if (flag == 7) {
                 price = textField73.getText();
-                textField73.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
+                textField73.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
             }
             if (flag == 8) {
                 price = textField131.getText();
-                textField131.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
+                textField131.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
             }
             if (flag == 9) {
                 price = textField231.getText();
-                textField231.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
+                textField231.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
             }
             if (flag == 10) {
                 price = textField331.getText();
-                textField331.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
+                textField331.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
             }
             if (flag == 11) {
                 price = textField431.getText();
-                textField431.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
+                textField431.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
             }
             if (flag == 12) {
                 price = textField531.getText();
-                textField531.setStyle("-fx-border-color:orange; -fx-background-color:orange;");
+                textField531.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
 
             }
             if (price.equals("")) {
@@ -898,6 +921,7 @@ public class NahariyaMenuController {
             }
             try {
                 Client.getClient().sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
+                System.out.println(price);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -921,10 +945,13 @@ public class NahariyaMenuController {
 
 
 
+    @FXML
+    void backFunc(ActionEvent event) {
 
+        String page = "Main Page";
+        App.switchScreen(page);
 
-
-
+    }
 
 
 }

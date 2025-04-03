@@ -81,6 +81,8 @@
             </rowConstraints>
         </GridPane>
         <Button fx:id="savebtn" layoutX="834.0" layoutY="631.0" mnemonicParsing="false" onAction="#saveFunc" text="save" visible="false" />
+        <Button fx:id="back" layoutX="820.0" layoutY="1320.0" mnemonicParsing="false" onAction="#backFunc" text="Back To Main Page" visible="true" />
+
         <TextField layoutX="14.0" layoutY="776.0" style="-fx-font-weight: bold; -fx-background-color: orange; " text="Special Meals" />
         <GridPane fx:id="menuGrid1" gridLinesVisible="true" layoutX="21.0" layoutY="811.0" prefHeight="700.0" prefWidth="700.0" style="-fx-background-color: orange; -fx-grid-lines-visible: false;">
             <columnConstraints>

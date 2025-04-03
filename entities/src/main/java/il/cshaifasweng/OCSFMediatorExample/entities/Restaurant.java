@@ -21,6 +21,14 @@ public class Restaurant implements Serializable {
     private String location;
     private String phoneNumber;
     private String activityHours;
+    private static Restaurant restaurant;
+
+    public static Restaurant getRestaurant() {
+        if (restaurant == null) {
+            restaurant = new Restaurant();  // or fetch from DB
+        }
+        return restaurant;
+    }
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private List<HostingTable> hostingTables;  // Reference to the HostingTable entity

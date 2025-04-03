@@ -137,6 +137,7 @@
             </children>
         </GridPane>
         <Button fx:id="savebtn" layoutX="834.0" layoutY="631.0" mnemonicParsing="false" onAction="#saveFunc" text="save" visible="false" />
+        <Button fx:id="back" layoutX="820.0" layoutY="1320.0" mnemonicParsing="false" onAction="#backFunc" text="Back To Main Page" visible="true" />
         <Button fx:id="editPrice1" layoutX="790.0" layoutY="120.0" mnemonicParsing="false" onAction="#editPrice1" text="edit price " visible="false" />
         <Button fx:id="editPrice2" layoutX="790.0" layoutY="225.0" mnemonicParsing="false" onAction="#editPrice2" text="edit price " visible="false" />
         <Button fx:id="editPrice3" layoutX="790.0" layoutY="311.0" mnemonicParsing="false" onAction="#editPrice3" text="edit price " visible="false" />
