@@ -46,7 +46,7 @@ public class DataManager {
         return data;
     }
 
-    private static List<Meal> getMealsByRestaurantId(int restaurantId) {
+   /* private static List<Meal> getMealsByRestaurantId(int restaurantId) {
         try {
             CriteriaBuilder builder = session.getCriteriaBuilder();
             CriteriaQuery<Meal> query = builder.createQuery(Meal.class);
@@ -64,7 +64,7 @@ public class DataManager {
             return null;
         }
     }
-
+*/
 
 
     private static void generateData() throws Exception {
@@ -350,7 +350,7 @@ public class DataManager {
         }
     }
 
-    static List<Meal> requestHaifaMenu(){
+    /*static List<Meal> requestHaifaMenu(){
         SessionFactory sessionFactory = getSessionFactory(password);
         session = sessionFactory.openSession();
         session.beginTransaction();
@@ -410,7 +410,7 @@ public class DataManager {
         }
     }
 
-
+*/
     static AuthorizedUser checkPermission(String details) {
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
@@ -540,6 +540,44 @@ public class DataManager {
             CriteriaUpdate<Meal> updateQuery = builder.createCriteriaUpdate(Meal.class);
             Root<Meal> root = updateQuery.from(Meal.class);
             updateQuery.set("mealPrice", mealPrice) // Use mealPrice directly
+                    .where(builder.equal(root.get("mealName"), mealName)); // Find the meal by name
+
+
+            // Execute the update
+            int rowsUpdated = session.createQuery(updateQuery).executeUpdate();
+
+            // Commit the transaction
+            session.getTransaction().commit();
+
+            return rowsUpdated; // Return number of rows updated (1 for success, 0 for failure)
+        } catch (Exception e) {
+            if (session != null && session.isOpen()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return 0; // Indicate failure
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+    static int updateMealIngredient(String mealName, String Ingredient) {
+        try {
+            System.out.println("update method reached");
+            // Start a session and transaction
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            System.out.println("meal name in update function" + mealName);
+            System.out.println("meal Ingredient in update function" + Ingredient);
+            // Build the query to update the meal price
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaUpdate<Meal> updateQuery = builder.createCriteriaUpdate(Meal.class);
+            Root<Meal> root = updateQuery.from(Meal.class);
+            updateQuery.set("mealDescription", Ingredient)
                     .where(builder.equal(root.get("mealName"), mealName)); // Find the meal by name
 
 

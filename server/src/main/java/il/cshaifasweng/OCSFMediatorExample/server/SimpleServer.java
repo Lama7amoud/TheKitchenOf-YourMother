@@ -70,7 +70,7 @@ public class SimpleServer extends AbstractServer {
 				exception.printStackTrace();
 			}
 		}
-		else if (msgString.equals("Request menu")) {
+		else if (msgString.startsWith("Request")) {
 			try {
 				List<Meal> menu = DataManager.requestMenu();
 				if(menu != null && !menu.isEmpty()) {
@@ -85,7 +85,7 @@ public class SimpleServer extends AbstractServer {
 			}
 
 		}
-		else if (msgString.equals("Request Haifa menu")) {
+		/*else if (msgString.equals("Request Haifa menu")) {
 			try {
 				List<Meal> HaifaMenu = DataManager.requestHaifaMenu();
 				if (HaifaMenu != null && !HaifaMenu.isEmpty()) {
@@ -125,7 +125,7 @@ public class SimpleServer extends AbstractServer {
 			} catch (Exception exception) {
 				exception.printStackTrace();
 			}
-		}
+		}*/
 
 		else if (msgString.startsWith("Update price")) {
 			// Remove the "Update price" prefix
@@ -170,7 +170,52 @@ public class SimpleServer extends AbstractServer {
 					ioException.printStackTrace();
 				}
 			}
-		} else if (msgString.startsWith("remove client")) {
+		} else if (msgString.startsWith("Update Ingredient ")) {
+			// Remove the "Update Ingredient" prefix
+			String details = msgString.substring("Update Ingredient ".length()).trim();
+
+			// Assuming meal name and price are enclosed in double quotes!
+			String[] parts = details.split("\"");
+
+			// Extract meal name (inside the first quotes) and meal price (inside the second quotes)
+			// Remember that parts[] now looks like this: ["","meal name","","meal price"]
+			String mealName = parts[1];
+			String mealIngredient = parts[3].trim();
+
+			try {
+				// Call the DataManager function to update the meal price
+				if(DataManager.updateMealIngredient(mealName, mealIngredient) != 1){
+					System.out.println("Update meal failed");
+					client.sendToClient(mealName + " Ingredient update has failed");
+				}
+				else {
+					client.sendToClient(mealName + "Ingredient has updated successfully");
+					try {
+						List<Meal> menu = DataManager.requestMenu();
+						if(menu != null && !menu.isEmpty()) {
+							sendToAllClients(menu); // update to all clients
+						}
+						else{
+							System.out.println("empty menu");
+							client.sendToClient("No menu available");
+						}
+					} catch (Exception exception){
+						exception.printStackTrace();
+					}
+					System.out.println("Ingredient has updated successfully");
+
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				try {
+					client.sendToClient(mealName + " Ingredient update has failed");
+				} catch (IOException ioException) {
+					ioException.printStackTrace();
+				}
+			}
+		}
+
+		else if (msgString.startsWith("remove client")) {
 			int index = msgString.indexOf(";");
 			String username = msgString.substring(index + 1).trim();
 			if(!(username.equals("Customer"))){
