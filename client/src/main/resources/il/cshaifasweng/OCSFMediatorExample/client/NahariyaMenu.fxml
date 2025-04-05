@@ -173,6 +173,9 @@
         <Label fx:id="errorLabel" layoutX="33.0" layoutY="1310.0" text="Label" textFill="RED" visible="false" />
         <Button fx:id="makeDiscount" layoutX="300.0" layoutY="1310.0" mnemonicParsing="false" onAction="#makeDiscount" text="Make Discount " visible="false" />
       <Button fx:id="backDietitian" layoutX="500.0" layoutY="1310.0" mnemonicParsing="false" onAction="#back_to_update_page_func" text="Back To Update Page" visible="false" />
+      <Button fx:id="makeNahariyaButton" layoutX="300.0" layoutY="1370.0" mnemonicParsing="false" onAction="#make_nahariya_discount" text="Make Nahariya Discount" visible="false" />
+      <TextField fx:id="nahariyaDiscountText" layoutX="435.0" layoutY="1370.0" visible="false" />
+      <Label fx:id="errorlabelnahariya" layoutX="435.0" layoutY="1400.0" prefHeight="17.0" prefWidth="243.0" text="Label" visible="false" />
 
     </AnchorPane>
 </ScrollPane>

@@ -2,18 +2,14 @@ package il.cshaifasweng.OCSFMediatorExample.server;
 
 import java.util.Arrays;
 import java.util.List;
+import java.time.LocalDate;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.util.Scanner;
 
-import il.cshaifasweng.OCSFMediatorExample.entities.HostingTable;
-import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
-import il.cshaifasweng.OCSFMediatorExample.entities.Discounts;
-import il.cshaifasweng.OCSFMediatorExample.entities.PriceConfirmation;
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
-import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
+import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.fxml.FXML;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -38,6 +34,7 @@ public class DataManager {
 
         configuration.addAnnotatedClass(AuthorizedUser.class);
         configuration.addAnnotatedClass(Restaurant.class);
+        configuration.addAnnotatedClass(Business.class);
         configuration.addAnnotatedClass(HostingTable.class);
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         return configuration.buildSessionFactory(serviceRegistry);
@@ -88,6 +85,16 @@ public class DataManager {
 
     private static void generateData() throws Exception {
 
+        Business momKitchenLtd = new Business();
+        momKitchenLtd.setName("Mom's Kitchen Ltd.");
+        momKitchenLtd.setOwnerName("Sharbel Maroun");
+        momKitchenLtd.setEmail("contact@momskitchen.com");
+        momKitchenLtd.setPhoneNumber("04-1234567");
+        momKitchenLtd.setAddress("Main Office, Haifa");
+        momKitchenLtd.setRegistrationNumber("MKL12345678"); // assume that this code's prefix is an agreement for the businesses.
+        momKitchenLtd.setCreationDate(LocalDate.of(2020, 1, 15));
+
+        session.save(momKitchenLtd);
         // Create Italian restaurants
         Restaurant restaurant1 = new Restaurant();
         restaurant1.setName("Mom Kitchen");
@@ -95,6 +102,7 @@ public class DataManager {
         restaurant1.setLocation("Haifa");
         restaurant1.setPhoneNumber("123-456-7890");
         restaurant1.setActivityHours("Monday-Saturday: 10:00 AM - 11:00 PM");
+        restaurant1.setBusiness(momKitchenLtd);
 
         Restaurant restaurant2 = new Restaurant();
         restaurant2.setName("Mom Kitchen");
@@ -102,6 +110,7 @@ public class DataManager {
         restaurant2.setLocation("Tel-Aviv");
         restaurant2.setPhoneNumber("987-654-3210");
         restaurant2.setActivityHours("Monday-Sunday: 9:00 AM - 10:00 PM");
+        restaurant2.setBusiness(momKitchenLtd);
 
         Restaurant restaurant3 = new Restaurant();
         restaurant3.setName("Mom Kitchen");
@@ -109,6 +118,7 @@ public class DataManager {
         restaurant3.setLocation("Nahariya");
         restaurant3.setPhoneNumber("555-123-4567");
         restaurant3.setActivityHours("Tuesday-Sunday: 11:00 AM - 12:00 AM");
+        restaurant3.setBusiness(momKitchenLtd);
 
 
         // Persist restaurants to the database
@@ -656,7 +666,7 @@ public class DataManager {
     }
 
 
-    static int makediscount(double discountPercentage) {
+    static int makediscount(double discountPercentage , String category) {
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
             session = sessionFactory.openSession();
@@ -672,16 +682,33 @@ public class DataManager {
 
             int count = 0;
             double discountFactor = (100.0 - discountPercentage) / 100.0;
-
-            for (Meal meal : meals) {
-                double originalPrice = meal.getMealPrice();
-                double newPrice = originalPrice * discountFactor;
-
-                meal.setMealPrice(Math.round(newPrice * 100.0) / 100.0);
-                session.update(meal);
-                count++;
+            if(category.equals("haifa"))
+            {
+                category = "special1";
+            }
+            if(category.equals("tel-aviv"))
+            {
+                category = "special2";
+            }
+            if(category.equals("nahariya"))
+            {
+                category = "special3";
             }
 
+
+            for (Meal meal : meals) {
+                if(meal.getMealCategory().equals(category))
+                {
+                    double originalPrice = meal.getMealPrice();
+                    double newPrice = originalPrice * discountFactor;
+
+                    meal.setMealPrice(Math.round(newPrice * 100.0) / 100.0);
+                    session.update(meal);
+                    count++;
+                }
+
+
+            }
             session.getTransaction().commit();
             return 1;
 
@@ -925,13 +952,13 @@ public class DataManager {
         }
     }
 
-    public static boolean addDiscountConfirmation(double percentage) {
+    public static boolean addDiscountConfirmation(double percentage,String category) {
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
             session = sessionFactory.openSession();
             session.beginTransaction();
 
-            Discounts d = new Discounts(percentage);
+            Discounts d = new Discounts(percentage,category);
             session.save(d);
 
             session.getTransaction().commit();

@@ -93,7 +93,19 @@ public class DiscountConfirmationController {
     void confirm1_func(ActionEvent event) {
         double discount = Double.parseDouble(discount1.getText());
         int id = Integer.parseInt(id1.getText());
-        String message = String.format("Confirm Discount \"%s\" \"%s\"", discount, id);
+        String category="";
+        if(label1.getText().equals("% discount on all shared meals")){
+            category = "shared meal";
+        } else if (label1.getText().equals("% discount on all haifa specials")) {
+            category="haifa";
+        } else if (label1.getText().equals("% discount on all telaviv specials")) {
+            category="telaviv";
+        } else if (label1.getText().equals("% discount on all nahariya specials")) {
+            category="nahariya";
+        }
+
+
+        String message = String.format("Confirm Discount \"%s\" \"%s\" \"%s\"", discount, id, category);
 
         try {
             Client.getClient().sendToServer(message);
@@ -122,8 +134,18 @@ public class DiscountConfirmationController {
     void confirm2_func(ActionEvent event) {
         double discount = Double.parseDouble(discount2.getText());
         int id = Integer.parseInt(id2.getText());
-        String message = String.format("Confirm Discount \"%s\" \"%s\"", discount, id);
+        String category="";
+        if(label2.getText().equals("% discount on all shared meals")){
+            category = "shared meal";
+        } else if (label2.getText().equals("% discount on all haifa specials")) {
+            category="haifa";
+        } else if (label2.getText().equals("% discount on all telaviv specials")) {
+            category="telaviv";
+        } else if (label2.getText().equals("% discount on all nahariya specials")) {
+            category="nahariya";
+        }
 
+        String message = String.format("Confirm Discount \"%s\" \"%s\" \"%s\"", discount, id, category);
         try {
             Client.getClient().sendToServer(message);
         } catch (IOException e) {
@@ -150,8 +172,19 @@ public class DiscountConfirmationController {
     void confirm3_func(ActionEvent event) {
         double discount = Double.parseDouble(discount3.getText());
         int id = Integer.parseInt(id3.getText());
-        String message = String.format("Confirm Discount \"%s\" \"%s\"", discount, id);
+        String category="";
+        if(label3.getText().equals("% discount on all shared meals")){
+            category = "shared meal";
+        } else if (label3.getText().equals("% discount on all haifa specials")) {
+            category="haifa";
+        } else if (label3.getText().equals("% discount on all telaviv specials")) {
+            category="telaviv";
+        } else if (label3.getText().equals("% discount on all nahariya specials")) {
+            category="nahariya";
+        }
 
+
+        String message = String.format("Confirm Discount \"%s\" \"%s\" \"%s\"", discount, id, category);
         try {
             Client.getClient().sendToServer(message);
         } catch (IOException e) {
@@ -178,8 +211,19 @@ public class DiscountConfirmationController {
     void confirm4_func(ActionEvent event) {
         double discount = Double.parseDouble(discount4.getText());
         int id = Integer.parseInt(id4.getText());
-        String message = String.format("Confirm Discount \"%s\" \"%s\"", discount, id);
+        String category="";
+        if(label4.getText().equals("% discount on all shared meals")){
+            category = "shared meal";
+        } else if (label4.getText().equals("% discount on all haifa specials")) {
+            category="haifa";
+        } else if (label4.getText().equals("% discount on all telaviv specials")) {
+            category="telaviv";
+        } else if (label4.getText().equals("% discount on all nahariya specials")) {
+            category="nahariya";
+        }
 
+
+        String message = String.format("Confirm Discount \"%s\" \"%s\" \"%s\"", discount, id, category);
         try {
             Client.getClient().sendToServer(message);
         } catch (IOException e) {
@@ -206,8 +250,19 @@ public class DiscountConfirmationController {
     void confirm5_func(ActionEvent event) {
         double discount = Double.parseDouble(discount5.getText());
         int id = Integer.parseInt(id5.getText());
-        String message = String.format("Confirm Discount \"%s\" \"%s\"", discount, id);
+        String category="";
+        if(label5.getText().equals("% discount on all shared meals")){
+            category = "shared meal";
+        } else if (label5.getText().equals("% discount on all haifa specials")) {
+            category="haifa";
+        } else if (label5.getText().equals("% discount on all telaviv specials")) {
+            category="telaviv";
+        } else if (label5.getText().equals("% discount on all nahariya specials")) {
+            category="nahariya";
+        }
 
+
+        String message = String.format("Confirm Discount \"%s\" \"%s\" \"%s\"", discount, id, category);
         try {
             Client.getClient().sendToServer(message);
         } catch (IOException e) {
@@ -234,8 +289,19 @@ public class DiscountConfirmationController {
     void confirm6_func(ActionEvent event) {
         double discount = Double.parseDouble(discount6.getText());
         int id = Integer.parseInt(id6.getText());
-        String message = String.format("Confirm Discount \"%s\" \"%s\"", discount, id);
+        String category="";
+        if(label6.getText().equals("% discount on all shared meals")){
+            category = "shared meal";
+        } else if (label6.getText().equals("% discount on all haifa specials")) {
+            category="haifa";
+        } else if (label6.getText().equals("% discount on all telaviv specials")) {
+            category="telaviv";
+        } else if (label6.getText().equals("% discount on all nahariya specials")) {
+            category="nahariya";
+        }
 
+
+        String message = String.format("Confirm Discount \"%s\" \"%s\" \"%s\"", discount, id, category);
         try {
             Client.getClient().sendToServer(message);
         } catch (IOException e) {
@@ -262,6 +328,7 @@ public class DiscountConfirmationController {
     void reject1_func(ActionEvent event) {
         double discount = Double.parseDouble(discount1.getText());
         int id = Integer.parseInt(id1.getText());
+
         String message = String.format("Reject Discount \"%s\" \"%s\"", discount,id);
 
         try {
@@ -550,29 +617,100 @@ public class DiscountConfirmationController {
 
             discount1.setText(String.valueOf(Discounts.get(0).getDiscount()));
             id1.setText(String.valueOf(Discounts.get(0).getId()));
+            if(Discounts.get(0).getCategory().equals("shared meal")) {
+                label1.setText("% discount on all shared meals");
+            } else if (Discounts.get(0).getCategory().equals("haifa")) {
+                label1.setText("% discount on all haifa specials");
+            } else if (Discounts.get(0).getCategory().equals("nahariya")) {
+                label1.setText("% discount on all nahariya specials");
+            } else if (Discounts.get(0).getCategory().equals("tel-aviv")) {
+                label1.setText("% discount on all tel-aviv specials");
+
+            }
         }
 
         if (size >= 2) {
             discount2.setText(String.valueOf(Discounts.get(1).getDiscount()));
             id2.setText(String.valueOf(Discounts.get(1).getId()));
+            if(Discounts.get(1).getCategory().equals("shared meal")) {
+                label2.setText("% discount on all shared meals");
+            } else if (Discounts.get(1).getCategory().equals("haifa")) {
+                label2.setText("% discount on all haifa specials");
+            } else if (Discounts.get(1).getCategory().equals("nahariya")) {
+                label2.setText("% discount on all nahariya specials");
+            } else if (Discounts.get(1).getCategory().equals("tel-aviv")) {
+                label2.setText("% discount on all tel-aviv specials");
+            }
         }
 
         if(size >= 3) {
             discount3.setText(String.valueOf(Discounts.get(2).getDiscount()));
             id3.setText(String.valueOf(Discounts.get(2).getId()));
+            if(Discounts.get(2).getCategory().equals("shared meal"))
+            {
+                label3.setText("% discount on all shared meals");
+            }
+            else if (Discounts.get(2).getCategory().equals("haifa")) {
+
+                label3.setText("% discount on all haifa specials");
+            }
+            else if (Discounts.get(2).getCategory().equals("nahariya")) {
+                label3.setText("% discount on all nahariya specials");
+            } else if (Discounts.get(2).getCategory().equals("tel-aviv")) {
+                label3.setText("% discount on all tel-aviv specials");
+            }
         }
         if(size >= 4) {
             discount4.setText(String.valueOf(Discounts.get(3).getDiscount()));
             id4.setText(String.valueOf(Discounts.get(3).getId()));
+            if(Discounts.get(3).getCategory().equals("shared meal"))
+            {
+                label4.setText("% discount on all shared meals");
+            }
+            else if (Discounts.get(3).getCategory().equals("haifa")) {
+
+                label4.setText("% discount on all haifa specials");
+            } else if (Discounts.get(3).getCategory().equals("nahariya")) {
+                label4.setText("% discount on all nahariya specials");
+
+            } else if (Discounts.get(3).getCategory().equals("tel-aviv")) {
+                label4.setText("% discount on all tel-aviv specials");
+            }
 
         }
         if(size >= 5) {
             discount5.setText(String.valueOf(Discounts.get(4).getDiscount()));
             id5.setText(String.valueOf(Discounts.get(4).getId()));
+            if(Discounts.get(4).getCategory().equals("shared meal"))
+            {
+                label5.setText("% discount on all shared meals");
+            }
+            else if (Discounts.get(4).getCategory().equals("haifa")) {
+
+                label5.setText("% discount on all haifa specials");
+            } else if (Discounts.get(4).getCategory().equals("nahariya")) {
+                label5.setText("% discount on all nahariya specials");
+            } else if (Discounts.get(4).getCategory().equals("tel-aviv")) {
+                label5.setText("% discount on all tel-aviv specials");
+
+            }
         }
         if(size >= 6) {
             discount6.setText(String.valueOf(Discounts.get(5).getDiscount()));
             id6.setText(String.valueOf(Discounts.get(5).getId()));
+            if(Discounts.get(5).getCategory().equals("shared meal"))
+            {
+                label6.setText("% discount on all shared meals");
+            }
+            else if (Discounts.get(5).getCategory().equals("haifa")) {
+
+                label6.setText("% discount on all haifa specials");
+            } else if (Discounts.get(5).getCategory().equals("nahariya")) {
+                label6.setText("% discount on all nahariya specials");
+            }
+            else if (Discounts.get(5).getCategory().equals("tel-aviv")) {
+                label6.setText("% discount on all tel-aviv specials");
+            }
         }
 
         reorder();

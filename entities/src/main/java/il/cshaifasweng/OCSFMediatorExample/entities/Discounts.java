@@ -19,6 +19,8 @@ public class Discounts implements Serializable {
 
     private double discount;
 
+    private String category;
+
 
 
 
@@ -26,8 +28,9 @@ public class Discounts implements Serializable {
     public Discounts() {
     }
 
-    public Discounts(double discount) {
+    public Discounts(double discount,String category) {
         this.discount = discount;
+        this.category = category;
     }
 
 
@@ -45,11 +48,18 @@ public class Discounts implements Serializable {
    public void setDiscount(double discount) {
         this.discount = discount;
    }
+   public String getCategory() {
+        return category;
+   }
+   public void setCategory(String category) {
+        this.category = category;
+    }
     @Override
     public String toString() {
         return "Discounts{" +
                 "id=" + id +
                 ", discount='" + discount + '\'' +
+                ", category='" + category + '\'' +
                 '}';
     }
 }

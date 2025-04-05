@@ -302,6 +302,15 @@ public class NahariyaMenuController {
     @FXML
     private Button backDietitian;
 
+    @FXML
+    private Button makeNahariyaButton;
+
+    @FXML
+    private TextField nahariyaDiscountText;
+
+    @FXML
+    private Label errorlabelnahariya;
+
     Client client = Client.getClient();
 
     @FXML
@@ -344,6 +353,8 @@ public class NahariyaMenuController {
                 makeDiscount.setVisible(true);
                 discount.setVisible(true);
                 backDietitian.setVisible(true);
+                makeNahariyaButton.setVisible(true);
+                nahariyaDiscountText.setVisible(true);
                 if (!textField10.getText().trim().isEmpty()) {
                     editPrice1.setVisible(true);
                     editIngredients1.setVisible(true);
@@ -1066,7 +1077,7 @@ public class NahariyaMenuController {
     void makeDiscount(ActionEvent event) {
         Platform.runLater(() -> {
             String input = discount.getText().trim();
-
+            String category ="shared meal";
             try {
                 double percentage = Double.parseDouble(input);
                 if (percentage < 0 || percentage > 100) {
@@ -1076,17 +1087,11 @@ public class NahariyaMenuController {
                 else {
 
                     try {
-                        client.sendToServer("Update discount" + "\"" + percentage);
+                        client.sendToServer("Update discount \"" + percentage + "\" \"" + category + "\"");
                     }
                     catch (Exception e) {
                         e.printStackTrace();
                     }
-                    /*
-                    for (Meal meal : Menu) {
-                        double originalPrice = meal.getMealPrice();
-                        double newPrice = originalPrice * (1 - percentage / 100);
-                        meal.setMealPrice(Math.round(newPrice * 100.0) / 100.0);
-                    }*/
 
                     menuOrder(Menu);
                     errorLabel.setVisible(false);
@@ -1098,6 +1103,38 @@ public class NahariyaMenuController {
                 errorLabel.setText("Enter a valid number");
             }
         });
+    }
+    @FXML
+    void make_nahariya_discount(ActionEvent event) {
+        Platform.runLater(() -> {
+            String input = nahariyaDiscountText.getText().trim();
+            String category ="nahariya";
+
+            try {
+                double percentage = Double.parseDouble(input);
+                if (percentage < 0 || percentage > 100) {
+                    errorlabelnahariya.setVisible(true);
+                    errorlabelnahariya.setText("Enter value between 0 and 100 , Try Again !");
+                }
+                else {
+                    try {
+                        client.sendToServer("Update discount \"" + percentage + "\" \"" + category + "\"");
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    menuOrder(Menu);
+                    errorLabel.setVisible(false);
+                    System.out.println("Discount applied to nahariya special meals.");
+                }
+
+            } catch (NumberFormatException e) {
+                errorLabel.setVisible(true);
+                errorLabel.setText("Enter a valid number");
+            }
+        });
+
     }
 
     private String mealName2 ;

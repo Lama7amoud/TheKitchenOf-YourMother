@@ -172,6 +172,9 @@
         <Label fx:id="errorLabel" layoutX="33.0" layoutY="1310.0" text="Label" textFill="RED" visible="false" />
         <Button fx:id="makeDiscount" layoutX="300.0" layoutY="1310.0" mnemonicParsing="false" onAction="#makeDiscount" text="Make Discount " visible="false" />
       <Button fx:id="backDietitian" layoutX="500.0" layoutY="1310.0" mnemonicParsing="false" onAction="#back_to_update_page_func" text="Back To Update Page" visible="false" />
+      <Button fx:id="teldis" layoutX="300.0" layoutY="1370" mnemonicParsing="false" onAction="#tel_func" text="Make Tel-Aviv Discount" visible="false" />
+      <TextField fx:id="telText" layoutX="435.0" layoutY="1370.0" visible="false" />
+      <Label fx:id="errorlabeltel" layoutX="435.0" layoutY="1400.0" prefHeight="17.0" prefWidth="208.0" text="Label" visible="false" />
 
     </AnchorPane>
 </ScrollPane>

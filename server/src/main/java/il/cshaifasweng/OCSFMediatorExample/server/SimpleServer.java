@@ -146,9 +146,10 @@ public class SimpleServer extends AbstractServer {
 			String[] parts = details.split("\"");
 
 			double percentage = Double.parseDouble(parts[1].trim());
-
-			sendToAllClients("Get Discount Confirm \""+percentage);
-			DataManager.addDiscountConfirmation(percentage);
+			String category = parts[3].trim();
+			System.out.println(percentage);
+			sendToAllClients("Get Discount Confirm \"" + percentage);
+			DataManager.addDiscountConfirmation(percentage,category);
 		}
 
 
@@ -360,10 +361,11 @@ public class SimpleServer extends AbstractServer {
 			String details = msgString.substring("Confirm Discount".length()).trim();
 			String[] parts = details.split("\"");
 
-			double discount = Double.parseDouble(parts[1]);
-			int id = Integer.parseInt(parts[3]);
+			double discount = Double.parseDouble(parts[1].trim());
+			int id = Integer.parseInt(parts[3].trim());
+			String category = parts[5].trim();
 
-			int updated = DataManager.makediscount(discount);
+			int updated = DataManager.makediscount(discount,category);
 			boolean x = DataManager.removeDiscountConfirmation(id);
 			if (updated == 1 && x) {
 				List<Meal> updatedMenu = DataManager.requestMenu();

@@ -28,6 +28,10 @@ public class Restaurant implements Serializable {
     @ManyToMany(mappedBy = "restaurants")
     private List<Meal> meals;  // Many-to-Many relationship with Meal
 
+    @ManyToOne
+    @JoinColumn(name = "business_id")
+    private Business business;
+
     // Default constructor (required by Hibernate)
     public Restaurant() {}
 
@@ -96,6 +100,14 @@ public class Restaurant implements Serializable {
         this.meals = meals;
     }
 
+    public Business getBusiness() {
+        return business;
+    }
+
+    public void setBusiness(Business business) {
+        this.business = business;
+    }
+
     public void addMeal(Meal meal) {
         this.meals.add(meal);
     }
@@ -107,9 +119,10 @@ public class Restaurant implements Serializable {
         this.setAddress(restaurant.getAddress());
         this.setLocation(restaurant.getLocation());
         this.setPhoneNumber(restaurant.getPhoneNumber());
-        this.setActivityHours(restaurant.getActivityHours()); // Copy activity hours
+        this.setActivityHours(restaurant.getActivityHours());
         this.setHostingTables(restaurant.getHostingTables());
         this.setMeals(restaurant.getMeals());
+        this.setBusiness(restaurant.getBusiness());
     }
 
     // Reset all attributes
@@ -122,5 +135,6 @@ public class Restaurant implements Serializable {
         this.setActivityHours(null);
         this.setHostingTables(null);
         this.setMeals(null);
+        this.setBusiness(null);
     }
 }

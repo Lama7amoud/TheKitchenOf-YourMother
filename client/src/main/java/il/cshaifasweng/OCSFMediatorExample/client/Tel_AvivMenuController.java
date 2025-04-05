@@ -318,6 +318,14 @@ public class Tel_AvivMenuController {
     private Button backDietitian;
 
     @FXML
+    private TextField telText;
+
+    @FXML
+    private Label errorlabeltel;
+    @FXML
+    private Button teldis;
+
+    @FXML
     Client client = Client.getClient();
 
     @FXML
@@ -360,6 +368,9 @@ public class Tel_AvivMenuController {
                 makeDiscount.setVisible(true);
                 discount.setVisible(true);
                 backDietitian.setVisible(true);
+                telText.setVisible(true);
+                teldis.setVisible(true);
+
                 if (!textField10.getText().trim().isEmpty()) {
                     editPrice1.setVisible(true);
                     editIngredients1.setVisible(true);
@@ -1082,6 +1093,8 @@ public class Tel_AvivMenuController {
     void makeDiscount(ActionEvent event) {
         Platform.runLater(() -> {
             String input = discount.getText().trim();
+            String category ="shared meal";
+
 
             try {
                 double percentage = Double.parseDouble(input);
@@ -1092,17 +1105,12 @@ public class Tel_AvivMenuController {
                 else {
 
                     try {
-                        client.sendToServer("Update discount" + "\"" + percentage);
+                        client.sendToServer("Update discount \"" + percentage + "\" \"" + category + "\"");
                     }
                     catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                    /*for (Meal meal : Menu) {
-                        double originalPrice = meal.getMealPrice();
-                        double newPrice = originalPrice * (1 - percentage / 100);
-                        meal.setMealPrice(Math.round(newPrice * 100.0) / 100.0);
-                    }*/
 
                     menuOrder(Menu);
                     errorLabel.setVisible(false);
@@ -1114,6 +1122,38 @@ public class Tel_AvivMenuController {
                 errorLabel.setText("Enter a valid number");
             }
         });
+    }
+    @FXML
+    void tel_func(ActionEvent event) {
+        Platform.runLater(() -> {
+            String input = telText.getText().trim();
+            String category ="tel-aviv";
+
+            try {
+                double percentage = Double.parseDouble(input);
+                if (percentage < 0 || percentage > 100) {
+                    errorlabeltel.setVisible(true);
+                    errorlabeltel.setText("Enter value between 0 and 100 , Try Again !");
+                }
+                else {
+                    try {
+                        client.sendToServer("Update discount \"" + percentage + "\" \"" + category + "\"");
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    menuOrder(Menu);
+                    errorLabel.setVisible(false);
+                    System.out.println("Discount applied to nahariya special meals.");
+                }
+
+            } catch (NumberFormatException e) {
+                errorLabel.setVisible(true);
+                errorLabel.setText("Enter a valid number");
+            }
+        });
+
     }
     private String mealName2 ;
     private int flag2=0 ;

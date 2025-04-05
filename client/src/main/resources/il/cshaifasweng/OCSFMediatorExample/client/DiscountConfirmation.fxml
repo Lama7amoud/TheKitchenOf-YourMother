@@ -30,12 +30,12 @@
                                 <Font size="25.0" />
                             </font>
                         </Label>
-                        <GridPane layoutX="3.0" layoutY="88.0" prefHeight="357.0" prefWidth="433.0">
+                        <GridPane layoutX="3.0" layoutY="88.0" prefHeight="365.0" prefWidth="502.0">
                             <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="293.3333384195963" minWidth="10.0" prefWidth="45.333343505859375" />
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="316.0000190734863" minWidth="10.0" prefWidth="233.999989827474" />
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="244.33331298828125" minWidth="10.0" prefWidth="153.33328247070312" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="244.33331298828125" minWidth="10.0" prefWidth="30.666717529296875" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="353.3332824707031" minWidth="10.0" prefWidth="310.6666768391927" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="244.33331298828125" minWidth="10.0" prefWidth="128.3333231608073" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="244.33331298828125" minWidth="10.0" prefWidth="11.999959309895814" />
                             </columnConstraints>
                             <rowConstraints>
                                 <RowConstraints maxHeight="126.0" minHeight="10.0" prefHeight="56.66668446858724" vgrow="SOMETIMES" />
@@ -105,43 +105,43 @@
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets></TextField>
-                                <TextField fx:id="discount2" layoutX="10.0" layoutY="74.0" prefHeight="61.0" prefWidth="124.0" visible="false" GridPane.rowIndex="1" />
-                                <TextField fx:id="discount3" layoutX="10.0" layoutY="137.0" prefHeight="61.0" prefWidth="124.0" visible="false" GridPane.rowIndex="2" />
-                                <TextField fx:id="discount4" layoutX="10.0" layoutY="200.0" prefHeight="61.0" prefWidth="124.0" visible="false" GridPane.rowIndex="3" />
-                                <TextField fx:id="discount5" layoutX="10.0" layoutY="326.0" prefHeight="61.0" prefWidth="124.0" visible="false" GridPane.rowIndex="4" />
-                                <TextField fx:id="discount6" layoutX="10.0" layoutY="389.0" prefHeight="61.0" prefWidth="124.0" visible="false" GridPane.rowIndex="5" />
+                                <TextField fx:id="discount2" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="74.0" prefHeight="61.0" prefWidth="124.0" visible="false" GridPane.rowIndex="1" />
+                                <TextField fx:id="discount3" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="137.0" prefHeight="61.0" prefWidth="124.0" visible="false" GridPane.rowIndex="2" />
+                                <TextField fx:id="discount4" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="200.0" prefHeight="61.0" prefWidth="124.0" visible="false" GridPane.rowIndex="3" />
+                                <TextField fx:id="discount5" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="326.0" prefHeight="61.0" prefWidth="124.0" visible="false" GridPane.rowIndex="4" />
+                                <TextField fx:id="discount6" alignment="CENTER_RIGHT" layoutX="10.0" layoutY="389.0" prefHeight="61.0" prefWidth="124.0" visible="false" GridPane.rowIndex="5" />
                         <TextField fx:id="id2" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                         <TextField fx:id="id1" layoutX="427.0" layoutY="85.0" visible="false" GridPane.columnIndex="3" />
                         <TextField fx:id="id3" layoutX="427.0" layoutY="27.0" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                         <TextField fx:id="id4" layoutX="427.0" layoutY="140.0" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="3" />
                         <TextField fx:id="id5" layoutX="427.0" layoutY="201.0" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="4" />
                         <TextField fx:id="id6" layoutX="427.0" layoutY="269.0" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="5" />
-                        <Label fx:id="label1" prefHeight="34.0" prefWidth="224.0" text="\% discount on all meals" visible="false" GridPane.columnIndex="1">
+                        <Label fx:id="label1" prefHeight="34.0" prefWidth="311.0" text="\\% discount on all meals" visible="false" GridPane.columnIndex="1">
                            <font>
                               <Font size="17.0" />
                            </font>
                         </Label>
-                        <Label fx:id="label2" prefHeight="34.0" prefWidth="224.0" text="\% discount on all meals" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label fx:id="label2" prefHeight="34.0" prefWidth="307.0" text="\% discount on all meals" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <font>
                               <Font size="17.0" />
                            </font>
                         </Label>
-                        <Label fx:id="label3" layoutX="58.0" layoutY="81.0" prefHeight="34.0" prefWidth="224.0" text="\% discount on all meals" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Label fx:id="label3" layoutX="58.0" layoutY="81.0" prefHeight="34.0" prefWidth="309.0" text="\% discount on all meals" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <font>
                               <Font size="17.0" />
                            </font>
                         </Label>
-                        <Label fx:id="label4" layoutX="58.0" layoutY="136.0" prefHeight="34.0" prefWidth="224.0" text="\% discount on all meals" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <Label fx:id="label4" layoutX="58.0" layoutY="136.0" prefHeight="34.0" prefWidth="308.0" text="\% discount on all meals" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
                            <font>
                               <Font size="17.0" />
                            </font>
                         </Label>
-                        <Label fx:id="label5" layoutX="58.0" layoutY="197.0" prefHeight="34.0" prefWidth="224.0" text="\% discount on all meals" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                        <Label fx:id="label5" layoutX="58.0" layoutY="197.0" prefHeight="34.0" prefWidth="305.0" text="\% discount on all meals" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="4">
                            <font>
                               <Font size="17.0" />
                            </font>
                         </Label>
-                        <Label fx:id="label6" layoutX="58.0" layoutY="265.0" prefHeight="34.0" prefWidth="224.0" text="\% discount on all meals" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                        <Label fx:id="label6" layoutX="58.0" layoutY="265.0" prefHeight="34.0" prefWidth="306.0" text="\% discount on all meals" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="5">
                            <font>
                               <Font size="17.0" />
                            </font>
