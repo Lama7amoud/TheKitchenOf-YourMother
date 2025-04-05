@@ -273,6 +273,9 @@ public class Tel_AvivMenuController {
     private Label errorLabel;
 
     @FXML
+    private Button makeDiscount;
+
+    @FXML
     private Button editIngredients1;
 
     @FXML
@@ -311,13 +314,24 @@ public class Tel_AvivMenuController {
     @FXML
     private Button save2btn;
 
+    @FXML
+    private Button backDietitian;
 
+    @FXML
+    private TextField telText;
+
+    @FXML
+    private Label errorlabeltel;
+    @FXML
+    private Button teldis;
+
+    @FXML
+    Client client = Client.getClient();
 
     @FXML
     void initialize() throws IOException {
 
         EventBus.getDefault().register(this);
-        Client client = Client.getClient();
         try {
             client.sendToServer("Request Tel-Aviv menu");
         } catch (IOException e) {
@@ -351,6 +365,12 @@ public class Tel_AvivMenuController {
         Platform.runLater(() -> {
             AuthorizedUser user = Client.getClientAttributes();
             if (user != null && user.getPermissionLevel() == 5) {
+                makeDiscount.setVisible(true);
+                discount.setVisible(true);
+                backDietitian.setVisible(true);
+                telText.setVisible(true);
+                teldis.setVisible(true);
+
                 if (!textField10.getText().trim().isEmpty()) {
                     editPrice1.setVisible(true);
                     editIngredients1.setVisible(true);
@@ -1029,8 +1049,9 @@ public class Tel_AvivMenuController {
                 price = "0";
             }
             try {
-                Client.getClient().sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
-                System.out.println(price);
+                client.sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
+                client.sendToServer("Request Tel-Aviv menu");
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1061,10 +1082,19 @@ public class Tel_AvivMenuController {
         App.switchScreen(page);
 
     }
+
+    @FXML
+    void back_to_update_page_func(ActionEvent event) {
+        String page = "Update Menu Page";
+        App.switchScreen(page);
+    }
+
     @FXML
     void makeDiscount(ActionEvent event) {
         Platform.runLater(() -> {
             String input = discount.getText().trim();
+            String category ="shared meal";
+
 
             try {
                 double percentage = Double.parseDouble(input);
@@ -1074,11 +1104,13 @@ public class Tel_AvivMenuController {
                 }
                 else {
 
-                    for (Meal meal : Menu) {
-                        double originalPrice = meal.getMealPrice();
-                        double newPrice = originalPrice * (1 - percentage / 100);
-                        meal.setMealPrice(Math.round(newPrice * 100.0) / 100.0);
+                    try {
+                        client.sendToServer("Update discount \"" + percentage + "\" \"" + category + "\"");
                     }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
 
                     menuOrder(Menu);
                     errorLabel.setVisible(false);
@@ -1090,6 +1122,38 @@ public class Tel_AvivMenuController {
                 errorLabel.setText("Enter a valid number");
             }
         });
+    }
+    @FXML
+    void tel_func(ActionEvent event) {
+        Platform.runLater(() -> {
+            String input = telText.getText().trim();
+            String category ="tel-aviv";
+
+            try {
+                double percentage = Double.parseDouble(input);
+                if (percentage < 0 || percentage > 100) {
+                    errorlabeltel.setVisible(true);
+                    errorlabeltel.setText("Enter value between 0 and 100 , Try Again !");
+                }
+                else {
+                    try {
+                        client.sendToServer("Update discount \"" + percentage + "\" \"" + category + "\"");
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    menuOrder(Menu);
+                    errorLabel.setVisible(false);
+                    System.out.println("Discount applied to nahariya special meals.");
+                }
+
+            } catch (NumberFormatException e) {
+                errorLabel.setVisible(true);
+                errorLabel.setText("Enter a valid number");
+            }
+        });
+
     }
     private String mealName2 ;
     private int flag2=0 ;

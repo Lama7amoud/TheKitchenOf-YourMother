@@ -121,6 +121,7 @@ public class BranchController {
                     locationPrefix = "Nahariya";
                     break;
             }
+            System.out.println(locationPrefix);
 
             System.out.println(user.getRestaurantInterest());
             j = 0;

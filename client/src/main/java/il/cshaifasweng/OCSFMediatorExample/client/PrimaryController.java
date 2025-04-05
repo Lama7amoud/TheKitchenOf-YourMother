@@ -48,6 +48,21 @@ public class PrimaryController {
     @FXML
     private Text RestaurantDetailsInstructionLabel;
 
+    void updateResInterest(){
+        Platform.runLater(() -> {
+            String selectedRestaurant = ChooseRestaurantBox.getValue();
+            if(selectedRestaurant != null){
+                userAtt.setRestaurantInterest((short) switch (selectedRestaurant) {
+                            case "Haifa Branch" -> 1;
+                            case "Tel-Aviv Branch" -> 2;
+                            case "Nahariya Branch" -> 3;
+                            default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
+                        }
+                );
+            }
+        });
+    }
+
     @FXML
     void switchPage(ActionEvent event) {
         Platform.runLater(() -> {
@@ -86,7 +101,7 @@ public class PrimaryController {
                     );
                 }
             }
-
+            updateResInterest();
             App.switchScreen(page);
         });
     }
@@ -106,6 +121,7 @@ public class PrimaryController {
                     );
                 }
             }
+            updateResInterest();
             App.switchScreen("Branch Page");
         });
     }
@@ -160,13 +176,8 @@ public class PrimaryController {
     @FXML
     void initialize() {
         Platform.runLater(() -> {
-            int user_permisson = userAtt.getPermissionLevel();
-            if((user_permisson == 0) || (user_permisson == 4)){
-                feedbackButton.setVisible(true);
-            }
-            else{
-                feedbackButton.setVisible(false);
-            }
+            int user_permission = userAtt.getPermissionLevel();
+            feedbackButton.setVisible((user_permission == 0) || (user_permission == 4));
 
             RestaurantDetailsInstructionLabel.setVisible(false);
             orderTablesButton.setDisable(true);

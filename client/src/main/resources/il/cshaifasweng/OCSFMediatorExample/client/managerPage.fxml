@@ -27,11 +27,10 @@
                   <Insets left="10.0" right="10.0" />
                </padding>
             </Label>
-            <Button fx:id="managerConfirmButton" alignment="CENTER" layoutX="92.0" layoutY="155.66666666666666" mnemonicParsing="false" onAction="#manager_confirm_price_func" prefHeight="51.0" prefWidth="93.0" text="Price Change Confirmation" textOverrun="CLIP" wrapText="true" AnchorPane.bottomAnchor="193.0" AnchorPane.leftAnchor="92.0" AnchorPane.rightAnchor="50.0" />
-            <Button fx:id="managerFeedbackButton" alignment="CENTER" layoutX="92.0" layoutY="230.0" mnemonicParsing="false" onAction="#manager_feedback_func" prefHeight="23.0" prefWidth="93.0" text="view feedback" />
-            <Button fx:id="makeOrderButton" alignment="CENTER" layoutX="92.0" layoutY="273.0" mnemonicParsing="false" onAction="#make_order_func" prefHeight="17.0" prefWidth="92.0" text="make order" visible="false" />
+            <Button fx:id="managerConfirmButton" alignment="CENTER" layoutX="92.0" layoutY="138.33333333333331" mnemonicParsing="false" onAction="#manager_confirm_price_func" prefHeight="51.0" prefWidth="93.0" text="Price Change Confirmation" textOverrun="CLIP" visible="false" wrapText="true" AnchorPane.bottomAnchor="210.33333333333334" AnchorPane.leftAnchor="92.0" AnchorPane.rightAnchor="50.0" />
+            <Button fx:id="managerFeedbackButton" alignment="CENTER" layoutX="92.0" layoutY="273.0" mnemonicParsing="false" onAction="#manager_feedback_func" prefHeight="25.0" prefWidth="92.0" text="view feedback" />
             <Button layoutX="40.0" layoutY="349.0" mnemonicParsing="false" onAction="#backFunc" text="back" />
-            <Button fx:id="organizationButton" layoutX="92.0" layoutY="312.0" mnemonicParsing="false" onAction="#organization_func" prefHeight="25.0" prefWidth="91.0" text="Organization" visible="false"/>
+            <Button fx:id="managerDiscountButton" alignment="CENTER" layoutX="92.0" layoutY="210.0" mnemonicParsing="false" onAction="#manager_confirm_discount_func" prefHeight="44.0" prefWidth="93.0" text="Discount Confirmation" textOverrun="CLIP" visible="false" wrapText="true" />
          </children>
       </AnchorPane>
    </left>
