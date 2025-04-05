@@ -25,7 +25,6 @@ import static il.cshaifasweng.OCSFMediatorExample.client.Client.userAtt;
 
 public class Tel_AvivMenuController {
 
-
     @FXML
     private TextField textField10;
 

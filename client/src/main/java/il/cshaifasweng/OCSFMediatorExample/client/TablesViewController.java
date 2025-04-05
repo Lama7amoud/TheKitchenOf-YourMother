@@ -22,7 +22,6 @@ public class TablesViewController {
     int numOfImages = 3;
     Image[] images;
     int[] reservedTables;
-
     @FXML
     private Pane DetailsPane;
 

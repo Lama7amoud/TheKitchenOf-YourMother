@@ -9,7 +9,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-
 public class PersonalAreaPageController {
 
     int numOfImages = 3; // For restaurant manager

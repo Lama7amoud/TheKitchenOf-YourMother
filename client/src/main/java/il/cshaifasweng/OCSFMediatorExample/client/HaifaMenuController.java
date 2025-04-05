@@ -25,7 +25,6 @@ import java.util.List;
 
 import static il.cshaifasweng.OCSFMediatorExample.client.Client.userAtt;
 
-
 public class HaifaMenuController {
 
     @FXML

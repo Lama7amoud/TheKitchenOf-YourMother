@@ -21,7 +21,6 @@ public class Client extends AbstractClient {
         this.port = port;
     }
 
-
     public static Client getClient() {
         if (client == null) {
             client = new Client(host, port);

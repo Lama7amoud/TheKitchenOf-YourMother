@@ -15,7 +15,6 @@ import javafx.scene.text.Text;
 import java.io.IOException;
 
 import static il.cshaifasweng.OCSFMediatorExample.client.Client.*;
-
 public class PrimaryController {
 
     int numOfImages = 3;

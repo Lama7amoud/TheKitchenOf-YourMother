@@ -20,7 +20,6 @@ import java.util.List;
 
 public class MenuController {
 
-
     Image image1;
     Image image2 ;
     Image image3;

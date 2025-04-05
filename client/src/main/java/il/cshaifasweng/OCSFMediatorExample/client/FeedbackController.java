@@ -5,7 +5,6 @@ import javafx.fxml.FXML;
 
 public class FeedbackController {
 
-
     @FXML
     void back_func(ActionEvent event) {
         String page = "Main Page";

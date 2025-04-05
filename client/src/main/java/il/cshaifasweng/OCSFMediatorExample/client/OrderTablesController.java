@@ -12,7 +12,6 @@ import static il.cshaifasweng.OCSFMediatorExample.client.Client.*;
 
 public class OrderTablesController {
 
-
     @FXML
     private Button ConfirmOrderButton;
 
