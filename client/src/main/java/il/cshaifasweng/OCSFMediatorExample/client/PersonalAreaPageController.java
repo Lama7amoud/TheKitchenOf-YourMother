@@ -125,7 +125,7 @@ public class PersonalAreaPageController {
                     leftImageButton.setVisible(false);
                     numOfImages = 1;
                     images = new Image[numOfImages];
-                    j = (user.getRestaurantInterest()-1);
+                    j = (user.getRestaurantId()-1); // the images are saved with names in range [0,3].
                     images[0] = new Image(String.valueOf(PersonalAreaPageController.class.getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Maps/" + j + ".jpg")));
                     restaurantMapTitle.setText(restaurantTitles[j] + " restaurant Map:");
                     imageView.setImage(images[0]);
@@ -163,8 +163,11 @@ public class PersonalAreaPageController {
             lastnameLabel.setText("Lastname: " + user.getLastname());
             IDNumLabel.setText("IDNum: " + user.getIDNum());
             ageLabel.setText("Age: " + user.getAge());
-            restaurantIDLabel.setText("Restaurant ID: " + user.getRestaurantInterest());
-            short userPermissionLevel = user.getPermissionLevel();
+            if (user.getPermissionLevel() == 4) {
+                restaurantIDLabel.setText("Restaurant ID: All");
+            } else {
+                restaurantIDLabel.setText("Restaurant ID: " + user.getRestaurantId());
+            }            short userPermissionLevel = user.getPermissionLevel();
             jobPositionLabel.setText("Job Position: " + switch (userPermissionLevel) {
                 case 1 -> "Employee";
                 case 2 -> "Service";

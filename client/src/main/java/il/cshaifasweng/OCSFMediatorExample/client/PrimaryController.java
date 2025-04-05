@@ -146,13 +146,8 @@ public class PrimaryController {
     @FXML
     void initialize() {
         Platform.runLater(() -> {
-            int user_permisson = userAtt.getPermissionLevel();
-            if((user_permisson == 0) || (user_permisson == 4)){
-                feedbackButton.setVisible(true);
-            }
-            else{
-                feedbackButton.setVisible(false);
-            }
+            int user_permission = userAtt.getPermissionLevel();
+            feedbackButton.setVisible((user_permission == 0) || (user_permission == 4));
 
             RestaurantDetailsInstructionLabel.setVisible(false);
             orderTablesButton.setDisable(true);
