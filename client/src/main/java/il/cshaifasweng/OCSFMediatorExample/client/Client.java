@@ -1,9 +1,6 @@
 
 package il.cshaifasweng.OCSFMediatorExample.client;
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
-import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
-import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
-import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
+import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.application.Platform;
 import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
@@ -65,9 +62,16 @@ public class Client extends AbstractClient {
         } else if (msg instanceof Warning) {
             // Handle warning message
             EventBus.getDefault().post(new WarningEvent((Warning) msg));
-        } else if (msg instanceof List) {
+        }
+
+        else if (msg instanceof List) {
             List<Meal> menu = (List<Meal>) msg;
+            List<PriceConfirmation> PriceConfirmation= (List<PriceConfirmation>) msg;
+            List<Discounts> Discounts= (List<Discounts>) msg;
             EventBus.getDefault().post(menu);
+            EventBus.getDefault().post(PriceConfirmation);
+            EventBus.getDefault().post(Discounts);
+
         }
         else if (msg instanceof AuthorizedUser) {
             userAtt.copyUser((AuthorizedUser) msg);

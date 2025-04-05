@@ -4,6 +4,7 @@ import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
@@ -11,6 +12,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
+import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,28 +20,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static il.cshaifasweng.OCSFMediatorExample.client.Client.userAtt;
+
 
 public class Tel_AvivMenuController {
 
-
-    @FXML
-    private Button editMeal1;
-
-    @FXML
-    private GridPane menuGrid;
-
-
-    @FXML
-    private TextField textField00;
-
-    @FXML
-    private TextField textField01;
-
-    @FXML
-    private TextField textField02;
-
-    @FXML
-    private TextField textField03;
 
     @FXML
     private TextField textField10;
@@ -88,9 +73,6 @@ public class Tel_AvivMenuController {
     private TextField textField23;
 
     @FXML
-    private TextField textField24;
-
-    @FXML
     private TextField textField30;
 
     @FXML
@@ -101,9 +83,6 @@ public class Tel_AvivMenuController {
 
     @FXML
     private TextField textField33;
-
-    @FXML
-    private TextField textField34;
 
     @FXML
     private TextField textField40;
@@ -117,8 +96,6 @@ public class Tel_AvivMenuController {
     @FXML
     private TextField textField43;
 
-    @FXML
-    private TextField textField44;
 
     @FXML
     private TextField textField50;
@@ -132,8 +109,6 @@ public class Tel_AvivMenuController {
     @FXML
     private TextField textField53;
 
-    @FXML
-    private TextField textField54;
 
     @FXML
     private TextField textField60;
@@ -147,8 +122,6 @@ public class Tel_AvivMenuController {
     @FXML
     private TextField textField63;
 
-    @FXML
-    private TextField textField64;
 
     @FXML
     private TextField textField70;
@@ -178,89 +151,46 @@ public class Tel_AvivMenuController {
     private ImageView imageView51;
 
     @FXML
-    private GridPane menuGrid1;
-
-
-    @FXML
-    private TextField textField001;
-
-
-    @FXML
-    private TextField textField011;
-
-
-    @FXML
-    private TextField textField021;
-
-
-    @FXML
-    private TextField textField031;
-
-    @FXML
-    private TextField textField04;
-
-    @FXML
-    private TextField textField041;
-
-
-    @FXML
     private TextField textField101;
 
     @FXML
-    private TextField textField10112;
-
-    @FXML
-    private TextField textField101121;
-
-
-    @FXML
     private TextField textField111;
-
 
 
     @FXML
     private TextField textField121;
 
 
-
     @FXML
     private TextField textField131;
-
 
 
     @FXML
     private TextField textField201;
 
 
-
     @FXML
     private TextField textField211;
-
 
 
     @FXML
     private TextField textField221;
 
 
-
     @FXML
     private TextField textField231;
-
 
 
     @FXML
     private TextField textField301;
 
 
-
     @FXML
     private TextField textField311;
 
 
-
     @FXML
     private TextField textField321;
-
 
 
     @FXML
@@ -271,10 +201,8 @@ public class Tel_AvivMenuController {
     private TextField textField401;
 
 
-
     @FXML
     private TextField textField411;
-
 
 
     @FXML
@@ -283,7 +211,6 @@ public class Tel_AvivMenuController {
 
     @FXML
     private TextField textField431;
-
 
     @FXML
     private TextField textField501;
@@ -300,20 +227,114 @@ public class Tel_AvivMenuController {
     @FXML
     private TextField textField531;
 
+    @FXML
+    private Button savebtn;
 
+    @FXML
+    private Button editPrice1;
+
+    @FXML
+    private Button editPrice2;
+
+    @FXML
+    private Button editPrice3;
+
+    @FXML
+    private Button editPrice4;
+
+    @FXML
+    private Button editPrice5;
+
+    @FXML
+    private Button editPrice6;
+
+    @FXML
+    private Button editPrice7;
+
+    @FXML
+    private Button editPrice11;
+
+    @FXML
+    private Button editPrice22;
+
+    @FXML
+    private Button editPrice33;
+
+    @FXML
+    private Button editPrice44;
+
+    @FXML
+    private Button editPrice55;
+
+    @FXML
+    private TextField discount;
+
+    @FXML
+    private Label errorLabel;
+
+    @FXML
+    private Button makeDiscount;
+
+    @FXML
+    private Button editIngredients1;
+
+    @FXML
+    private Button editIngredients2;
+
+    @FXML
+    private Button editIngredients3;
+
+    @FXML
+    private Button editIngredients4;
+
+    @FXML
+    private Button editIngredients5;
+
+    @FXML
+    private Button editIngredients6;
+
+    @FXML
+    private Button editIngredients7;
+
+    @FXML
+    private Button editIngredients11;
+
+    @FXML
+    private Button editIngredients22;
+
+    @FXML
+    private Button editIngredients33;
+
+    @FXML
+    private Button editIngredients44;
+
+    @FXML
+    private Button editIngredients55;
+
+    @FXML
+    private Button save2btn;
+
+    @FXML
+    private Button backDietitian;
+
+    @FXML
+    Client client = Client.getClient();
 
     @FXML
     void initialize() throws IOException {
+
         EventBus.getDefault().register(this);
-        Client client = Client.getClient();
-        client.sendToServer("Request Tel-Aviv menu");
+        try {
+            client.sendToServer("Request Tel-Aviv menu");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
 
 
     private List<Meal> Menu ;
-    private List<Image> images ;
 
     @Subscribe
     public void ExternalIntervention(Object msg) {
@@ -323,9 +344,74 @@ public class Tel_AvivMenuController {
                     Menu = (List<Meal>) msg;
                     menuOrder(Menu);
                     imagesOrder(Menu);
+                    isDietitian();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        });
+    }
+
+    private void isDietitian()
+    {
+        Platform.runLater(() -> {
+            AuthorizedUser user = Client.getClientAttributes();
+            if (user != null && user.getPermissionLevel() == 5) {
+                makeDiscount.setVisible(true);
+                discount.setVisible(true);
+                backDietitian.setVisible(true);
+                if (!textField10.getText().trim().isEmpty()) {
+                    editPrice1.setVisible(true);
+                    editIngredients1.setVisible(true);
+                }
+                if (!textField20.getText().trim().isEmpty()) {
+                    editPrice2.setVisible(true);
+                    editIngredients2.setVisible(true);
+                }
+                if (!textField30.getText().trim().isEmpty()) {
+                    editPrice3.setVisible(true);
+                    editIngredients3.setVisible(true);
+
+                }
+                if (!textField40.getText().trim().isEmpty()) {
+                    editPrice4.setVisible(true);
+                    editIngredients4.setVisible(true);
+                }
+                if (!textField50.getText().trim().isEmpty()) {
+                    editPrice5.setVisible(true);
+                    editIngredients5.setVisible(true);
+
+                }
+                if (!textField60.getText().trim().isEmpty()) {
+                    editPrice6.setVisible(true);
+                    editIngredients6.setVisible(true);
+                }
+                if (!textField70.getText().trim().isEmpty()) {
+                    editPrice7.setVisible(true);
+                    editIngredients7.setVisible(true);
+                }
+                if (!textField101.getText().trim().isEmpty()) {
+                    editPrice11.setVisible(true);
+                    editIngredients11.setVisible(true);
+                }
+                if (!textField201.getText().trim().isEmpty()) {
+                    editPrice22.setVisible(true);
+                    editIngredients22.setVisible(true);
+                }
+                if (!textField301.getText().trim().isEmpty()) {
+                    editPrice33.setVisible(true);
+                    editIngredients33.setVisible(true);
+                }
+                if (!textField401.getText().trim().isEmpty()) {
+                    editPrice44.setVisible(true);
+                    editIngredients44.setVisible(true);
+                }
+                if (!textField501.getText().trim().isEmpty()) {
+                    editPrice55.setVisible(true);
+                    editIngredients55.setVisible(true);
+                }
+
+
             }
         });
     }
@@ -595,6 +681,7 @@ public class Tel_AvivMenuController {
                 }
             }
 
+
         });
 
     }
@@ -606,18 +693,782 @@ public class Tel_AvivMenuController {
 
 
     @FXML
-    void edit1(ActionEvent event) {
+    void editPrice1(ActionEvent event) {
         Platform.runLater(() -> {
+            editPrice2.setVisible(false);
+            editPrice3.setVisible(false);
+            editPrice4.setVisible(false);
+            editPrice5.setVisible(false);
+            editPrice6.setVisible(false);
+            editPrice7.setVisible(false);
+            editPrice11.setVisible(false);
+            editPrice22.setVisible(false);
+            editPrice33.setVisible(false);
+            editPrice44.setVisible(false);
+            editPrice55.setVisible(false);
+            savebtn.setVisible(true);
             textField13.setEditable(true);
-            textField13.setStyle("-fx-background-color: #D3D3D3 ;");
-            editMeal1.setDisable(true);
+            textField13.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editPrice1.setVisible(false);
             mealName = textField10.getText();
             flag = 1;
         });
     }
 
+    @FXML
+    void editPrice2(ActionEvent event) {
+        Platform.runLater(() -> {
+            editPrice1.setVisible(false);
+            editPrice3.setVisible(false);
+            editPrice4.setVisible(false);
+            editPrice5.setVisible(false);
+            editPrice6.setVisible(false);
+            editPrice7.setVisible(false);
+            editPrice11.setVisible(false);
+            editPrice22.setVisible(false);
+            editPrice33.setVisible(false);
+            editPrice44.setVisible(false);
+            editPrice55.setVisible(false);
+            savebtn.setVisible(true);
+            textField23.setEditable(true);
+            textField23.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
+            editPrice2.setVisible(false);
+            mealName = textField20.getText();
+            flag = 2;
+        });
+    }
+
+    @FXML
+    void editPrice3(ActionEvent event) {
+        Platform.runLater(() -> {
+            editPrice1.setVisible(false);
+            editPrice2.setVisible(false);
+            editPrice4.setVisible(false);
+            editPrice5.setVisible(false);
+            editPrice6.setVisible(false);
+            editPrice7.setVisible(false);
+            editPrice11.setVisible(false);
+            editPrice22.setVisible(false);
+            editPrice33.setVisible(false);
+            editPrice44.setVisible(false);
+            editPrice55.setVisible(false);
+            savebtn.setVisible(true);
+            textField33.setEditable(true);
+            textField33.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
+            editPrice3.setVisible(false);
+            mealName = textField30.getText();
+            flag = 3;
+        });
+    }
+
+    @FXML
+    void editPrice4(ActionEvent event) {
+        Platform.runLater(() -> {
+            editPrice1.setVisible(false);
+            editPrice2.setVisible(false);
+            editPrice3.setVisible(false);
+            editPrice5.setVisible(false);
+            editPrice6.setVisible(false);
+            editPrice7.setVisible(false);
+            editPrice11.setVisible(false);
+            editPrice22.setVisible(false);
+            editPrice33.setVisible(false);
+            editPrice44.setVisible(false);
+            editPrice55.setVisible(false);
+            savebtn.setVisible(true);
+            textField43.setEditable(true);
+            textField43.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
+            editPrice4.setVisible(false);
+            mealName = textField40.getText();
+            flag = 4;
+        });
+    }
+
+    @FXML
+    void editPrice5(ActionEvent event) {
+        Platform.runLater(() -> {
+            editPrice1.setVisible(false);
+            editPrice2.setVisible(false);
+            editPrice3.setVisible(false);
+            editPrice4.setVisible(false);
+            editPrice6.setVisible(false);
+            editPrice7.setVisible(false);
+            editPrice11.setVisible(false);
+            editPrice22.setVisible(false);
+            editPrice33.setVisible(false);
+            editPrice44.setVisible(false);
+            editPrice55.setVisible(false);
+            savebtn.setVisible(true);
+            textField53.setEditable(true);
+            textField53.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
+            editPrice5.setVisible(false);
+            mealName = textField50.getText();
+            flag = 5;
+
+        });
+    }
+
+    @FXML
+    void editPrice6(ActionEvent event) {
+        Platform.runLater(() -> {
+            editPrice1.setVisible(false);
+            editPrice2.setVisible(false);
+            editPrice3.setVisible(false);
+            editPrice4.setVisible(false);
+            editPrice5.setVisible(false);
+            editPrice7.setVisible(false);
+            editPrice11.setVisible(false);
+            editPrice22.setVisible(false);
+            editPrice33.setVisible(false);
+            editPrice44.setVisible(false);
+            editPrice55.setVisible(false);
+            savebtn.setVisible(true);
+            textField63.setEditable(true);
+            textField63.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
+            editPrice6.setVisible(false);
+            mealName = textField60.getText();
+            flag = 6;
+        });
+    }
+
+    @FXML
+    void editPrice7(ActionEvent event) {
+        Platform.runLater(() -> {
+            editPrice1.setVisible(false);
+            editPrice2.setVisible(false);
+            editPrice3.setVisible(false);
+            editPrice4.setVisible(false);
+            editPrice5.setVisible(false);
+            editPrice6.setVisible(false);
+            editPrice11.setVisible(false);
+            editPrice22.setVisible(false);
+            editPrice33.setVisible(false);
+            editPrice44.setVisible(false);
+            editPrice55.setVisible(false);
+            savebtn.setVisible(true);
+            textField73.setEditable(true);
+            textField73.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
+            editPrice7.setVisible(false);
+            mealName = textField70.getText();
+            flag = 7;
+        });
+    }
+
+    @FXML
+    void editPrice11(ActionEvent event) {
+        Platform.runLater(() -> {
+            editPrice22.setVisible(false);
+            editPrice33.setVisible(false);
+            editPrice44.setVisible(false);
+            editPrice55.setVisible(false);
+            editPrice1.setVisible(false);
+            editPrice2.setVisible(false);
+            editPrice3.setVisible(false);
+            editPrice4.setVisible(false);
+            editPrice5.setVisible(false);
+            editPrice6.setVisible(false);
+            editPrice7.setVisible(false);
+
+            savebtn.setVisible(true);
+            textField131.setEditable(true);
+            textField131.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editPrice11.setVisible(false);
+            mealName = textField101.getText();
+            flag = 8;
+        });
+    }
+
+    @FXML
+    void editPrice22(ActionEvent event) {
+        Platform.runLater(() -> {
+            editPrice11.setVisible(false);
+            editPrice33.setVisible(false);
+            editPrice44.setVisible(false);
+            editPrice55.setVisible(false);
+            editPrice1.setVisible(false);
+            editPrice2.setVisible(false);
+            editPrice3.setVisible(false);
+            editPrice4.setVisible(false);
+            editPrice5.setVisible(false);
+            editPrice6.setVisible(false);
+            editPrice7.setVisible(false);
+            savebtn.setVisible(true);
+            textField231.setEditable(true);
+            textField231.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
+            editPrice22.setVisible(false);
+            mealName = textField201.getText();
+            flag = 9;
+        });
+    }
+
+    @FXML
+    void editPrice33(ActionEvent event) {
+        Platform.runLater(() -> {
+            editPrice22.setVisible(false);
+            editPrice11.setVisible(false);
+            editPrice44.setVisible(false);
+            editPrice55.setVisible(false);
+            editPrice1.setVisible(false);
+            editPrice2.setVisible(false);
+            editPrice3.setVisible(false);
+            editPrice4.setVisible(false);
+            editPrice5.setVisible(false);
+            editPrice6.setVisible(false);
+            editPrice7.setVisible(false);
+            savebtn.setVisible(true);
+            textField331.setEditable(true);
+            textField331.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
+            editPrice33.setVisible(false);
+            mealName = textField301.getText();
+            flag = 10;
+        });
+    }
+
+    @FXML
+    void editPrice44(ActionEvent event) {
+        Platform.runLater(() -> {
+            editPrice22.setVisible(false);
+            editPrice33.setVisible(false);
+            editPrice11.setVisible(false);
+            editPrice55.setVisible(false);
+            editPrice1.setVisible(false);
+            editPrice2.setVisible(false);
+            editPrice3.setVisible(false);
+            editPrice4.setVisible(false);
+            editPrice5.setVisible(false);
+            editPrice6.setVisible(false);
+            editPrice7.setVisible(false);
+            savebtn.setVisible(true);
+            textField431.setEditable(true);
+            textField431.setStyle("-fx-background-color: orange ;-fx-border-color: blue");
+            editPrice44.setVisible(false);
+            mealName = textField401.getText();
+            flag = 11;
+        });
+    }
+
+    @FXML
+    void editPrice55(ActionEvent event) {
+        Platform.runLater(() -> {
+            editPrice22.setVisible(false);
+            editPrice33.setVisible(false);
+            editPrice44.setVisible(false);
+            editPrice11.setVisible(false);
+            editPrice1.setVisible(false);
+            editPrice2.setVisible(false);
+            editPrice3.setVisible(false);
+            editPrice4.setVisible(false);
+            editPrice5.setVisible(false);
+            editPrice6.setVisible(false);
+            editPrice7.setVisible(false);
+            savebtn.setVisible(true);
+            textField531.setEditable(true);
+            textField531.setStyle("-fx-background-color: orange ; -fx-border-color: blue");
+            editPrice55.setVisible(false);
+            mealName = textField501.getText();
+            flag = 12;
+
+        });
+    }
+
+    @FXML
+    void saveFunc(ActionEvent event) {
+        Platform.runLater(() -> {
+
+            if (flag == 1) {
+                price = textField13.getText();
+                textField13.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+            }
+            if (flag == 2) {
+                price = textField23.getText();
+                textField23.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+
+            }
+            if (flag == 3) {
+                price = textField33.getText();
+                textField33.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag == 4) {
+                price = textField43.getText();
+                textField43.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag == 5) {
+                price = textField53.getText();
+                textField53.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag == 6) {
+                price = textField63.getText();
+                textField63.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+            }
+            if (flag == 7) {
+                price = textField73.getText();
+                textField73.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag == 8) {
+                price = textField131.getText();
+                textField131.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag == 9) {
+                price = textField231.getText();
+                textField231.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag == 10) {
+                price = textField331.getText();
+                textField331.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag == 11) {
+                price = textField431.getText();
+                textField431.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag == 12) {
+                price = textField531.getText();
+                textField531.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (price.equals("")) {
+                price = "0";
+            }
+            try {
+                client.sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
+                client.sendToServer("Request Tel-Aviv menu");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            textField131.setEditable(false);
+            textField231.setEditable(false);
+            textField331.setEditable(false);
+            textField431.setEditable(false);
+            textField531.setEditable(false);
+            textField13.setEditable(false);
+            textField23.setEditable(false);
+            textField33.setEditable(false);
+            textField43.setEditable(false);
+            textField53.setEditable(false);
+            textField63.setEditable(false);
+            textField73.setEditable(false);
+
+            savebtn.setVisible(false);
+            isDietitian();
+        });
+    }
 
 
 
+    @FXML
+    void backFunc(ActionEvent event) {
 
+        String page = "Main Page";
+        App.switchScreen(page);
+
+    }
+
+    @FXML
+    void back_to_update_page_func(ActionEvent event) {
+        String page = "Update Menu Page";
+        App.switchScreen(page);
+    }
+
+    @FXML
+    void makeDiscount(ActionEvent event) {
+        Platform.runLater(() -> {
+            String input = discount.getText().trim();
+
+            try {
+                double percentage = Double.parseDouble(input);
+                if (percentage < 0 || percentage > 100) {
+                    errorLabel.setVisible(true);
+                    errorLabel.setText("Enter value between 0 and 100 , Try Again !");
+                }
+                else {
+
+                    try {
+                        client.sendToServer("Update discount" + "\"" + percentage);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    /*for (Meal meal : Menu) {
+                        double originalPrice = meal.getMealPrice();
+                        double newPrice = originalPrice * (1 - percentage / 100);
+                        meal.setMealPrice(Math.round(newPrice * 100.0) / 100.0);
+                    }*/
+
+                    menuOrder(Menu);
+                    errorLabel.setVisible(false);
+                    System.out.println("Discount applied to all meals.");
+                }
+
+            } catch (NumberFormatException e) {
+                errorLabel.setVisible(true);
+                errorLabel.setText("Enter a valid number");
+            }
+        });
+    }
+    private String mealName2 ;
+    private int flag2=0 ;
+    private String ingredients;
+
+    @FXML
+    void editIngredients1(ActionEvent event) {
+        Platform.runLater(() -> {
+            editIngredients2.setVisible(false);
+            editIngredients3.setVisible(false);
+            editIngredients4.setVisible(false);
+            editIngredients5.setVisible(false);
+            editIngredients6.setVisible(false);
+            editIngredients7.setVisible(false);
+            editIngredients11.setVisible(false);
+            editIngredients22.setVisible(false);
+            editIngredients33.setVisible(false);
+            editIngredients44.setVisible(false);
+            editIngredients55.setVisible(false);
+            save2btn.setVisible(true);
+            textField11.setEditable(true);
+            textField11.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editIngredients1.setVisible(false);
+            mealName2 = textField10.getText();
+            flag2 = 1;
+        });
+    }
+    @FXML
+    void editIngredients2(ActionEvent event) {
+        Platform.runLater(() -> {
+            editIngredients1.setVisible(false);
+            editIngredients3.setVisible(false);
+            editIngredients4.setVisible(false);
+            editIngredients5.setVisible(false);
+            editIngredients6.setVisible(false);
+            editIngredients7.setVisible(false);
+            editIngredients11.setVisible(false);
+            editIngredients22.setVisible(false);
+            editIngredients33.setVisible(false);
+            editIngredients44.setVisible(false);
+            editIngredients55.setVisible(false);
+            save2btn.setVisible(true);
+            textField21.setEditable(true);
+            textField21.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editIngredients2.setVisible(false);
+            mealName2 = textField20.getText();
+            flag2 = 2;
+        });
+    }
+    @FXML
+    void editIngredients3(ActionEvent event) {
+        Platform.runLater(() -> {
+            editIngredients2.setVisible(false);
+            editIngredients1.setVisible(false);
+            editIngredients4.setVisible(false);
+            editIngredients5.setVisible(false);
+            editIngredients6.setVisible(false);
+            editIngredients7.setVisible(false);
+            editIngredients11.setVisible(false);
+            editIngredients22.setVisible(false);
+            editIngredients33.setVisible(false);
+            editIngredients44.setVisible(false);
+            editIngredients55.setVisible(false);
+            save2btn.setVisible(true);
+            textField31.setEditable(true);
+            textField31.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editIngredients3.setVisible(false);
+            mealName2 = textField30.getText();
+            flag2 = 3;
+        });
+    }
+    @FXML
+    void editIngredients4(ActionEvent event) {
+        Platform.runLater(() -> {
+            editIngredients2.setVisible(false);
+            editIngredients3.setVisible(false);
+            editIngredients1.setVisible(false);
+            editIngredients5.setVisible(false);
+            editIngredients6.setVisible(false);
+            editIngredients7.setVisible(false);
+            editIngredients11.setVisible(false);
+            editIngredients22.setVisible(false);
+            editIngredients33.setVisible(false);
+            editIngredients44.setVisible(false);
+            editIngredients55.setVisible(false);
+            save2btn.setVisible(true);
+            textField41.setEditable(true);
+            textField41.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editIngredients4.setVisible(false);
+            mealName2 = textField40.getText();
+            flag2 = 4;
+        });
+    }
+    @FXML
+    void editIngredients5(ActionEvent event) {
+        Platform.runLater(() -> {
+            editIngredients2.setVisible(false);
+            editIngredients3.setVisible(false);
+            editIngredients4.setVisible(false);
+            editIngredients1.setVisible(false);
+            editIngredients6.setVisible(false);
+            editIngredients7.setVisible(false);
+            editIngredients11.setVisible(false);
+            editIngredients22.setVisible(false);
+            editIngredients33.setVisible(false);
+            editIngredients44.setVisible(false);
+            editIngredients55.setVisible(false);
+            save2btn.setVisible(true);
+            textField51.setEditable(true);
+            textField51.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editIngredients5.setVisible(false);
+            mealName2 = textField50.getText();
+            flag2 = 5;
+        });
+    }
+    @FXML
+    void editIngredients6(ActionEvent event) {
+        Platform.runLater(() -> {
+            editIngredients2.setVisible(false);
+            editIngredients3.setVisible(false);
+            editIngredients4.setVisible(false);
+            editIngredients5.setVisible(false);
+            editIngredients1.setVisible(false);
+            editIngredients7.setVisible(false);
+            editIngredients11.setVisible(false);
+            editIngredients22.setVisible(false);
+            editIngredients33.setVisible(false);
+            editIngredients44.setVisible(false);
+            editIngredients55.setVisible(false);
+            save2btn.setVisible(true);
+            textField61.setEditable(true);
+            textField61.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editIngredients6.setVisible(false);
+            mealName2 = textField60.getText();
+            flag2 = 6;
+        });
+    }
+    @FXML
+    void editIngredients7(ActionEvent event) {
+        Platform.runLater(() -> {
+            editIngredients2.setVisible(false);
+            editIngredients3.setVisible(false);
+            editIngredients4.setVisible(false);
+            editIngredients5.setVisible(false);
+            editIngredients6.setVisible(false);
+            editIngredients1.setVisible(false);
+            editIngredients11.setVisible(false);
+            editIngredients22.setVisible(false);
+            editIngredients33.setVisible(false);
+            editIngredients44.setVisible(false);
+            editIngredients55.setVisible(false);
+            save2btn.setVisible(true);
+            textField71.setEditable(true);
+            textField71.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editIngredients7.setVisible(false);
+            mealName2 = textField70.getText();
+            flag2 = 7;
+        });
+    }
+    @FXML
+    void editIngredients11(ActionEvent event) {
+        Platform.runLater(() -> {
+            editIngredients1.setVisible(false);
+            editIngredients2.setVisible(false);
+            editIngredients3.setVisible(false);
+            editIngredients4.setVisible(false);
+            editIngredients5.setVisible(false);
+            editIngredients6.setVisible(false);
+            editIngredients7.setVisible(false);
+            editIngredients22.setVisible(false);
+            editIngredients33.setVisible(false);
+            editIngredients44.setVisible(false);
+            editIngredients55.setVisible(false);
+            save2btn.setVisible(true);
+            textField111.setEditable(true);
+            textField111.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editIngredients11.setVisible(false);
+            mealName2 = textField101.getText();
+            flag2 = 8;
+        });
+    }
+    @FXML
+    void editIngredients22(ActionEvent event) {
+        Platform.runLater(() -> {
+            editIngredients1.setVisible(false);
+            editIngredients2.setVisible(false);
+            editIngredients3.setVisible(false);
+            editIngredients4.setVisible(false);
+            editIngredients5.setVisible(false);
+            editIngredients6.setVisible(false);
+            editIngredients7.setVisible(false);
+            editIngredients11.setVisible(false);
+            editIngredients33.setVisible(false);
+            editIngredients44.setVisible(false);
+            editIngredients55.setVisible(false);
+            save2btn.setVisible(true);
+            textField211.setEditable(true);
+            textField211.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editIngredients22.setVisible(false);
+            mealName2 = textField201.getText();
+            flag2 = 9;
+        });
+    }
+    @FXML
+    void editIngredients33(ActionEvent event) {
+        Platform.runLater(() -> {
+            editIngredients1.setVisible(false);
+            editIngredients2.setVisible(false);
+            editIngredients3.setVisible(false);
+            editIngredients4.setVisible(false);
+            editIngredients5.setVisible(false);
+            editIngredients6.setVisible(false);
+            editIngredients7.setVisible(false);
+            editIngredients22.setVisible(false);
+            editIngredients11.setVisible(false);
+            editIngredients44.setVisible(false);
+            editIngredients55.setVisible(false);
+            save2btn.setVisible(true);
+            textField311.setEditable(true);
+            textField311.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editIngredients33.setVisible(false);
+            mealName2 = textField301.getText();
+            flag2 = 10;
+        });
+    }
+    @FXML
+    void editIngredients44(ActionEvent event) {
+        Platform.runLater(() -> {
+            editIngredients1.setVisible(false);
+            editIngredients2.setVisible(false);
+            editIngredients3.setVisible(false);
+            editIngredients4.setVisible(false);
+            editIngredients5.setVisible(false);
+            editIngredients6.setVisible(false);
+            editIngredients7.setVisible(false);
+            editIngredients22.setVisible(false);
+            editIngredients11.setVisible(false);
+            editIngredients33.setVisible(false);
+            editIngredients55.setVisible(false);
+            save2btn.setVisible(true);
+            textField411.setEditable(true);
+            textField411.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editIngredients44.setVisible(false);
+            mealName2 = textField401.getText();
+            flag2 = 11;
+        });
+    }
+    @FXML
+    void editIngredients55(ActionEvent event) {
+        Platform.runLater(() -> {
+            editIngredients1.setVisible(false);
+            editIngredients2.setVisible(false);
+            editIngredients3.setVisible(false);
+            editIngredients4.setVisible(false);
+            editIngredients5.setVisible(false);
+            editIngredients6.setVisible(false);
+            editIngredients7.setVisible(false);
+            editIngredients22.setVisible(false);
+            editIngredients11.setVisible(false);
+            editIngredients33.setVisible(false);
+            editIngredients44.setVisible(false);
+            save2btn.setVisible(true);
+            textField511.setEditable(true);
+            textField511.setStyle("-fx-background-color: orange;-fx-border-color: blue");
+            editIngredients55.setVisible(false);
+            mealName2 = textField501.getText();
+            flag2 = 12;
+        });
+    }
+
+    @FXML
+    void save2Func(ActionEvent event) {
+        Platform.runLater(() -> {
+
+            if (flag2 == 1) {
+                ingredients = textField11.getText();
+                textField11.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+            }
+            if (flag2 == 2) {
+                ingredients = textField21.getText();
+                textField21.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag2 == 3) {
+                ingredients = textField31.getText();
+                textField31.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag2 == 4) {
+                ingredients = textField41.getText();
+                textField41.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag2 == 5) {
+                ingredients = textField51.getText();
+                textField51.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag2 == 6) {
+                ingredients = textField61.getText();
+                textField61.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+            }
+            if (flag2 == 7) {
+                ingredients = textField71.getText();
+                textField71.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag2 == 8) {
+                ingredients = textField111.getText();
+                textField111.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag2 == 9) {
+                ingredients = textField211.getText();
+                textField211.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag2 == 10) {
+                ingredients = textField311.getText();
+                textField311.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag2 == 11) {
+                ingredients = textField411.getText();
+                textField411.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (flag2 == 12) {
+                ingredients = textField511.getText();
+                textField511.setStyle("-fx-background-color: orange ; -fx-border-color: orange");
+
+            }
+            if (ingredients.equals("")) {
+                ingredients = " ";
+            }
+            try {
+                Client.getClient().sendToServer("Update Ingredient " + "\"" + mealName2 + "\" " + "\"" + ingredients + "\"");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            textField111.setEditable(false);
+            textField211.setEditable(false);
+            textField311.setEditable(false);
+            textField411.setEditable(false);
+            textField511.setEditable(false);
+            textField11.setEditable(false);
+            textField21.setEditable(false);
+            textField31.setEditable(false);
+            textField41.setEditable(false);
+            textField51.setEditable(false);
+            textField61.setEditable(false);
+            textField71.setEditable(false);
+
+            save2btn.setVisible(false);
+            isDietitian();
+        });
+    }
 }
