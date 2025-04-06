@@ -1,10 +1,7 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
 import il.cshaifasweng.OCSFMediatorExample.client.Client;
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
-import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
-import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
-import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
+import il.cshaifasweng.OCSFMediatorExample.entities.*;
 
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.ConnectionToClient;
@@ -24,6 +21,46 @@ public class SimpleServer extends AbstractServer {
 
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
+		try {
+			// Check if msg is a String command like "save_reservation"
+			if (msg instanceof String) {
+				String command = (String) msg;
+
+				if (command.equals("save_reservation")) {
+					// Set a flag or state that the next Reservation object should be saved
+					client.setInfo("save_reservation", true); // Store flag on the client
+					return;
+				}
+
+				// Handle other string commands...
+			}
+
+			// Check if msg is a Reservation object
+			if (msg instanceof Reservation) {
+				Reservation reservation = (Reservation) msg;
+
+				// Check if we were expecting to save the reservation
+				Object saveFlag = client.getInfo("save_reservation");
+				if (saveFlag != null && (boolean) saveFlag) {
+					System.out.println("Saving reservation to DB...");
+					DataManager.saveReservation(reservation);
+					client.setInfo("save_reservation", false); // Reset flag
+					client.sendToClient("Reservation saved successfully");
+					return;
+				}
+
+				// Otherwise, just return available tables
+				System.out.println("Checking availability for reservation...");
+				List<HostingTable> availability = DataManager.getAvailableTables(reservation);
+				System.out.println("Available tables: " + availability.size());
+				client.sendToClient(availability);
+				return;
+			}
+
+			// Continue with other commands...
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		String msgString = msg.toString();
 		System.out.println(msgString);
 		if (msgString.startsWith("#warning")) {
@@ -57,6 +94,8 @@ public class SimpleServer extends AbstractServer {
 			try {
 				int index = msgString.indexOf(";");
 				String restaurantId = msgString.substring(index + 1).trim();
+//				RestaurantsService.getRestaurantById(id);
+//				RestaurantsService.getRestaurantByName(id);
 				Restaurant restaurant = DataManager.getRestaurant(restaurantId);
 				if(restaurant != null) {
 					client.sendToClient(restaurant);
@@ -144,14 +183,15 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 
-		}else if(msgString.startsWith("log out")){
+		} else if(msgString.startsWith("log out")){
 			int index = msgString.indexOf(";");
 			String username = msgString.substring(index + 1).trim();
 			DataManager.disconnectUser(username);
 		}
-		else {
+		else  {
 			System.out.println("The server didn't recognize this " + msgString + " signal");
 		}
+
 	}
 
 	public void sendToAllClients(Object message) {

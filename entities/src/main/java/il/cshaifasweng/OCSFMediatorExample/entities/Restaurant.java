@@ -20,18 +20,18 @@ public class Restaurant implements Serializable {
     private String address;
     private String location;
     private String phoneNumber;
-    private String activityHours;
+    private String holidays;
+    private double openingTime;
+    private double closingTime;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
-    private List<HostingTable> hostingTables;  // Reference to the HostingTable entity
+    private List<HostingTable> hostingTables;
 
     @ManyToMany(mappedBy = "restaurants")
-    private List<Meal> meals;  // Many-to-Many relationship with Meal
+    private List<Meal> meals;
 
-    // Default constructor (required by Hibernate)
     public Restaurant() {}
 
-    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -72,12 +72,28 @@ public class Restaurant implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getActivityHours() {
-        return activityHours;
+    public String getHolidays() {
+        return holidays;
     }
 
-    public void setActivityHours(String activityHours) {
-        this.activityHours = activityHours;
+    public void setHolidays(String holidays) {
+        this.holidays = holidays;
+    }
+
+    public double getOpeningTime() {
+        return openingTime;
+    }
+
+    public void setOpeningTime(double openingTime) {
+        this.openingTime = openingTime;
+    }
+
+    public double getClosingTime() {
+        return closingTime;
+    }
+
+    public void setClosingTime(double closingTime) {
+        this.closingTime = closingTime;
     }
 
     public List<HostingTable> getHostingTables() {
@@ -100,26 +116,28 @@ public class Restaurant implements Serializable {
         this.meals.add(meal);
     }
 
-    // Copy restaurant attributes from another restaurant
     public void copyRestaurant(Restaurant restaurant) {
         this.setId(restaurant.getId());
         this.setName(restaurant.getName());
         this.setAddress(restaurant.getAddress());
         this.setLocation(restaurant.getLocation());
         this.setPhoneNumber(restaurant.getPhoneNumber());
-        this.setActivityHours(restaurant.getActivityHours()); // Copy activity hours
+        this.setHolidays(restaurant.getHolidays());
+        this.setOpeningTime(restaurant.getOpeningTime());
+        this.setClosingTime(restaurant.getClosingTime());
         this.setHostingTables(restaurant.getHostingTables());
         this.setMeals(restaurant.getMeals());
     }
 
-    // Reset all attributes
     public void resetAttributes() {
         this.setId(0);
         this.setName(null);
         this.setAddress(null);
         this.setLocation(null);
         this.setPhoneNumber(null);
-        this.setActivityHours(null);
+        this.setHolidays(null);
+        this.setOpeningTime(0.0);
+        this.setClosingTime(0.0);
         this.setHostingTables(null);
         this.setMeals(null);
     }

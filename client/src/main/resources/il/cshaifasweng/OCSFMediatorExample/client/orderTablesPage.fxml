@@ -34,56 +34,47 @@
    <right>
       <AnchorPane prefHeight="400.0" prefWidth="470.0" BorderPane.alignment="CENTER">
          <children>
-            <Pane layoutX="32.0" layoutY="109.0" prefHeight="75.0" prefWidth="125.0" style="-fx-background-color: #D6D8E0; -fx-background-radius: 5em;">
+            <Pane layoutX="32.0" layoutY="109.0" prefHeight="75.0" prefWidth="304.0" style="-fx-background-color: #D6D8E0; -fx-background-radius: 5em;">
                <children>
-                  <Label alignment="CENTER" layoutX="38.0" layoutY="-1.0" prefHeight="30.0" prefWidth="49.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Hour" textFill="ORANGE">
+                  <ComboBox fx:id="PrefferedTimeBox" layoutX="23.0" layoutY="38.0" prefHeight="25.0" prefWidth="260.0" promptText="choose preferred time" style="-fx-background-color: #FDF8E2; -fx-background-radius: 5em;" visibleRowCount="1" />
+                  <Label alignment="CENTER" layoutX="22.0" layoutY="8.0" prefHeight="30.0" prefWidth="261.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Available Times" textFill="ORANGE">
                      <font>
                         <Font size="20.0" />
                      </font>
                   </Label>
-                  <ComboBox layoutX="22.0" layoutY="49.0" prefHeight="25.0" prefWidth="81.0" promptText="00" style="-fx-background-color: #FDF8E2; -fx-background-radius: 5em;" />
-               </children>
-            </Pane>
-            <Pane layoutX="207.0" layoutY="109.0" prefHeight="75.0" prefWidth="125.0" style="-fx-background-color: #D6D8E0; -fx-background-radius: 5em;">
-               <children>
-                  <Label alignment="CENTER" layoutX="17.0" layoutY="-1.0" prefHeight="30.0" prefWidth="91.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Minutes" textFill="ORANGE">
-                     <font>
-                        <Font size="20.0" />
-                     </font>
-                  </Label>
-                  <ComboBox layoutX="22.0" layoutY="49.0" prefHeight="25.0" prefWidth="81.0" promptText="00" style="-fx-background-color: #FDF8E2; -fx-background-radius: 5em;" />
                </children>
             </Pane>
             <Separator layoutX="18.0" layoutY="231.0" prefWidth="150.0" style="-fx-background-color: #ffa500;" />
-            <DatePicker layoutX="95.0" layoutY="69.0" style="-fx-background-color: #ffa500;" />
-            <Separator layoutX="18.0" layoutY="284.0" prefWidth="150.0" style="-fx-background-color: #ffa500;" />
-            <Button alignment="CENTER" layoutX="18.0" layoutY="242.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="65.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Inside" textFill="WHITE" />
-            <Button alignment="CENTER" layoutX="95.0" layoutY="242.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="65.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Outside" textFill="WHITE" />
+            <DatePicker fx:id="datePicker" layoutX="95.0" layoutY="69.0" />
+            <Separator layoutX="194.0" layoutY="232.0" prefWidth="150.0" style="-fx-background-color: #ffa500;" />
+            <Button fx:id="insideButton" alignment="CENTER" layoutX="18.0" layoutY="242.0" mnemonicParsing="false" onAction="#handleInsideClick" prefHeight="35.0" prefWidth="65.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Inside" textFill="WHITE" />
+
+            <Button fx:id="outsideButton" alignment="CENTER" layoutX="95.0" layoutY="242.0" mnemonicParsing="false" onAction="#handleOutsideClick" prefHeight="35.0" prefWidth="65.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Outside" textFill="WHITE" />
+
             <Label alignment="CENTER" layoutX="17.0" layoutY="200.0" prefHeight="30.0" prefWidth="55.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Sitting:" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
             </Label>
-            <Label alignment="CENTER" layoutX="14.0" layoutY="335.0" prefHeight="30.0" prefWidth="98.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="General note:" textFill="ORANGE">
+            <Label alignment="CENTER" layoutX="14.0" layoutY="302.0" prefHeight="42.0" prefWidth="98.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="General note:" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
             </Label>
-            <TextField layoutX="14.0" layoutY="365.0" prefHeight="26.0" prefWidth="155.0" promptText="Somthing to tell us?" />
+            <TextField fx:id="generalNoteField" layoutX="116.0" layoutY="304.0" prefHeight="38.0" prefWidth="231.0" promptText="Somthing to tell us?" />
             <Label alignment="CENTER" layoutX="45.0" layoutY="32.0" prefHeight="30.0" prefWidth="290.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Let us know your arrival time" textFill="ORANGE">
                <font>
                   <Font size="20.0" />
                </font>
             </Label>
-            <Label alignment="CENTER" layoutX="15.0" layoutY="295.0" prefHeight="30.0" prefWidth="95.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Total guests:" textFill="ORANGE">
+            <Label alignment="CENTER" layoutX="222.0" layoutY="200.0" prefHeight="30.0" prefWidth="95.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Total guests:" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
             </Label>
-            <TextField layoutX="120.0" layoutY="298.0" prefHeight="8.0" prefWidth="50.0" />
-            <Separator layoutX="18.0" layoutY="333.0" prefWidth="150.0" style="-fx-background-color: #ffa500;" />
-            <Button fx:id="ConfirmOrderButton" alignment="CENTER" layoutX="221.0" layoutY="365.0" mnemonicParsing="false" style="-fx-background-color: green; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Confirm Order" textAlignment="CENTER" textFill="WHITE" />
-            <ComboBox layoutX="187.0" layoutY="246.0" prefHeight="26.0" prefWidth="165.0" promptText="Suggested Hours" style="-fx-background-color: #ffa500; -fx-background-radius: 5em;" />
+            <TextField fx:id="guestCountField" layoutX="244.0" layoutY="247.0" prefHeight="8.0" prefWidth="50.0" />
+            <Separator layoutX="16.0" layoutY="290.0" prefHeight="0.0" prefWidth="330.0" style="-fx-background-color: #ffa500;" />
+            <Button fx:id="ConfirmOrderButton" alignment="CENTER" layoutX="63.0" layoutY="351.0" mnemonicParsing="false" onAction="#handleConfirmOrderClick" prefHeight="35.0" prefWidth="242.0" style="-fx-background-color: green; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Continue" textAlignment="CENTER" textFill="WHITE" />
          </children>
       </AnchorPane>
    </right>

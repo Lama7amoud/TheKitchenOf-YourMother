@@ -1,5 +1,8 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.Reservation;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -7,6 +10,10 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.util.Scanner;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.HostingTable;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
@@ -19,10 +26,14 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
+import java.time.LocalDateTime;
+
+
 public class DataManager {
 
     private static Session session;
     private static String password = "";
+
 
     private static SessionFactory getSessionFactory(String password) throws HibernateException {
 
@@ -33,6 +44,7 @@ public class DataManager {
         configuration.addAnnotatedClass(AuthorizedUser.class);
         configuration.addAnnotatedClass(Restaurant.class);
         configuration.addAnnotatedClass(HostingTable.class);
+        configuration.addAnnotatedClass(Reservation.class);
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         return configuration.buildSessionFactory(serviceRegistry);
     }
@@ -48,37 +60,39 @@ public class DataManager {
 
 
     private static void generateData() throws Exception {
-
-        // Create Italian restaurants
+    // Create Italian restaurants
         Restaurant restaurant1 = new Restaurant();
-        restaurant1.setName("Mom Kitchen");
+        restaurant1.setName("Haifa-Mom Kitchen");
         restaurant1.setAddress("German Colony");
         restaurant1.setLocation("Haifa");
         restaurant1.setPhoneNumber("123-456-7890");
-        restaurant1.setActivityHours("Monday-Saturday: 10:00 AM - 11:00 PM");
+        restaurant1.setOpeningTime(10.00);  // 10:00 AM
+        restaurant1.setClosingTime(23.00);  // 11:00 PM
+        restaurant1.setHolidays("Sunday");
 
         Restaurant restaurant2 = new Restaurant();
-        restaurant2.setName("Mom Kitchen");
+        restaurant2.setName("Tel-Aviv-Mom Kitchen");
         restaurant2.setAddress("Rothschild");
         restaurant2.setLocation("Tel-Aviv");
         restaurant2.setPhoneNumber("987-654-3210");
-        restaurant2.setActivityHours("Monday-Sunday: 9:00 AM - 10:00 PM");
+        restaurant2.setOpeningTime(9.00);   // 9:00 AM
+        restaurant2.setClosingTime(22.00);  // 10:00 PM
+        restaurant2.setHolidays("Saturday");
 
         Restaurant restaurant3 = new Restaurant();
-        restaurant3.setName("Mom Kitchen");
+        restaurant3.setName("Nahariya-Mom Kitchen");
         restaurant3.setAddress("Weizman");
         restaurant3.setLocation("Nahariya");
         restaurant3.setPhoneNumber("555-123-4567");
-        restaurant3.setActivityHours("Tuesday-Sunday: 11:00 AM - 12:00 AM");
+        restaurant3.setOpeningTime(11.00);  // 11:00 AM
+        restaurant3.setClosingTime(24.00);  // 12:00 AM (midnight)
+        restaurant3.setHolidays("Monday");
 
 
-        // Persist restaurants to the database
         session.save(restaurant1);
         session.save(restaurant2);
         session.save(restaurant3);
-
         session.flush();
-
         // Create Italian meals
         Meal meal1 = new Meal("Margherita Pizza", "Classic pizza with fresh mozzarella and basil", "Vegetarian", 10.99);
         Meal meal2 = new Meal("Spaghetti Carbonara", "Pasta with pancetta, eggs, and Parmesan cheese", "Contains dairy", 13.99);
@@ -157,34 +171,37 @@ public class DataManager {
         for (int i = 1; i <= 13; i++) {
             HostingTable table = new HostingTable();
             table.setTableNumber(i);
-            table.setSeatsNumber((i % 4) + 2); // Seats between 2-5
-            table.setReserved(false);
+            table.setSeatsNumber((i % 3) + 2);  // Seats: 2–4
             table.setRestaurant(restaurant1);
+            table.setInside(i % 2 == 0);
+            table.setReservedTimes(new ArrayList<>());
             session.save(table);
         }
 
         // Insert tables for Tel Aviv branch (8 tables)
         for (int i = 1; i <= 8; i++) {
-            HostingTable table = new HostingTable();
-            table.setTableNumber(i);
-            table.setSeatsNumber((i % 4) + 2); // Seats between 2-5
-            table.setReserved(false);
-            table.setRestaurant(restaurant2);
-            session.save(table);
+            HostingTable table1 = new HostingTable();
+            table1.setTableNumber(i);
+            table1.setSeatsNumber((i % 3) + 2);  // Seats: 2–4
+            table1.setRestaurant(restaurant2);
+            table1.setInside(i % 2 == 0);
+            table1.setReservedTimes(new ArrayList<>());
+            session.save(table1);
         }
 
         // Insert tables for Nahariya branch (14 tables)
         for (int i = 1; i <= 14; i++) {
-            HostingTable table = new HostingTable();
-            table.setTableNumber(i);
-            table.setSeatsNumber((i % 4) + 2); // Seats between 2-5
-            table.setReserved(false);
-            table.setRestaurant(restaurant3);
-            session.save(table);
+            HostingTable table2 = new HostingTable();
+            table2.setTableNumber(i);
+            table2.setSeatsNumber((i % 3) + 2);  // Seats: 2–4
+            table2.setRestaurant(restaurant3);
+            table2.setInside(i % 2 == 0);
+            table2.setReservedTimes(new ArrayList<>());
+            session.save(table2);
         }
     }
 
-    static Restaurant getRestaurant(String restaurantId){
+    public static Restaurant getRestaurant(String restaurantId){
         SessionFactory sessionFactory = getSessionFactory(password);
         session = sessionFactory.openSession();
         session.beginTransaction();
@@ -374,6 +391,11 @@ public class DataManager {
         }
     }
 
+    //TODO: implement
+//    static Restaurant getRestaurantByName(String restaurantName) {
+//
+//    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter database password: ");
@@ -402,4 +424,114 @@ public class DataManager {
             }
         }
     }
+
+
+    public static boolean isTimeAvailable(Restaurant restaurant, String timeSlot) {
+        SessionFactory sessionFactory = getSessionFactory(password);
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        try {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Reservation> query = cb.createQuery(Reservation.class);
+            Root<Reservation> root = query.from(Reservation.class);
+            query.select(root).where(
+                    cb.and(
+                            cb.equal(root.get("restaurant"), restaurant),
+                            cb.equal(root.get("timeSlot"), timeSlot)
+                    )
+            );
+
+            List<Reservation> results = session.createQuery(query).getResultList();
+            return results.isEmpty(); // true = available
+
+        } finally {
+            session.close();
+        }
+    }
+
+    public static void saveReservation(Reservation reservation) {
+        SessionFactory sessionFactory = getSessionFactory(password);
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        try {
+            if (reservation.getReservedTables() != null) {
+                for (HostingTable table : reservation.getReservedTables()) {
+                    session.update(table);
+                }
+            }
+
+            session.save(reservation);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+
+    public static List<HostingTable> getAvailableTables(Reservation reservation) {
+        SessionFactory sessionFactory = getSessionFactory(password);
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        List<HostingTable> availableTables = new ArrayList<>();
+
+        try {
+            // Get the Restaurant object from the ID
+            Restaurant restaurant = session.get(Restaurant.class, reservation.getRestaurantId());
+
+            // 1. Get all hosting tables for the restaurant
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<HostingTable> tableQuery = cb.createQuery(HostingTable.class);
+            Root<HostingTable> tableRoot = tableQuery.from(HostingTable.class);
+            tableQuery.select(tableRoot).where(cb.equal(tableRoot.get("restaurant").get("id"), reservation.getRestaurantId()));
+
+
+            List<HostingTable> allTables = session.createQuery(tableQuery).getResultList();
+
+            LocalDate date = reservation.getDate(); // e.g., 2025-04-06
+            LocalTime time = LocalTime.parse(reservation.getTimeSlot()); // e.g., "12:00"
+            LocalDateTime requestedStart = LocalDateTime.of(date, time);
+
+            // 2. Filter tables based on reservedTimes overlap
+            /*LocalDateTime requestedStart = LocalDateTime.parse(reservation.getTimeSlot());*/
+
+            LocalDateTime requestedEnd = requestedStart.plusMinutes(90);
+
+            for (HostingTable table : allTables) {
+                boolean isAvailable = true;
+
+                List<LocalDateTime> reservedTimes = table.getReservedTimes();
+                if (reservedTimes != null) {
+                    for (LocalDateTime reservedStart : reservedTimes) {
+                        LocalDateTime reservedEnd = reservedStart.plusMinutes(90);
+                        boolean overlaps = requestedStart.isBefore(reservedEnd) && reservedStart.isBefore(requestedEnd);
+                        if (overlaps) {
+                            isAvailable = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (isAvailable) {
+                    availableTables.add(table);
+                }
+            }
+
+            return availableTables;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return availableTables;
+        } finally {
+            session.close();
+        }
+    }
+
+
+
+
 }

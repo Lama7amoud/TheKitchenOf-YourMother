@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Map;
 
+import static java.util.Map.entry;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -44,16 +46,18 @@ public class App extends Application {
     }
 
     public static void switchScreen(String screenName) {
-        Map<String, String> screenMappings = Map.of(
-                "Main Page", "primary",
-                "Log In Page", "logIn",
-                "Menu Page", "menu",
-                "Personal Area Page", "personalAreaPage",
-                "Management Page", "managerPage",
-                "Feedback Page", "feedbackPage",
-                "Order Tables Page", "orderTablesPage",
-                "Branch Page" , "branchPage",
-                "Tables Page" , "tablesViewPage"
+        Map<String, String> screenMappings = Map.ofEntries(
+                entry("Main Page", "primary"),
+                entry("Log In Page", "logIn"),
+                entry("Menu Page", "menu"),
+                entry("Personal Area Page", "personalAreaPage"),
+                entry("Management Page", "managerPage"),
+                entry("Feedback Page", "feedbackPage"),
+                entry("Order Tables Page", "orderTablesPage"),
+                entry("Branch Page", "branchPage"),
+                entry("Tables Page", "tablesViewPage"),
+                entry("Confirm Order Page", "confirmOrder"),
+                entry("TakeAwayOrReservation Page", "takeAwayOrReservation")
         );
 
         String contentName = screenMappings.get(screenName);
@@ -66,6 +70,8 @@ public class App extends Application {
                     e.printStackTrace();
                 }
             });
+        } else {
+            System.err.println("Unknown screen name: " + screenName);
         }
     }
 
@@ -78,26 +84,21 @@ public class App extends Application {
         appStage = stage;
         scene = new Scene(loadFXML("mainPage"), 790, 480);
         stage.setScene(scene);
-
         stage.show();
     }
 
     @Override
     public void stop() {
-        if (stop) {
-            return;
-        }
+        if (stop) return;
         stop = true;
 
         try {
             Client clientInstance = Client.getClient();
-
             if (clientInstance != null && clientInstance.isConnected()) {
                 clientInstance.sendToServer("remove client;" + Client.getClientUsername());
             }
             clientInstance.closeConnection();
             super.stop();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -113,7 +114,5 @@ public class App extends Application {
             );
             alert.show();
         });
-
     }
-
 }

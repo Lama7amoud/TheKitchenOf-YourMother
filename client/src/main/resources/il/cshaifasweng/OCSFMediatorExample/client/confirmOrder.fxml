@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.ConfirmOrderController">
+
+    <left>
+        <AnchorPane prefWidth="235.0" style="-fx-background-color: #FDF8E2;" BorderPane.alignment="CENTER">
+            <children>
+                <Label layoutX="42.0" layoutY="29.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Order Tables" textFill="ORANGE">
+                    <font>
+                        <Font size="25.0" />
+                    </font>
+                </Label>
+
+                <Label fx:id="branchNameLabel" layoutX="38.0" layoutY="77.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Branch Name" textFill="ORANGE">
+                    <font>
+                        <Font size="25.0" />
+                    </font>
+                </Label>
+
+                <Button fx:id="viewMapButton" layoutX="8.0" layoutY="174.0" onAction="#switchPage" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="View tables availability in the map" textFill="WHITE" />
+
+                <Button fx:id="branchDetailsButton" layoutX="56.0" layoutY="315.0" onAction="#switchPage" prefWidth="124.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="See Branch Details" textFill="WHITE" />
+
+                <Button fx:id="backToMainPageButton" layoutX="56.0" layoutY="351.0" onAction="#handleBackToMainPage" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Back To Main Page" textFill="WHITE" />
+            </children>
+        </AnchorPane>
+    </left>
+
+    <right>
+        <AnchorPane prefWidth="470.0" BorderPane.alignment="CENTER">
+            <children>
+
+                <Label layoutX="56.0" layoutY="14.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="We are almost there!" textFill="ORANGE">
+                    <font>
+                        <Font size="20.0" />
+                    </font>
+                </Label>
+
+                <!-- SINGLE COMBOBOX -->
+                <Label layoutX="30.0" layoutY="60.0" text="Select Time:" />
+                <ComboBox fx:id="AvailableTimeBox" layoutX="120.0" layoutY="56.0" prefWidth="288.0" promptText="Please select one of below options" style="-fx-background-color: #FDF8E2; -fx-background-radius: 5em;" visibleRowCount="1" />
+
+                <!-- User Info Labels and Fields -->
+                <Label alignment="CENTER" layoutX="78.0" layoutY="128.0" prefWidth="314.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Please enter your info's for Reservation:" textAlignment="CENTER" textFill="#151515" />
+
+                <Label layoutX="36.0" layoutY="160.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Full name:" textFill="#151515" />
+                <TextField fx:id="nameField" layoutX="130.0" layoutY="156.0" prefWidth="186.0" />
+
+                <Label layoutX="24.0" layoutY="197.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Phone Number:" textFill="#151515" />
+                <TextField fx:id="phoneField" layoutX="130.0" layoutY="193.0" prefWidth="186.0" />
+
+                <Label layoutX="56.0" layoutY="237.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="ID:" textFill="#151515" />
+                <TextField fx:id="idField" layoutX="130.0" layoutY="233.0" prefWidth="186.0" />
+
+                <Label layoutX="42.0" layoutY="272.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Address:" textFill="#151515" />
+                <TextField fx:id="addressField" layoutX="130.0" layoutY="268.0" prefWidth="186.0" />
+
+                <!-- Buttons -->
+                <Button fx:id="ConfirmOrderButton" layoutX="130.0" layoutY="323.0" onAction="#handleConfirmReservation" prefWidth="219.0" style="-fx-background-color: green; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Confirm Reservation" textFill="WHITE">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Button>
+
+                <Button fx:id="backToOrderTablesButton" layoutX="25.0" layoutY="334.0" onAction="#handleBackToOrderTables" text="Back" />
+
+                <!-- Hidden labels for passing state -->
+                <Label fx:id="preferredTimeLabel" layoutX="50.0" layoutY="30.0" text="Time:" visible="false" />
+                <Label fx:id="sittingTypeLabel" layoutX="50.0" layoutY="70.0" text="Sitting:" visible="false" />
+                <Label fx:id="guestCountLabel" layoutX="50.0" layoutY="110.0" text="Guests:" visible="false" />
+                <Label fx:id="notesLabel" layoutX="50.0" layoutY="150.0" text="Note:" visible="false" />
+
+            </children>
+        </AnchorPane>
+    </right>
+</BorderPane>

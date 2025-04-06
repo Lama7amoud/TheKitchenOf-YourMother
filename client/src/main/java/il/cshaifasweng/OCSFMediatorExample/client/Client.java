@@ -1,9 +1,6 @@
 
 package il.cshaifasweng.OCSFMediatorExample.client;
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
-import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
-import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
-import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
+import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.application.Platform;
 import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
@@ -33,6 +30,15 @@ public class Client extends AbstractClient {
             userAtt = getClientAttributes();
         }
         return client;
+    }
+
+    @Override
+    public void sendToServer(Object msg) {
+        try {
+            super.sendToServer(msg);
+        } catch (IOException e) {
+            e.printStackTrace(); // or show a dialog
+        }
     }
 
     public static void resetClientAttributes(){
@@ -77,6 +83,8 @@ public class Client extends AbstractClient {
         }
         else if (msg instanceof Restaurant) {
             System.out.println("Restaurant " + ((Restaurant) msg).getId() + " has received to client side");
+            EventBus.getDefault().post(msg);
+        } else if (msg instanceof Reservation) {
             EventBus.getDefault().post(msg);
         }
 

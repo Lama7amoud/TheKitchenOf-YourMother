@@ -99,7 +99,7 @@ public class BranchController {
             addressLabel.setText("Address: " + restaurant.getAddress());
             phoneNumberLabel.setText("Phone Number: " + restaurant.getPhoneNumber());
             locationLabel.setText("location: " + restaurant.getLocation());
-            activityHoursLabel.setText(restaurant.getActivityHours()); // In the next line in GUI (long string)
+            activityHoursLabel.setText("All Days Except: " + restaurant.getHolidays() + "From " +restaurant.getOpeningTime() + "Untill " + restaurant.getClosingTime()); // In the next line in GUI (long string)
         });
     }
 

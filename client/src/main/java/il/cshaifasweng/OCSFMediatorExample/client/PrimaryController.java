@@ -43,7 +43,7 @@ public class PrimaryController {
     private Button menuButton;
 
     @FXML
-    private Button orderTablesButton;
+    private Button orderButton;
 
     @FXML
     private Text RestaurantDetailsInstructionLabel;
@@ -59,24 +59,20 @@ public class PrimaryController {
                 page = "Menu Page";
             } else if (sourceButton == PersonalAreaButton) {
                 page = "Personal Area Page";
-            }
-            else if(sourceButton == feedbackButton){
+            } else if (sourceButton == feedbackButton) {
                 page = "Feedback Page";
+            } else if (sourceButton == orderButton) {
+                page = "TakeAwayOrReservation Page";
             }
-            else if(sourceButton == orderTablesButton){
-                page = "Order Tables Page";
-            }
-            if(userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4){
-                String selectedRestaurant = ChooseRestaurantBox.getValue();
-                if(selectedRestaurant != null){
-                    userAtt.setRestaurantInterest((short) switch (selectedRestaurant) {
-                                case "Haifa Branch" -> 1;
-                                case "Tel-Aviv Branch" -> 2;
-                                case "Nahariya Branch" -> 3;
-                                default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
-                            }
-                    );
-                }
+
+            String selectedRestaurant = ChooseRestaurantBox.getValue();
+            if (selectedRestaurant != null) {
+                userAtt.setRestaurantInterest((short) switch (selectedRestaurant) {
+                    case "Haifa Branch" -> 1;
+                    case "Tel-Aviv Branch" -> 2;
+                    case "Nahariya Branch" -> 3;
+                    default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
+                });
             }
 
             App.switchScreen(page);
@@ -84,18 +80,17 @@ public class PrimaryController {
     }
 
     @FXML
-    void toBranchPage(MouseEvent event){
+    void toBranchPage(MouseEvent event) {
         Platform.runLater(() -> {
-            if(userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4){
+            if (userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4) {
                 String selectedRestaurant = ChooseRestaurantBox.getValue();
-                if(selectedRestaurant != null){
+                if (selectedRestaurant != null) {
                     userAtt.setRestaurantInterest((short) switch (selectedRestaurant) {
-                                case "Haifa Branch" -> 1;
-                                case "Tel-Aviv Branch" -> 2;
-                                case "Nahariya Branch" -> 3;
-                                default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
-                            }
-                    );
+                        case "Haifa Branch" -> 1;
+                        case "Tel-Aviv Branch" -> 2;
+                        case "Nahariya Branch" -> 3;
+                        default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
+                    });
                 }
             }
             App.switchScreen("Branch Page");
@@ -105,75 +100,64 @@ public class PrimaryController {
     @FXML
     private void logOut(ActionEvent event) {
         Platform.runLater(() -> {
-            try {
-                Client client = Client.getClient();
-                String username = getClientUsername();
+            Client client = Client.getClient();
+            String username = getClientUsername();
 
-                if (username != null && !username.equals("Customer")) {
-                    client.sendToServer("log out;" + getClientUsername());
-                }
-
-                resetClientAttributes();
-                App.switchScreen("Log In Page");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if (username != null && !username.equals("Customer")) {
+                client.sendToServer("log out;" + username);
             }
+
+            resetClientAttributes();
+            App.switchScreen("Log In Page");
         });
     }
 
     @FXML
-    void comboBoxChoice(){
+    void comboBoxChoice() {
         Platform.runLater(() -> {
-        String selectedRestaurant = ChooseRestaurantBox.getValue();
+            String selectedRestaurant = ChooseRestaurantBox.getValue();
 
-        if (selectedRestaurant != null) {
-            ComboChoiceRequestLabel.setVisible(false); // making the label that tells the user to choose a restaurant to invisible
-            RestaurantDetailsInstructionLabel.setVisible(true);
-            orderTablesButton.setDisable(false);
-            feedbackButton.setDisable(false);
-            menuButton.setDisable(false);
-            imageView.setVisible(true);
+            if (selectedRestaurant != null) {
+                ComboChoiceRequestLabel.setVisible(false);
+                RestaurantDetailsInstructionLabel.setVisible(true);
+                orderButton.setDisable(false);
+                feedbackButton.setDisable(false);
+                menuButton.setDisable(false);
+                imageView.setVisible(true);
 
-            switch (selectedRestaurant) {
-                case "Haifa Branch":
-                    imageView.setImage(images[0]);
-                    break;
-                case "Tel-Aviv Branch":
-                    imageView.setImage(images[1]);
-                    break;
-                case "Nahariya Branch":
-                    imageView.setImage(images[2]);
-                    break;
+                switch (selectedRestaurant) {
+                    case "Haifa Branch":
+                        imageView.setImage(images[0]);
+                        break;
+                    case "Tel-Aviv Branch":
+                        imageView.setImage(images[1]);
+                        break;
+                    case "Nahariya Branch":
+                        imageView.setImage(images[2]);
+                        break;
+                }
             }
-        }
         });
     }
 
     @FXML
     void initialize() {
         Platform.runLater(() -> {
-            int user_permisson = userAtt.getPermissionLevel();
-            if((user_permisson == 0) || (user_permisson == 4)){
-                feedbackButton.setVisible(true);
-            }
-            else{
-                feedbackButton.setVisible(false);
-            }
+            int user_permission = userAtt.getPermissionLevel();
+            feedbackButton.setVisible(user_permission == 0 || user_permission == 4);
 
             RestaurantDetailsInstructionLabel.setVisible(false);
-            orderTablesButton.setDisable(true);
+            orderButton.setDisable(true);
             feedbackButton.setDisable(true);
             menuButton.setDisable(true);
             imageView.setVisible(false);
 
             try {
                 images = new Image[numOfImages];
-
                 for (int i = 0; i < numOfImages; i++) {
                     images[i] = new Image(String.valueOf(PrimaryController.class.getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Maps/" + i + ".jpg")));
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -193,8 +177,5 @@ public class PrimaryController {
                 PersonalAreaButton.setVisible(true);
             }
         });
-
     }
 }
-
-
