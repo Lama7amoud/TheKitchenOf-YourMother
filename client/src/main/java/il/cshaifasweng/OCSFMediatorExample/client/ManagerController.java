@@ -28,10 +28,7 @@ public class ManagerController {
     private Button managerFeedbackButton;
 
     @FXML
-    private Button makeOrderButton;
-
-    @FXML
-    private Button organizationButton;
+    private Button managerDiscountButton;
 
 
 
@@ -44,24 +41,19 @@ public class ManagerController {
             AuthorizedUser user = Client.getClientAttributes();
             helloTitleLabel.setText("Hello " + user.getFirstname());
             switch (user.getPermissionLevel()){
-                case(2):
-                    managerTypeLabel.setText("Customer Service");
-                    pageTitleLabel.setText("Service Page");
-                    break;
 
                 case(3):
-                    managerTypeLabel.setText(restaurantTitles[user.getRestaurantInterest()-1] + " Branch Manger");
+                    managerTypeLabel.setText(restaurantTitles[user.getRestaurantId()-1] + " Branch Manger");
                     pageTitleLabel.setText("Manager Page");
                     break;
 
                 case(4):
                     managerTypeLabel.setText("Restaurant Manager");
                     pageTitleLabel.setText("Manager Page");
+                    managerConfirmButton.setVisible(true);
+                    managerDiscountButton.setVisible(true);
                     break;
 
-                case(5):
-                    managerTypeLabel.setText("Dietitian");
-                    pageTitleLabel.setText("Dietitian Page");
             }
         });
     }
@@ -73,38 +65,21 @@ public class ManagerController {
     }
     @FXML
     void manager_confirm_price_func(ActionEvent event) {
-        //String page = "Confirmation Price Page";
-        String page = "Personal Area Page";
+        String page = "Price Confirmation Page";
         App.switchScreen(page);
-
     }
-
     @FXML
     void manager_feedback_func(ActionEvent event) {
         //String page = "Manager Feedback Page";
         String page = "Personal Area Page";
         App.switchScreen(page);
-
     }
 
-
     @FXML
-    void make_order_func(ActionEvent event) {
-        //String page = "Make Order Page";
-        String page = "Personal Area Page";
+    void manager_confirm_discount_func(ActionEvent event) {
+        String page = "Discount Confirmation Page";
         App.switchScreen(page);
 
     }
-
-
-    @FXML
-    void organization_func(ActionEvent event) {
-        //String page = "Organization Page";
-        String page = "Personal Area Page";
-        App.switchScreen(page);
-
-    }
-
-
 
 }

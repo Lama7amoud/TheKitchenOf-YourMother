@@ -258,6 +258,9 @@ public class NahariyaMenuController {
     private Label errorLabel;
 
     @FXML
+    private Button makeDiscount;
+
+    @FXML
     private Button editIngredients1;
 
     @FXML
@@ -296,14 +299,25 @@ public class NahariyaMenuController {
     @FXML
     private Button save2btn;
 
+    @FXML
+    private Button backDietitian;
 
+    @FXML
+    private Button makeNahariyaButton;
+
+    @FXML
+    private TextField nahariyaDiscountText;
+
+    @FXML
+    private Label errorlabelnahariya;
+
+    Client client = Client.getClient();
 
     @FXML
     void initialize() throws IOException {
 
 
         EventBus.getDefault().register(this);
-        Client client = Client.getClient();
         try {
             client.sendToServer("Request Nahariya menu");
         } catch (IOException e) {
@@ -336,6 +350,11 @@ public class NahariyaMenuController {
         Platform.runLater(() -> {
             AuthorizedUser user = Client.getClientAttributes();
             if (user != null && user.getPermissionLevel() == 5) {
+                makeDiscount.setVisible(true);
+                discount.setVisible(true);
+                backDietitian.setVisible(true);
+                makeNahariyaButton.setVisible(true);
+                nahariyaDiscountText.setVisible(true);
                 if (!textField10.getText().trim().isEmpty()) {
                     editPrice1.setVisible(true);
                     editIngredients1.setVisible(true);
@@ -946,7 +965,6 @@ public class NahariyaMenuController {
 
         });
     }
-
     @FXML
     void saveFunc(ActionEvent event) {
         Platform.runLater(() -> {
@@ -1014,8 +1032,9 @@ public class NahariyaMenuController {
                 price = "0";
             }
             try {
-                Client.getClient().sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
-                System.out.println(price);
+                client.sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
+                client.sendToServer("Request Nahariya menu");
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1046,11 +1065,19 @@ public class NahariyaMenuController {
         App.switchScreen(page);
 
     }
+
+    @FXML
+    void back_to_update_page_func(ActionEvent event) {
+        String page = "Update Menu Page";
+        App.switchScreen(page);
+    }
+
+
     @FXML
     void makeDiscount(ActionEvent event) {
         Platform.runLater(() -> {
             String input = discount.getText().trim();
-
+            String category ="shared meal";
             try {
                 double percentage = Double.parseDouble(input);
                 if (percentage < 0 || percentage > 100) {
@@ -1059,10 +1086,11 @@ public class NahariyaMenuController {
                 }
                 else {
 
-                    for (Meal meal : Menu) {
-                        double originalPrice = meal.getMealPrice();
-                        double newPrice = originalPrice * (1 - percentage / 100);
-                        meal.setMealPrice(Math.round(newPrice * 100.0) / 100.0);
+                    try {
+                        client.sendToServer("Update discount \"" + percentage + "\" \"" + category + "\"");
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
                     }
 
                     menuOrder(Menu);
@@ -1075,6 +1103,38 @@ public class NahariyaMenuController {
                 errorLabel.setText("Enter a valid number");
             }
         });
+    }
+    @FXML
+    void make_nahariya_discount(ActionEvent event) {
+        Platform.runLater(() -> {
+            String input = nahariyaDiscountText.getText().trim();
+            String category ="nahariya";
+
+            try {
+                double percentage = Double.parseDouble(input);
+                if (percentage < 0 || percentage > 100) {
+                    errorlabelnahariya.setVisible(true);
+                    errorlabelnahariya.setText("Enter value between 0 and 100 , Try Again !");
+                }
+                else {
+                    try {
+                        client.sendToServer("Update discount \"" + percentage + "\" \"" + category + "\"");
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    menuOrder(Menu);
+                    errorLabel.setVisible(false);
+                    System.out.println("Discount applied to nahariya special meals.");
+                }
+
+            } catch (NumberFormatException e) {
+                errorLabel.setVisible(true);
+                errorLabel.setText("Enter a valid number");
+            }
+        });
+
     }
 
     private String mealName2 ;

@@ -82,7 +82,7 @@
             </rowConstraints>
         </GridPane>
         <Button fx:id="editPrice1" layoutX="790.0" layoutY="120.0" mnemonicParsing="false" onAction="#editPrice1" text="edit price " visible="false" />
-        <Button fx:id="editIngredients1" layoutX="870.0" layoutY="120.0" mnemonicParsing="false" onAction="#editIngredients1" text="edit ingredients" visible="true" />
+        <Button fx:id="editIngredients1" layoutX="870.0" layoutY="120.0" mnemonicParsing="false" onAction="#editIngredients1" text="edit ingredients" visible="false" />
 
 
         <TextField layoutX="14.0" layoutY="776.0" style="-fx-font-weight: bold; -fx-background-color: orange; " text="Special Meals" />
@@ -140,8 +140,8 @@
                 <ImageView fx:id="imageView11" fitHeight="94.0" fitWidth="87.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4" GridPane.rowIndex="1" />
             </children>
         </GridPane>
-        <Button fx:id="savebtn" layoutX="840.0" layoutY="1284.0" mnemonicParsing="false" onAction="#saveFunc" text="save Price" visible="false" />
-        <Button fx:id="back" layoutX="820.0" layoutY="1320.0" mnemonicParsing="false" onAction="#backFunc" text="Back To Main Page" visible="true" />
+        <Button fx:id="savebtn" layoutX="820.0" layoutY="1284.0" mnemonicParsing="false" onAction="#saveFunc" text="ask the manager" visible="false" />
+        <Button fx:id="back" layoutX="820.0" layoutY="1310.0" mnemonicParsing="false" onAction="#backFunc" text="Back To Main Page" visible="true" />
         <Button fx:id="save2btn" layoutX="910.0" layoutY="1284.0" mnemonicParsing="false" onAction="#save2Func" text="save Ingredient" visible="false" />
 
 
@@ -169,9 +169,13 @@
         <Button fx:id="editIngredients55" layoutX="870.0" layoutY="1248.0" mnemonicParsing="false" onAction="#editIngredients55" text="edit Ingredients" visible="false" />
 
 
-        <TextField fx:id="discount" editable="true" layoutX="25.0" layoutY="1310.0" prefHeight="10.0" prefWidth="250.0" promptText="write discount percentage here" style="-fx-background-color: white; -fx-text-fill: black;" />
-        <Label fx:id="errorLabel" layoutX="33.0" layoutY="1354.0" text="Label" textFill="RED" visible="false" />
-        <Button fx:id="makeDiscount" layoutX="300.0" layoutY="1310.0" mnemonicParsing="false" onAction="#makeDiscount" text="Make Discount " visible="true" />
+        <TextField fx:id="discount" editable="true" layoutX="25.0" layoutY="1310.0" prefHeight="10.0" prefWidth="250.0" promptText="write discount percentage here" style="-fx-background-color: white; -fx-text-fill: black;" visible="false" />
+        <Label fx:id="errorLabel" layoutX="33.0" layoutY="1310.0" text="Label" textFill="RED" visible="false" />
+        <Button fx:id="makeDiscount" layoutX="300.0" layoutY="1310.0" mnemonicParsing="false" onAction="#makeDiscount" text="Make Discount " visible="false" />
+      <Button fx:id="backDietitian" layoutX="500.0" layoutY="1310.0" mnemonicParsing="false" onAction="#back_to_update_page_func" text="Back To Update Page" visible="false" />
+      <Button fx:id="makeNahariyaButton" layoutX="300.0" layoutY="1370.0" mnemonicParsing="false" onAction="#make_nahariya_discount" text="Make Nahariya Discount" visible="false" />
+      <TextField fx:id="nahariyaDiscountText" layoutX="435.0" layoutY="1370.0" visible="false" />
+      <Label fx:id="errorlabelnahariya" layoutX="435.0" layoutY="1400.0" prefHeight="17.0" prefWidth="243.0" text="Label" visible="false" />
 
     </AnchorPane>
 </ScrollPane>

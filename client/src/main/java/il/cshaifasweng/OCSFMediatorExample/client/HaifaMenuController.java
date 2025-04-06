@@ -2,6 +2,7 @@ package il.cshaifasweng.OCSFMediatorExample.client;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
 import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
+import javafx.scene.control.ComboBox;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -13,6 +14,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
+import javax.swing.*;
 import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
 
 import java.io.FileInputStream;
@@ -293,18 +295,43 @@ public class HaifaMenuController {
     @FXML
     private Button makeDiscount;
 
+    @FXML
+    private Button backDietitian;
+
+
+    @FXML
+    private Button makeHaifaDiscountButton;
+
+    @FXML
+    private TextField makeHaifaDiscountText;
+
+
+    @FXML
+    private Button searchButton;
+
+    @FXML
+    private TextField searchText;
+
+    @FXML
+    private ComboBox<String> combo;
+
+    @FXML
+    private Label errorLabelhaifa;
+
+    Client client = Client.getClient();
+
 
     @FXML
     void initialize() throws IOException {
 
 
         EventBus.getDefault().register(this);
-        Client client = Client.getClient();
         try {
             client.sendToServer("Request Haifa menu");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        combo.getItems().addAll("Meal Name", "Ingredients", "Price");
 
     }
 
@@ -332,6 +359,12 @@ public class HaifaMenuController {
         Platform.runLater(() -> {
             AuthorizedUser user = Client.getClientAttributes();
             if (user != null && user.getPermissionLevel() == 5) {
+                makeDiscount.setVisible(true);
+                discount.setVisible(true);
+                makeHaifaDiscountText.setVisible(true);
+                makeHaifaDiscountButton.setVisible(true);
+                backDietitian.setVisible(true);
+
                 if (!textField10.getText().trim().isEmpty()) {
                     editPrice1.setVisible(true);
                     editIngredients1.setVisible(true);
@@ -1010,8 +1043,9 @@ public class HaifaMenuController {
                 price = "0";
             }
             try {
-                Client.getClient().sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
-                System.out.println(price);
+                client.sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
+                client.sendToServer("Request Haifa menu");
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1042,9 +1076,16 @@ public class HaifaMenuController {
     }
 
     @FXML
+    void back_to_update_page_func(ActionEvent event) {
+        String page = "Update Menu Page";
+        App.switchScreen(page);
+    }
+
+    @FXML
     void makeDiscount(ActionEvent event) {
         Platform.runLater(() -> {
             String input = discount.getText().trim();
+            String category = "shared meal";
 
             try {
                 double percentage = Double.parseDouble(input);
@@ -1053,12 +1094,13 @@ public class HaifaMenuController {
                     errorLabel.setText("Enter value between 0 and 100 , Try Again !");
                 }
                 else {
-
-                    for (Meal meal : Menu) {
-                        double originalPrice = meal.getMealPrice();
-                        double newPrice = originalPrice * (1 - percentage / 100);
-                        meal.setMealPrice(Math.round(newPrice * 100.0) / 100.0);
+                    try {
+                        client.sendToServer("Update discount \"" + percentage + "\" \"" + category + "\"");
                     }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
 
                     menuOrder(Menu);
                     errorLabel.setVisible(false);
@@ -1070,6 +1112,39 @@ public class HaifaMenuController {
                 errorLabel.setText("Enter a valid number");
             }
         });
+    }
+
+    @FXML
+    void make_discount_haifa_func(ActionEvent event) {
+        Platform.runLater(() -> {
+            String input = makeHaifaDiscountText.getText().trim();
+            String category ="haifa";
+
+            try {
+                double percentage = Double.parseDouble(input);
+                if (percentage < 0 || percentage > 100) {
+                    errorLabelhaifa.setVisible(true);
+                    errorLabelhaifa.setText("Enter value between 0 and 100 , Try Again !");
+                }
+                else {
+                    try {
+                        client.sendToServer("Update discount \"" + percentage + "\" \"" + category + "\"");
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    menuOrder(Menu);
+                    errorLabel.setVisible(false);
+                    System.out.println("Discount applied to haifa special meals.");
+                }
+
+            } catch (NumberFormatException e) {
+                errorLabel.setVisible(true);
+                errorLabel.setText("Enter a valid number");
+            }
+        });
+
     }
 
     private String mealName2 ;
@@ -1429,6 +1504,72 @@ public class HaifaMenuController {
         });
     }
 
+
+
+    private void clearMealDisplay() {
+        // Clear all text fields
+        textField10.clear(); textField11.clear(); textField12.clear(); textField13.clear();
+        textField20.clear(); textField21.clear(); textField22.clear(); textField23.clear();
+        textField30.clear(); textField31.clear(); textField32.clear(); textField33.clear();
+        textField40.clear(); textField41.clear(); textField42.clear(); textField43.clear();
+        textField50.clear(); textField51.clear(); textField52.clear(); textField53.clear();
+        textField60.clear(); textField61.clear(); textField62.clear(); textField63.clear();
+        textField70.clear(); textField71.clear(); textField72.clear(); textField73.clear();
+        textField101.clear(); textField111.clear(); textField121.clear(); textField131.clear();
+        textField201.clear(); textField211.clear(); textField221.clear(); textField231.clear();
+        textField301.clear(); textField311.clear(); textField321.clear(); textField331.clear();
+        textField401.clear(); textField411.clear(); textField421.clear(); textField431.clear();
+        textField501.clear(); textField511.clear(); textField521.clear(); textField531.clear();
+
+        // Clear all images
+        imageView1.setImage(null); imageView2.setImage(null); imageView3.setImage(null);
+        imageView4.setImage(null); imageView5.setImage(null); imageView6.setImage(null);
+        imageView7.setImage(null); imageView11.setImage(null); imageView21.setImage(null);
+        imageView31.setImage(null); imageView41.setImage(null); imageView51.setImage(null);
+    }
+
+
+    @FXML
+    void searchFunc(ActionEvent event) {
+        Platform.runLater(() -> {
+            String selectedCriterion = combo.getValue();
+            String searchTerm = searchText.getText().trim().toLowerCase();
+
+            if (searchTerm.isEmpty() || selectedCriterion == null) {
+                return; // Don't search if input or criterion is missing
+            }
+
+            List<Meal> filtered = new ArrayList<>();
+
+            for (Meal meal : Menu) {
+                switch (selectedCriterion) {
+                    case "Meal Name":
+                        if (meal.getMealName().toLowerCase().contains(searchTerm)) {
+                            filtered.add(meal);
+                        }
+                        break;
+                    case "Ingredients":
+                        if (meal.getMealPreferences().toLowerCase().contains(searchTerm)) {
+                            filtered.add(meal);
+                        }
+                        break;
+                    case "Price":
+                        String priceStr = String.valueOf(meal.getMealPrice());
+                        if (priceStr.contains(searchTerm)) {
+                            filtered.add(meal);
+                        }
+                        break;
+                }
+            }
+
+            // Clear previous display
+            clearMealDisplay();
+
+            // Show filtered meals
+            menuOrder(filtered);
+            imagesOrder(filtered);
+        });
+    }
 
 
 }
