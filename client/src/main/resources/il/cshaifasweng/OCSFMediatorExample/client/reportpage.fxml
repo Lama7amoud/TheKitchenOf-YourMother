@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.ReportPageController">
+    <children>
+        <Label alignment="CENTER" layoutX="216.0" layoutY="41.0" style="-fx-font-style: italic; -fx-font-weight: bond;" text="Monthly Reports" textFill="ORANGE">
+            <font>
+                <Font size="24.0" />
+            </font>
+        </Label>
+        <Button layoutX="248.0" layoutY="187.0" mnemonicParsing="false" onAction="#getReport" text="Show Reports" />
+        <Button layoutX="48.0" layoutY="331.0" mnemonicParsing="false" onAction="#backButton" text="Back" />
+    </children>
+</AnchorPane>

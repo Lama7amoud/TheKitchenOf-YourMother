@@ -1,20 +1,15 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
-import il.cshaifasweng.OCSFMediatorExample.client.Client;
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
-import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
-import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
-import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
+import il.cshaifasweng.OCSFMediatorExample.entities.*;
 
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.ConnectionToClient;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import il.cshaifasweng.OCSFMediatorExample.entities.PriceConfirmation;
-import il.cshaifasweng.OCSFMediatorExample.entities.Discounts;
 
 
 public class SimpleServer extends AbstractServer {
@@ -46,6 +41,58 @@ public class SimpleServer extends AbstractServer {
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+		}
+		else if (msgString.startsWith("feedback;")) {
+			String[] parts = msgString.split(";", 4);
+			if (parts.length < 4) {
+				System.out.println("Invalid feedback format");
+				return;
+			}
+
+			int userId = Integer.parseInt(parts[1]);
+			String message = parts[2];
+			int rating = Integer.parseInt(parts[3]);
+
+			Feedback feedback = new Feedback(userId, message, rating, LocalDateTime.now());
+			DataManager.saveFeedback(feedback);
+			System.out.println("Feedback saved successfully.");
+		}
+
+		else  if (msgString.equals("REQUEST_MONTHLY_REPORTS")) {
+			// Fetch the monthly reports from DataManager
+			List<MonthlyReport> reports = DataManager.getAllReports();
+
+			// Prepare the string response
+			StringBuilder response = new StringBuilder();
+			for (MonthlyReport report : reports) {
+				// Append the date and total delivery orders
+				response.append("Report for: ").append(report.getReportDate()).append("\n");
+				response.append("Total Delivery Orders: ").append(report.getTotalDeliveryOrders()).append("\n");
+				// Add more details as needed (e.g., complaints, customer count, etc.)
+				response.append("-------------------------------------------------\n");
+			}
+
+			// Send the reports back to the client as a string
+			try {
+				client.sendToClient("REQUEST_MONTHLY_REPORTS\n" + response.toString());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else if (msgString.startsWith("complaint;")) {
+			String[] parts = msgString.split(";", 4);
+			if (parts.length < 4) {
+				System.out.println("Invalid complaint format");
+				return;
+			}
+
+			int userId = Integer.parseInt(parts[1]);
+			String complaintText = parts[2];
+			String status = parts[3];
+
+			Complaint complaint = new Complaint(userId, complaintText, status,  LocalDateTime.now());
+			DataManager.saveComplaint(complaint);
+			System.out.println("Complaint saved successfully.");
 		}
 		else if(msgString.startsWith("logIn:")){
 			AuthorizedUser currentUser = DataManager.checkPermission(msgString);
@@ -88,47 +135,6 @@ public class SimpleServer extends AbstractServer {
 			}
 
 		}
-		/*else if (msgString.equals("Request Haifa menu")) {
-			try {
-				List<Meal> HaifaMenu = DataManager.requestHaifaMenu();
-				if (HaifaMenu != null && !HaifaMenu.isEmpty()) {
-					client.sendToClient(HaifaMenu);
-				} else {
-					System.out.println("empty menu");
-					client.sendToClient("No menu available");
-				}
-			} catch (Exception exception) {
-				exception.printStackTrace();
-			}
-		}
-
-		else if (msgString.equals("Request Tel-Aviv menu")) {
-			try {
-				List<Meal> TelAvivMenu = DataManager.requestTelAvivMenu();
-				if (TelAvivMenu != null && !TelAvivMenu.isEmpty()) {
-					client.sendToClient(TelAvivMenu);
-				} else {
-					System.out.println("empty menu");
-					client.sendToClient("No menu available");
-				}
-			} catch (Exception exception) {
-				exception.printStackTrace();
-			}
-		}
-
-		else if (msgString.equals("Request Nahariya menu")) {
-			try {
-				List<Meal> NahariyaMenu = DataManager.requestNahariyaMenu();
-				if (NahariyaMenu != null && !NahariyaMenu.isEmpty()) {
-					client.sendToClient(NahariyaMenu);
-				} else {
-					System.out.println("empty menu");
-					client.sendToClient("No menu available");
-				}
-			} catch (Exception exception) {
-				exception.printStackTrace();
-			}
-		}*/
 
 		else if (msgString.startsWith("Update price")) {
 			String details = msgString.substring("Update price".length()).trim();

@@ -1,19 +1,18 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.time.LocalDate;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
-import java.util.Scanner;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.fxml.FXML;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
@@ -22,6 +21,9 @@ public class DataManager {
 
     private static Session session;
     private static String password = "";
+    public static String getPassword(){
+        return password;
+    }
 
     private static SessionFactory getSessionFactory(String password) throws HibernateException {
 
@@ -36,8 +38,45 @@ public class DataManager {
         configuration.addAnnotatedClass(Restaurant.class);
         configuration.addAnnotatedClass(Business.class);
         configuration.addAnnotatedClass(HostingTable.class);
+        configuration.addAnnotatedClass(Feedback.class);
+        configuration.addAnnotatedClass(Complaint.class);
+        configuration.addAnnotatedClass(MonthlyReport.class);
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         return configuration.buildSessionFactory(serviceRegistry);
+    }
+
+    // Save a generated report
+    public static void saveMonthlyReport(MonthlyReport report) {
+        Transaction transaction = null;
+        SessionFactory sessionFactory = getSessionFactory(password);
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            session.save(report);
+            transaction.commit();
+            System.out.println("Monthly report saved to the database.");
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            if (sessionFactory != null) sessionFactory.close();
+        }
+    }
+
+    public static Map<String, Integer> getComplaintHistogram(String password, LocalDate start, LocalDate end) {
+        Map<String, Integer> histogram = new HashMap<>();
+        try (Session session = getSessionFactory(password).openSession()) {
+            List<Complaint> complaints = session.createQuery("FROM Complaint", Complaint.class).list();
+            for (Complaint complaint : complaints) {
+                LocalDate date = LocalDate.from(complaint.getSubmittedAt());
+                if ((date.isEqual(start) || date.isAfter(start)) && (date.isEqual(end) || date.isBefore(end))) {
+                    String key = date.getYear() + "-" + String.format("%02d", date.getMonthValue());
+                    histogram.put(key, histogram.getOrDefault(key, 0) + 1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return histogram;
     }
 
     private static List<Meal> getMenu() throws Exception {
@@ -47,6 +86,38 @@ public class DataManager {
 
         List<Meal> data = session.createQuery(query).getResultList();
         return data;
+    }
+
+    public static Map<LocalDate, Integer> getCustomerCountPerDay(String password, LocalDate start, LocalDate end) {
+        Map<LocalDate, Integer> customerCount = new HashMap<>();
+        try (Session session = getSessionFactory(password).openSession()) {
+            List<Customer> customers = session.createQuery("FROM Customer", Customer.class).list();
+            for (Customer customer : customers) {
+                LocalDate date = customer.getVisitDate(); // Assuming 'visitDate' is the field
+                if ((date.isEqual(start) || date.isAfter(start)) && (date.isEqual(end) || date.isBefore(end))) {
+                    customerCount.put(date, customerCount.getOrDefault(date, 0) + 1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return customerCount;
+    }
+
+    public static int getDeliveryOrdersCount(String password, LocalDate start, LocalDate end) {
+        int count = 0;
+        try (Session session = getSessionFactory(password).openSession()) {
+            List<Order> orders = session.createQuery("FROM Order", Order.class).list();
+            for (Order order : orders) {
+                LocalDate date = order.getDate();
+                if ((date.isEqual(start) || date.isAfter(start)) && (date.isEqual(end) || date.isBefore(end))) {
+                    count++;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
     }
 
    /* private static List<Meal> getMealsByRestaurantId(int restaurantId) {

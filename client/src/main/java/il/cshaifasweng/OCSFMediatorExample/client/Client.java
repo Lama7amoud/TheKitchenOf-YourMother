@@ -51,6 +51,16 @@ public class Client extends AbstractClient {
         return null;
     }
 
+    // Client-side: Request Monthly Reports from the server
+    public static void requestMonthlyReports() {
+        try {
+            // Send request message for monthly reports
+            Client.getClient().sendToServer("REQUEST_MONTHLY_REPORTS");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void handleMessageFromServer(Object msg) {
         if(msg instanceof String) {
@@ -72,13 +82,25 @@ public class Client extends AbstractClient {
             EventBus.getDefault().post(Discounts);
 
         }
-        else if (msg instanceof AuthorizedUser) {
-            userAtt.copyUser((AuthorizedUser) msg);
-            System.out.println("response: " + userAtt.getMessageToServer());
-            String response = "Authorized user request:" + userAtt.getMessageToServer();
-            EventBus.getDefault().post(response);
-        }
-        else if (msg instanceof Restaurant) {
+        else if (msg instanceof String) {
+            String msgString = (String) msg;
+            if (msgString.startsWith("REQUEST_MONTHLY_REPORTS")) {
+                String[] reports = msgString.split("\n");
+                for (String report : reports) {
+                    // Post each report to the EventBus for further processing
+                    EventBus.getDefault().post(report);
+                }
+            } else if (msg instanceof Feedback) {
+                System.out.println("Feedback saved.");
+            } else if (msg instanceof Complaint) {
+                System.out.println("Complaint saved.");
+            } else if (msg instanceof AuthorizedUser) {
+                userAtt.copyUser((AuthorizedUser) msg);
+                System.out.println("response: " + userAtt.getMessageToServer());
+                String response = "Authorized user request:" + userAtt.getMessageToServer();
+                EventBus.getDefault().post(response);
+            }
+        }       else if (msg instanceof Restaurant) {
             System.out.println("Restaurant " + ((Restaurant) msg).getId() + " has received to client side");
             EventBus.getDefault().post(msg);
         }
