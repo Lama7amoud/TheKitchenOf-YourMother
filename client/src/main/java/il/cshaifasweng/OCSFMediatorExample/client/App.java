@@ -59,7 +59,9 @@ public class App extends Application {
                         Map.entry("Nahariya Menu Page" ,"NahariyaMenu"),
                         Map.entry("Update Menu Page" ,"updateMenuPage"),
                         Map.entry("Price Confirmation Page" ,"PriceConfirmationPage"),
-                        Map.entry("Discount Confirmation Page" ,"DiscountConfirmation")
+                        Map.entry("Discount Confirmation Page" ,"DiscountConfirmation"),
+                        Map.entry("Manager Feedback Page" ,"managerfeedbackpage")
+
                 );
 
 

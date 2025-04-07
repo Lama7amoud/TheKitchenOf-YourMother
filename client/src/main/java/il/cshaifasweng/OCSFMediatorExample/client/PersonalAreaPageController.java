@@ -24,8 +24,6 @@ public class PersonalAreaPageController {
     @FXML
     private Button backButton;
 
-    @FXML
-    private Button makePaymentButton;
 
     @FXML
     private Button customerServiceButton;
@@ -116,9 +114,6 @@ public class PersonalAreaPageController {
                 page = "Management Page";
             } else if (event.getSource() == backButton) {
                 page = "Main Page";
-            } else if (event.getSource() == makePaymentButton ) {
-                //page = "Make Payment Page";
-                page = "Main Page";
             } else if (event.getSource() == customerServiceButton) {
                 //page = "Service Page";
                 page = "Main Page";
@@ -168,15 +163,14 @@ public class PersonalAreaPageController {
                 e.printStackTrace();
             }
 
-            if(user != null && user.getPermissionLevel() == 1){
-                makePaymentButton.setVisible(true);
-            } else if (user != null && user.getPermissionLevel() == 2) {
+            if (user != null && user.getPermissionLevel() == 2) {
                 customerServiceButton.setVisible(true);
             } else if (user != null && user.getPermissionLevel() == 5) {
                 updateMenuButton.setVisible(true);
-            } else {
+            } else if(user != null && user.getPermissionLevel() == 3) {
                 advancedPageButton.setVisible(true);
-                makePaymentButton.setVisible(true);
+            } else if (user != null && user.getPermissionLevel() == 4) {
+                advancedPageButton.setVisible(true);
             }
 
             welcomeLabel.setText("Hello " + user.getFirstname());

@@ -845,20 +845,24 @@ public class PriceConfirmationController {
     private List<PriceConfirmation> PriceConfirmation ;
 
 
+
     @Subscribe
     public void ExternalIntervention(Object msg) {
         Platform.runLater(() -> {
             try {
                 if (msg instanceof List) {
-                    PriceConfirmation = (List<PriceConfirmation>) msg;
-                    fillTextFields(PriceConfirmation);
-
+                    List list = (List) msg;
+                    if (!list.isEmpty() && list.get(0) instanceof PriceConfirmation) {
+                        List<PriceConfirmation> confirmations = (List<PriceConfirmation>) list;
+                        fillTextFields(confirmations);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
+
 
 
 

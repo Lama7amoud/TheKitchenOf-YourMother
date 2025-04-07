@@ -70,8 +70,7 @@ public class ManagerController {
     }
     @FXML
     void manager_feedback_func(ActionEvent event) {
-        //String page = "Manager Feedback Page";
-        String page = "Personal Area Page";
+        String page = "Manager Feedback Page";
         App.switchScreen(page);
     }
 

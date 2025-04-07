@@ -1,19 +1,18 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.time.LocalDate;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
-import java.util.Scanner;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.fxml.FXML;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
@@ -22,6 +21,9 @@ public class DataManager {
 
     private static Session session;
     private static String password = "";
+    public static String getPassword(){
+        return password;
+    }
 
     private static SessionFactory getSessionFactory(String password) throws HibernateException {
 
@@ -32,12 +34,51 @@ public class DataManager {
         configuration.addAnnotatedClass(PriceConfirmation.class);
         configuration.addAnnotatedClass(Discounts.class);
 
+        configuration.addAnnotatedClass(Feedback.class);
+        configuration.addAnnotatedClass(Complaint.class);
+        //configuration.addAnnotatedClass(MonthlyReport.class);
+
         configuration.addAnnotatedClass(AuthorizedUser.class);
         configuration.addAnnotatedClass(Restaurant.class);
         configuration.addAnnotatedClass(Business.class);
         configuration.addAnnotatedClass(HostingTable.class);
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         return configuration.buildSessionFactory(serviceRegistry);
+    }
+
+    // Save a generated report
+    /*
+    public static void saveMonthlyReport(MonthlyReport report) {
+        Transaction transaction = null;
+        SessionFactory sessionFactory = getSessionFactory(password);
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            session.save(report);
+            transaction.commit();
+            System.out.println("Monthly report saved to the database.");
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            if (sessionFactory != null) sessionFactory.close();
+        }
+    }*/
+
+    public static Map<String, Integer> getComplaintHistogram(String password, LocalDate start, LocalDate end) {
+        Map<String, Integer> histogram = new HashMap<>();
+        try (Session session = getSessionFactory(password).openSession()) {
+            List<Complaint> complaints = session.createQuery("FROM Complaint", Complaint.class).list();
+            for (Complaint complaint : complaints) {
+                LocalDate date = LocalDate.from(complaint.getSubmittedAt());
+                if ((date.isEqual(start) || date.isAfter(start)) && (date.isEqual(end) || date.isBefore(end))) {
+                    String key = date.getYear() + "-" + String.format("%02d", date.getMonthValue());
+                    histogram.put(key, histogram.getOrDefault(key, 0) + 1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return histogram;
     }
 
     private static List<Meal> getMenu() throws Exception {
@@ -49,31 +90,64 @@ public class DataManager {
         return data;
     }
 
-   /* private static List<Meal> getMealsByRestaurantId(int restaurantId) {
-        try {
-            CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaQuery<Meal> query = builder.createQuery(Meal.class);
-            Root<Meal> root = query.from(Meal.class);
-
-            // Join the meal with its associated restaurants and filter by restaurant ID
-            query.select(root).where(
-                    builder.equal(root.join("restaurants").get("id"), restaurantId)
-            );
-
-            List<Meal> meals = session.createQuery(query).getResultList();
-            return meals;
+    /*
+    public static Map<LocalDate, Integer> getCustomerCountPerDay(String password, LocalDate start, LocalDate end) {
+        Map<LocalDate, Integer> customerCount = new HashMap<>();
+        try (Session session = getSessionFactory(password).openSession()) {
+            List<Customer> customers = session.createQuery("FROM Customer", Customer.class).list();
+            for (Customer customer : customers) {
+                LocalDate date = customer.getVisitDate(); // Assuming 'visitDate' is the field
+                if ((date.isEqual(start) || date.isAfter(start)) && (date.isEqual(end) || date.isBefore(end))) {
+                    customerCount.put(date, customerCount.getOrDefault(date, 0) + 1);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
-    }
-*/
-   private static void generatePrice() throws Exception {
-       //PriceConfirmation priceConfirmation = new PriceConfirmation("mna",9,11);
-       //session.save(priceConfirmation);
-       //session.flush();
+        return customerCount;
+    }*/
+/*
+    public static int getDeliveryOrdersCount(String password, LocalDate start, LocalDate end) {
+        int count = 0;
+        try (Session session = getSessionFactory(password).openSession()) {
+            List<Order> orders = session.createQuery("FROM Order", Order.class).list();
+            for (Order order : orders) {
+                LocalDate date = order.getDate();
+                if ((date.isEqual(start) || date.isAfter(start)) && (date.isEqual(end) || date.isBefore(end))) {
+                    count++;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }*/
 
-   }
+    /* private static List<Meal> getMealsByRestaurantId(int restaurantId) {
+         try {
+             CriteriaBuilder builder = session.getCriteriaBuilder();
+             CriteriaQuery<Meal> query = builder.createQuery(Meal.class);
+             Root<Meal> root = query.from(Meal.class);
+
+             // Join the meal with its associated restaurants and filter by restaurant ID
+             query.select(root).where(
+                     builder.equal(root.join("restaurants").get("id"), restaurantId)
+             );
+
+             List<Meal> meals = session.createQuery(query).getResultList();
+             return meals;
+         } catch (Exception e) {
+             e.printStackTrace();
+             return null;
+         }
+     }
+ */
+    private static void generatePrice() throws Exception {
+        //PriceConfirmation priceConfirmation = new PriceConfirmation("mna",9,11);
+        //session.save(priceConfirmation);
+        //session.flush();
+
+    }
 
     private static void generateDiscount() throws Exception {
         //Discounts discounts = new Discounts(12.4);
@@ -440,6 +514,35 @@ public class DataManager {
     }
 
 */
+
+    public static void saveFeedback(String password, Feedback feedback) {
+        Transaction tx = null;
+        try (Session session = getSessionFactory(password).openSession()) {
+            tx = session.beginTransaction();
+            session.save(feedback);
+            tx.commit();
+            System.out.println("Feedback saved successfully.");
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        }
+    }
+    public static void saveComplaint(String password, Complaint complaint) {
+        Transaction tx = null;
+        try (Session session = getSessionFactory(password).openSession()) {
+            tx = session.beginTransaction();
+            session.save(complaint);
+            tx.commit();
+            System.out.println("Complaint saved successfully.");
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        }
+    }
     static AuthorizedUser checkPermission(String details) {
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
@@ -1006,6 +1109,29 @@ public class DataManager {
             query.select(root);
 
             List<PriceConfirmation> results = session.createQuery(query).getResultList();
+            session.getTransaction().commit();
+            return results;
+        } catch (Exception e) {
+            if (session != null) session.getTransaction().rollback();
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (session != null) session.close();
+        }
+    }
+
+    public static List<Feedback> getManagerFeedback() {
+        try {
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Feedback> query = builder.createQuery(Feedback.class);
+            Root<Feedback> root = query.from(Feedback.class);
+            query.select(root);
+
+            List<Feedback> results = session.createQuery(query).getResultList();
             session.getTransaction().commit();
             return results;
         } catch (Exception e) {

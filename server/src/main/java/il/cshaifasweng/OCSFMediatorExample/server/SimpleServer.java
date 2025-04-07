@@ -1,20 +1,16 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
 import il.cshaifasweng.OCSFMediatorExample.client.Client;
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
-import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
-import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
-import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
+import il.cshaifasweng.OCSFMediatorExample.entities.*;
 
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.ConnectionToClient;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import il.cshaifasweng.OCSFMediatorExample.entities.PriceConfirmation;
-import il.cshaifasweng.OCSFMediatorExample.entities.Discounts;
 
 
 public class SimpleServer extends AbstractServer {
@@ -47,6 +43,21 @@ public class SimpleServer extends AbstractServer {
 				throw new RuntimeException(e);
 			}
 		}
+		else if (msgString.startsWith("feedback;")) {
+			String[] parts = msgString.split(";", 4);
+			if (parts.length < 4) {
+				System.out.println("Invalid feedback format");
+				return;
+			}
+			int userId = Integer.parseInt(parts[1]);
+			String message = parts[2];
+			int rating = Integer.parseInt(parts[3]);
+
+			Feedback feedback = new Feedback(userId, message, rating, LocalDateTime.now());
+			DataManager.saveFeedback(DataManager.getPassword(),feedback);
+			System.out.println("Feedback saved successfully.");
+		}
+
 		else if(msgString.startsWith("logIn:")){
 			AuthorizedUser currentUser = DataManager.checkPermission(msgString);
 			try {
@@ -72,8 +83,20 @@ public class SimpleServer extends AbstractServer {
 			catch (Exception exception){
 				exception.printStackTrace();
 			}
-		}
-		else if (msgString.startsWith("Request")) {
+		} else if (msgString.startsWith("Get Manager feedback")) {
+			try {
+				List<Feedback> list = DataManager.getManagerFeedback();
+				if (list != null && !list.isEmpty()) {
+					client.sendToClient(list);
+				} else {
+					client.sendToClient(new ArrayList<Feedback>());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+
+		} else if (msgString.startsWith("Request")) {
 			try {
 				List<Meal> menu = DataManager.requestMenu();
 				if(menu != null && !menu.isEmpty()) {

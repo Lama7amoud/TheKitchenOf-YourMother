@@ -4,6 +4,7 @@ import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -321,9 +322,41 @@ public class Tel_AvivMenuController {
     private TextField telText;
 
     @FXML
+    private Button searchButton;
+
+    @FXML
+    private TextField searchText;
+
+    @FXML
+    private ComboBox<String> combo;
+
+    @FXML
     private Label errorlabeltel;
     @FXML
     private Button teldis;
+
+    @FXML
+    private TextField QuantityTextField1;
+    @FXML
+    private TextField QuantityTextField2;
+    @FXML
+    private TextField QuantityTextField3;
+    @FXML
+    private TextField QuantityTextField4;
+    @FXML
+    private TextField QuantityTextField5;
+    @FXML
+    private TextField QuantityTextField6;
+    @FXML
+    private TextField QuantityTextField7;
+    @FXML
+    private TextField QuantityTextField8;
+    @FXML
+    private TextField QuantityTextField9;
+    @FXML
+    private TextField QuantityTextField10;
+    @FXML
+    private TextField QuantityTextField11;
 
     @FXML
     Client client = Client.getClient();
@@ -333,10 +366,11 @@ public class Tel_AvivMenuController {
 
         EventBus.getDefault().register(this);
         try {
-            client.sendToServer("Request Tel-Aviv menu");
+            client.sendToServer("Request menu");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        combo.getItems().addAll("Meal Name", "Ingredients", "Price");
 
     }
 
@@ -349,16 +383,36 @@ public class Tel_AvivMenuController {
         Platform.runLater(() -> {
             try {
                 if (msg instanceof List) {
-                    Menu = (List<Meal>) msg;
-                    menuOrder(Menu);
-                    imagesOrder(Menu);
-                    isDietitian();
+                    List list = (List) msg;
+                    if (!list.isEmpty() && list.get(0) instanceof Meal) {
+                        Menu = (List<Meal>) list;
+                        menuOrder(Menu);
+                        imagesOrder(Menu);
+                        isDietitian();
+                        QuantityTextField1.setVisible(true);
+                        QuantityTextField2.setVisible(true);
+                        QuantityTextField3.setVisible(true);
+                        QuantityTextField4.setVisible(true);
+
+
+                        QuantityTextField5.setVisible(true);
+
+
+                        QuantityTextField6.setVisible(true);
+                        QuantityTextField7.setVisible(true);
+                        QuantityTextField8.setVisible(true);
+                        QuantityTextField9.setVisible(true);
+                        QuantityTextField10.setVisible(true);
+                        QuantityTextField11.setVisible(true);
+
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
+
 
     private void isDietitian()
     {
@@ -573,7 +627,7 @@ public class Tel_AvivMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 1");
                     }
                 }
                 if (i==2) {
@@ -584,7 +638,7 @@ public class Tel_AvivMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 2");
                     }
 
                 }
@@ -596,7 +650,7 @@ public class Tel_AvivMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 3");
                     }
                 }
                 if (i==4) {
@@ -607,7 +661,7 @@ public class Tel_AvivMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 4");
                     }
                 }
                 if (i==5) {
@@ -618,7 +672,7 @@ public class Tel_AvivMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 5");
                     }
                 }
                 if (i==6) {
@@ -629,7 +683,7 @@ public class Tel_AvivMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 6");
                     }
                 }
             }
@@ -643,7 +697,7 @@ public class Tel_AvivMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 7");
                     }
                 }
                 if (i==1) {
@@ -654,7 +708,7 @@ public class Tel_AvivMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 8");
                     }
                 }
                 if (i==2) {
@@ -665,7 +719,7 @@ public class Tel_AvivMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 9");
                     }
                 }
                 if (i==3) {
@@ -676,7 +730,7 @@ public class Tel_AvivMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 10");
                     }
                 }
                 if (i==4) {
@@ -687,7 +741,7 @@ public class Tel_AvivMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 11");
                     }
                 }
             }
@@ -1050,7 +1104,7 @@ public class Tel_AvivMenuController {
             }
             try {
                 client.sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
-                client.sendToServer("Request Tel-Aviv menu");
+                client.sendToServer("Request menu");
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1511,4 +1565,71 @@ public class Tel_AvivMenuController {
             isDietitian();
         });
     }
+
+    private void clearMealDisplay() {
+        // Clear all text fields
+        textField10.clear(); textField11.clear(); textField12.clear(); textField13.clear();
+        textField20.clear(); textField21.clear(); textField22.clear(); textField23.clear();
+        textField30.clear(); textField31.clear(); textField32.clear(); textField33.clear();
+        textField40.clear(); textField41.clear(); textField42.clear(); textField43.clear();
+        textField50.clear(); textField51.clear(); textField52.clear(); textField53.clear();
+        textField60.clear(); textField61.clear(); textField62.clear(); textField63.clear();
+        textField70.clear(); textField71.clear(); textField72.clear(); textField73.clear();
+        textField101.clear(); textField111.clear(); textField121.clear(); textField131.clear();
+        textField201.clear(); textField211.clear(); textField221.clear(); textField231.clear();
+        textField301.clear(); textField311.clear(); textField321.clear(); textField331.clear();
+        textField401.clear(); textField411.clear(); textField421.clear(); textField431.clear();
+        textField501.clear(); textField511.clear(); textField521.clear(); textField531.clear();
+
+        // Clear all images
+        imageView1.setImage(null); imageView2.setImage(null); imageView3.setImage(null);
+        imageView4.setImage(null); imageView5.setImage(null); imageView6.setImage(null);
+        imageView7.setImage(null); imageView11.setImage(null); imageView21.setImage(null);
+        imageView31.setImage(null); imageView41.setImage(null); imageView51.setImage(null);
+    }
+
+
+    @FXML
+    void searchFunc(ActionEvent event) {
+        Platform.runLater(() -> {
+            String selectedCriterion = combo.getValue();
+            String searchTerm = searchText.getText().trim().toLowerCase();
+
+            if (searchTerm.isEmpty() || selectedCriterion == null) {
+                return; // Don't search if input or criterion is missing
+            }
+
+            List<Meal> filtered = new ArrayList<>();
+
+            for (Meal meal : Menu) {
+                switch (selectedCriterion) {
+                    case "Meal Name":
+                        if (meal.getMealName().toLowerCase().contains(searchTerm)) {
+                            filtered.add(meal);
+                        }
+                        break;
+                    case "Ingredients":
+                        if (meal.getMealPreferences().toLowerCase().contains(searchTerm)) {
+                            filtered.add(meal);
+                        }
+                        break;
+                    case "Price":
+                        String priceStr = String.valueOf(meal.getMealPrice());
+                        if (priceStr.equals(searchTerm)) {
+                            filtered.add(meal);
+                        }
+                        break;
+                }
+            }
+
+            // Clear previous display
+            clearMealDisplay();
+
+            // Show filtered meals
+            menuOrder(filtered);
+            imagesOrder(filtered);
+        });
+    }
+
+
 }

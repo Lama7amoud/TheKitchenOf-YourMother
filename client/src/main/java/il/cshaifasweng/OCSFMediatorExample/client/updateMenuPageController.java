@@ -125,7 +125,6 @@ public class updateMenuPageController {
         Client client = Client.getClient();
 
         String Category ="";
-
         if(mealCategory.getText().equals("Haifa")){
             Category = "special1";
         } else if (mealCategory.getText().equals("Tel-Aviv")) {
@@ -135,10 +134,7 @@ public class updateMenuPageController {
         } else if (mealCategory.getText().equals("All")) {
             Category = "shared meal";
         }
-
         //String Category = mealCategory.getText();
-
-
         try {
             String messageToSend = String.format("Add Meal \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"", Name, Description, Preferences, Price, Image,Category);
             client.sendToServer(messageToSend);
@@ -146,7 +142,6 @@ public class updateMenuPageController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     @FXML

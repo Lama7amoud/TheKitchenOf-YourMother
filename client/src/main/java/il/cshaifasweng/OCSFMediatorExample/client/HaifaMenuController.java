@@ -318,6 +318,29 @@ public class HaifaMenuController {
     @FXML
     private Label errorLabelhaifa;
 
+    @FXML
+    private TextField QuantityTextField1;
+    @FXML
+    private TextField QuantityTextField2;
+    @FXML
+            private TextField QuantityTextField3;
+    @FXML
+            private TextField QuantityTextField4;
+    @FXML
+            private TextField QuantityTextField5;
+    @FXML
+            private TextField QuantityTextField6;
+    @FXML
+            private TextField QuantityTextField7;
+    @FXML
+            private TextField QuantityTextField8;
+    @FXML
+            private TextField QuantityTextField9;
+    @FXML
+            private TextField QuantityTextField10;
+    @FXML
+            private TextField QuantityTextField11;
+
     Client client = Client.getClient();
 
 
@@ -327,7 +350,7 @@ public class HaifaMenuController {
 
         EventBus.getDefault().register(this);
         try {
-            client.sendToServer("Request Haifa menu");
+            client.sendToServer("Request menu");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -343,10 +366,22 @@ public class HaifaMenuController {
         Platform.runLater(() -> {
             try {
                 if (msg instanceof List) {
-                    Menu = (List<Meal>) msg;
-                    menuOrder(Menu);
-                    imagesOrder(Menu);
-                    isDietitian();
+                    List list = (List) msg;
+                    if (!list.isEmpty() && list.get(0) instanceof Meal) {
+                        Menu = (List<Meal>) list;
+                        menuOrder(Menu);
+                        imagesOrder(Menu);
+                        isDietitian();
+                        if(userAtt.getPermissionLevel()==0) {
+
+                            QuantityTextField1.setVisible(true);
+                            QuantityTextField2.setVisible(true);
+                            QuantityTextField3.setVisible(true);
+                            QuantityTextField4.setVisible(true);
+
+
+                        }
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -420,6 +455,9 @@ public class HaifaMenuController {
             }
         });
     }
+
+    private
+
     int crt1;
     private List<Meal> sharedList(List<Meal>Menu) {
         crt1=0;
@@ -567,7 +605,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 1");
                     }
                 }
                 if (i==2) {
@@ -578,7 +616,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 2");
                     }
 
                 }
@@ -590,7 +628,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 3");
                     }
                 }
                 if (i==4) {
@@ -601,7 +639,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 4");
                     }
                 }
                 if (i==5) {
@@ -612,7 +650,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 5");
                     }
                 }
                 if (i==6) {
@@ -623,7 +661,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 6");
                     }
                 }
             }
@@ -637,7 +675,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 7");
                     }
                 }
                 if (i==1) {
@@ -648,7 +686,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 8");
                     }
                 }
                 if (i==2) {
@@ -659,7 +697,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 9");
                     }
                 }
                 if (i==3) {
@@ -670,7 +708,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 10");
                     }
                 }
                 if (i==4) {
@@ -681,7 +719,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 11");
                     }
                 }
             }
@@ -1044,7 +1082,7 @@ public class HaifaMenuController {
             }
             try {
                 client.sendToServer("Update price " + "\"" + mealName + "\" " + "\"" + price + "\"");
-                client.sendToServer("Request Haifa menu");
+                client.sendToServer("Request menu");
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1555,7 +1593,7 @@ public class HaifaMenuController {
                         break;
                     case "Price":
                         String priceStr = String.valueOf(meal.getMealPrice());
-                        if (priceStr.contains(searchTerm)) {
+                        if (priceStr.equals(searchTerm)) {
                             filtered.add(meal);
                         }
                         break;

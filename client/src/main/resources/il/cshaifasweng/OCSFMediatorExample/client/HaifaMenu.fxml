@@ -170,15 +170,26 @@
 
 
         <TextField fx:id="discount" editable="true" layoutX="25.0" layoutY="1310.0" prefHeight="10.0" prefWidth="250.0" promptText="write discount percentage here" style="-fx-background-color: white; -fx-text-fill: black;" visible="false" />
-        <Label fx:id="errorLabel" layoutX="33.0" layoutY="1310.0" text="Label" textFill="RED" visible="false" />
+        <Label fx:id="errorLabel" layoutX="33.0" layoutY="1340.0" text="Label" textFill="RED" visible="false" />
         <Button fx:id="makeDiscount" layoutX="300.0" layoutY="1310.0" mnemonicParsing="false" onAction="#makeDiscount" text="Make Discount " visible="false" />
-      <Button fx:id="backDietitian" layoutX="500.0" layoutY="1310.0" mnemonicParsing="false" onAction="#back_to_update_page_func" text="Back To Update Page" visible="false" />
-      <Button fx:id="makeHaifaDiscountButton" layoutX="300.0" layoutY="1370.0" mnemonicParsing="false" onAction="#make_discount_haifa_func" text="Make Haifa Discount" visible="false" />
-      <TextField fx:id="makeHaifaDiscountText" layoutX="435.0" layoutY="1370.0" visible="false" />
-      <Label fx:id="errorLabelhaifa" layoutX="435.0" layoutY="1400.0" prefHeight="17.0" prefWidth="149.0" visible="false" />
+        <Button fx:id="backDietitian" layoutX="500.0" layoutY="1310.0" mnemonicParsing="false" onAction="#back_to_update_page_func" text="Back To Update Page" visible="false" />
+        <Button fx:id="makeHaifaDiscountButton" layoutX="300.0" layoutY="1370.0" mnemonicParsing="false" onAction="#make_discount_haifa_func" text="Make Haifa Discount" visible="false" />
+        <Label fx:id="errorLabelhaifa" layoutX="25.0" layoutY="1400.0" prefHeight="17.0" prefWidth="291.0" visible="false" />
         <TextField fx:id="searchText" layoutX="265.0" layoutY="26.0" prefHeight="26.0" prefWidth="566.0" promptText="Search" style="-fx-background-radius: 30; -fx-background-color: white;" />
-        <Button fx:id="searchButton" layoutX="793.0" layoutY="24.0" minWidth="38.0" mnemonicParsing="false" onAction="#searchFunc" prefHeight="33.0" prefWidth="38.0" style="-fx-background-color: blue; -fx-background-radius: 30;" text="🔍" />
+        <Button fx:id="searchButton" layoutX="793.0" layoutY="24.0" minWidth="38.0" mnemonicParsing="false" onAction="#searchFunc" prefHeight="33.0" prefWidth="38.0" style="-fx-background-color: #add8e6; -fx-background-radius: 30;" text="🔍" />
         <ComboBox fx:id="combo" layoutX="53.0" layoutY="25.0" prefHeight="18.0" prefWidth="193.0" promptText="Pick a search criterion" style="-fx-background-radius: 30; -fx-background-color: white;" />
-
+        <TextField fx:id="makeHaifaDiscountText" layoutX="25.0" layoutY="1370.0" prefHeight="25.0" prefWidth="242.0" visible="false" />
+        <TextField fx:id="QuantityTextField1" layoutX="787.0" layoutY="119.0" prefHeight="26.0" prefWidth="87.0" promptText="Add Quantity " visible="false"/>
+        <TextField fx:id="QuantityTextField2" layoutX="787.0" layoutY="212.0" prefHeight="26.0" prefWidth="87.0" promptText="Add Quantity " visible="false"/>
+        <TextField fx:id="QuantityTextField3" layoutX="787.0" layoutY="310.0" prefHeight="26.0" prefWidth="87.0" promptText="Add Quantity " visible="false"/>
+        <TextField fx:id="QuantityTextField4" layoutX="787.0" layoutY="402.0" prefHeight="26.0" prefWidth="87.0" promptText="Add Quantity " visible="false"/>
+        <TextField fx:id="QuantityTextField5" layoutX="787.0" layoutY="506.0" prefHeight="26.0" prefWidth="87.0" promptText="Add Quantity " visible="false"/>
+        <TextField fx:id="QuantityTextField6" layoutX="787.0" layoutY="608.0" prefHeight="26.0" prefWidth="87.0" promptText="Add Quantity " visible="false"/>
+        <TextField fx:id="QuantityTextField7" layoutX="787.0" layoutY="697.0" prefHeight="26.0" prefWidth="87.0" promptText="Add Quantity " visible="false"/>
+        <TextField fx:id="QuantityTextField8" layoutX="787.0" layoutY="876.0" prefHeight="26.0" prefWidth="87.0" promptText="Add Quantity " visible="false"/>
+        <TextField fx:id="QuantityTextField9" layoutX="787.0" layoutY="959.0" prefHeight="26.0" prefWidth="87.0" promptText="Add Quantity " visible="false"/>
+        <TextField fx:id="QuantityTextField10" layoutX="787.0" layoutY="1062.0" prefHeight="26.0" prefWidth="87.0" promptText="Add Quantity " visible="false"/>
+        <TextField fx:id="QuantityTextField11" layoutX="793.0" layoutY="1160.0" prefHeight="26.0" prefWidth="87.0" promptText="Add Quantity " visible="false"/>
+        <TextField fx:id="QuantityTextField12" layoutX="793.0" layoutY="1247.0" prefHeight="26.0" prefWidth="87.0" promptText="Add Quantity " visible="false"/>
     </AnchorPane>
 </ScrollPane>

@@ -727,15 +727,18 @@ public class DiscountConfirmationController {
         Platform.runLater(() -> {
             try {
                 if (msg instanceof List) {
-                    Discounts = (List<Discounts>) msg;
-                    fillTextFields(Discounts);
-
+                    List list = (List) msg;
+                    if (!list.isEmpty() && list.get(0) instanceof Discounts) {
+                        List<Discounts> discounts = (List<Discounts>) list;
+                        fillTextFields(discounts);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
+
 
 
 
