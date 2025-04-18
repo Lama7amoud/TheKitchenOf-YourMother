@@ -3,8 +3,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="700.0" prefWidth="900.0" style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.ManagerFeedBackController">
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.ManagerFeedBackController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml" >
    <children>
       <Label layoutX="20" layoutY="10" text="Feedback List" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
 

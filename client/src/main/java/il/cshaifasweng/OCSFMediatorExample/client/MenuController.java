@@ -30,6 +30,15 @@ import java.util.stream.Collectors;
 
 public class MenuController {
 
+
+    @FXML
+    private Button searchButton;
+
+    @FXML
+    private TextField searchText;
+
+    @FXML
+    private ComboBox<String> combo;
     @FXML
     private TableView<Meal> menuTable;
 
@@ -58,6 +67,7 @@ public class MenuController {
 
 
     private ObservableList<Meal> menuData = FXCollections.observableArrayList();
+    private List<Meal> fullMealList = new ArrayList<>();
 
 
 
@@ -79,7 +89,7 @@ public class MenuController {
         preferencesColumn.setCellValueFactory(new PropertyValueFactory<>("mealPreferences"));
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("mealPrice"));
         imageColumn.setCellValueFactory(new PropertyValueFactory<>("imagePath"));
-
+        combo.getItems().addAll("Meal Name", "Ingredients","Description", "Price");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("mealDescription"));
 
         descriptionColumn.setCellFactory(column -> new TableCell<>() {
@@ -311,8 +321,10 @@ public class MenuController {
                 Platform.runLater(() -> {
                     List<Meal> allMeals = (List<Meal>) list;
                     List<Meal> filtered = filterByInterest(allMeals);
+                    fullMealList = filtered;         // Save original full list
                     menuData.clear();
-                    menuData.addAll(filtered);
+                    menuData.addAll(fullMealList);   // Set to TableView
+
 
                     // Dynamically resize table height to fit rows
                     menuTable.setFixedCellSize(60);
@@ -347,6 +359,59 @@ public class MenuController {
         result.addAll(special);
         return result;
     }
+    @FXML
+    void searchFunc(ActionEvent event) {
+        String selectedCriterion = combo.getValue();
+        String searchTerm = searchText.getText().trim().toLowerCase();
+
+        if (searchTerm.isEmpty()) {
+            // Show full table when search is empty
+            menuData.setAll(fullMealList);
+            resizeTable(); // optional
+            return;
+        }
+
+        if (selectedCriterion == null) return;
+
+        List<Meal> filtered = new ArrayList<>();
+
+        for (Meal meal : fullMealList) {
+            switch (selectedCriterion) {
+                case "Meal Name":
+                    if (meal.getMealName().toLowerCase().contains(searchTerm)) {
+                        filtered.add(meal);
+                    }
+                    break;
+                case "Ingredients":
+                    if (meal.getMealPreferences().toLowerCase().contains(searchTerm)) {
+                        filtered.add(meal);
+                    }
+                    break;
+                case "Description":
+                    if (meal.getMealDescription().toLowerCase().contains(searchTerm)) {
+                        filtered.add(meal);
+                    }
+                    break;
+                case "Price":
+                    if (String.valueOf(meal.getMealPrice()).contains(searchTerm)) {
+                        filtered.add(meal);
+                    }
+                    break;
+            }
+        }
+
+        menuData.setAll(filtered); // update content but keep cell logic
+        resizeTable(); // optional
+    }
+    private void resizeTable() {
+        menuTable.setFixedCellSize(60);
+        menuTable.prefHeightProperty().bind(
+                menuTable.fixedCellSizeProperty().multiply(Bindings.size(menuTable.getItems()).add(1.01))
+        );
+        menuTable.minHeightProperty().bind(menuTable.prefHeightProperty());
+        menuTable.maxHeightProperty().bind(menuTable.prefHeightProperty());
+    }
+
 
 
     @FXML
