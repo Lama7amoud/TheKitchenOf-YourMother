@@ -658,7 +658,7 @@ public class DataManager {
 
     public static boolean removePriceConfirmation(int id) {
         try {
-            System.out.println("Remove Conf");
+            System.out.println("Remove Confirmation");
             SessionFactory sessionFactory = getSessionFactory(password);
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -887,12 +887,12 @@ public class DataManager {
             Meal mealToRemove = session.createQuery(query).uniqueResult();
 
             if (mealToRemove != null) {
-                String category = mealToRemove.getMealCategory(); // ✅ Get the category BEFORE deletion
+                String category = mealToRemove.getMealCategory();
 
                 session.remove(mealToRemove);
                 session.getTransaction().commit();
                 System.out.println("Meal '" + mealName + "' removed successfully.");
-                return category; // ✅ Return category to caller
+                return category;
             } else {
                 System.out.println("Meal not found: " + mealName);
                 session.getTransaction().rollback();
@@ -989,7 +989,7 @@ public class DataManager {
                     .where(builder.equal(root.get("mealName"), mealName)); // Find the meal by name
 
 
-            // Execute the update
+
             int rowsUpdated = session.createQuery(updateQuery).executeUpdate();
 
             // Commit the transaction
@@ -1035,7 +1035,8 @@ public class DataManager {
     }
 
 
-    public static boolean addPriceConfirmation(String mealName, double oldPrice, double newPrice) {
+    public static List<PriceConfirmation> addPriceConfirmation(String mealName, double oldPrice, double newPrice) {
+        List<PriceConfirmation> allConfirmations = new ArrayList<>();
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
             session = sessionFactory.openSession();
@@ -1045,35 +1046,51 @@ public class DataManager {
             session.save(pc);
 
             session.getTransaction().commit();
-            return true;
+
+            // Fetch all current price confirmations from the DB
+            session.beginTransaction();
+            allConfirmations = session.createQuery("FROM PriceConfirmation", PriceConfirmation.class).getResultList();
+            session.getTransaction().commit();
+
         } catch (Exception e) {
             if (session != null) session.getTransaction().rollback();
             e.printStackTrace();
-            return false;
         } finally {
             if (session != null) session.close();
         }
+
+        return allConfirmations;
     }
 
-    public static boolean addDiscountConfirmation(double percentage,String category) {
+
+    public static List<Discounts> addDiscountConfirmation(double percentage,String category) {
+        List<Discounts> allDiscounts = new ArrayList<>();
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
             session = sessionFactory.openSession();
             session.beginTransaction();
 
-            Discounts d = new Discounts(percentage,category);
-            session.save(d);
+            Discounts pc = new Discounts(percentage, category);
+            session.save(pc);
 
             session.getTransaction().commit();
-            return true;
+
+            // Fetch all current price confirmations from the DB
+            session.beginTransaction();
+            allDiscounts = session.createQuery("FROM Discounts", Discounts.class).getResultList();
+            session.getTransaction().commit();
+
         } catch (Exception e) {
             if (session != null) session.getTransaction().rollback();
             e.printStackTrace();
-            return false;
         } finally {
             if (session != null) session.close();
         }
+
+        return allDiscounts;
     }
+
+
     public static List<Discounts> getDiscountConfirmations() {
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
@@ -1097,28 +1114,94 @@ public class DataManager {
         }
     }
 
-    public static List<PriceConfirmation> getPriceConfirmations() {
+    public static boolean mealExist(String mealName) {
+        SessionFactory sessionFactory = getSessionFactory(password);
+        Session session = null;
+        try {
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Meal> query = builder.createQuery(Meal.class);
+            Root<Meal> root = query.from(Meal.class);
+
+            query.select(root).where(builder.equal(builder.lower(root.get("mealName")), mealName.toLowerCase()));
+            List<Meal> results = session.createQuery(query).getResultList();
+
+            session.getTransaction().commit();
+
+            return !results.isEmpty(); // True if meal exists
+        } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+    public static String getMealCategoryByName(String mealName) {
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
             session = sessionFactory.openSession();
             session.beginTransaction();
 
             CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaQuery<PriceConfirmation> query = builder.createQuery(PriceConfirmation.class);
-            Root<PriceConfirmation> root = query.from(PriceConfirmation.class);
-            query.select(root);
+            CriteriaQuery<Meal> query = builder.createQuery(Meal.class);
+            Root<Meal> root = query.from(Meal.class);
+            query.select(root).where(builder.equal(root.get("mealName"), mealName));
 
-            List<PriceConfirmation> results = session.createQuery(query).getResultList();
+            Meal meal = session.createQuery(query).uniqueResult();
             session.getTransaction().commit();
-            return results;
+
+            return (meal != null) ? meal.getMealCategory() : null;
+
         } catch (Exception e) {
-            if (session != null) session.getTransaction().rollback();
             e.printStackTrace();
             return null;
         } finally {
             if (session != null) session.close();
         }
     }
+
+
+    public static List<PriceConfirmation> getPriceConfirmations() {
+        List<PriceConfirmation> confirmations = new ArrayList<>();
+        try {
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            List<PriceConfirmation> rawConfirmations = session.createQuery("FROM PriceConfirmation", PriceConfirmation.class).getResultList();
+
+            for (PriceConfirmation pc : rawConfirmations) {
+                CriteriaBuilder builder = session.getCriteriaBuilder();
+                CriteriaQuery<Meal> query = builder.createQuery(Meal.class);
+                Root<Meal> root = query.from(Meal.class);
+                query.select(root).where(builder.equal(root.get("mealName"), pc.getMealName()));
+
+                Meal meal = session.createQuery(query).uniqueResult();
+                if (meal != null) {
+                    pc.setOldPrice(meal.getMealPrice());  // This overrides to latest price
+                }
+
+                confirmations.add(pc);
+            }
+
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (session != null) session.getTransaction().rollback();
+            e.printStackTrace();
+        } finally {
+            if (session != null) session.close();
+        }
+        return confirmations;
+    }
+
 
     public static List<Feedback> getManagerFeedback() {
         try {

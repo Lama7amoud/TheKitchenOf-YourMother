@@ -26,7 +26,6 @@
             <ComboBox fx:id="ratingComboBox" layoutX="63.0" layoutY="166.0" prefHeight="26.0" prefWidth="81.0" promptText="choose" />
             <Button fx:id="submitComplaintButton" layoutX="61.0" layoutY="237.0" mnemonicParsing="false" onAction="#submitComplaintOnAction" text="Submit Complaint" />
             <Button fx:id="backButton" layoutX="41.0" layoutY="337.0" mnemonicParsing="false" onAction="#back_func" text="Back" />
-            <Button layoutX="115.0" layoutY="337.0" mnemonicParsing="false" text="feedback manage" />
          </children>
       </AnchorPane>
    </left>

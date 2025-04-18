@@ -71,21 +71,36 @@ public class PrimaryController {
 
             // Check which button triggered the event
             if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Haifa Branch")) {
-                page = "Haifa Menu Page";
+                MenuController.setRestaurantInterest(1);
+                page = "Menu Page";
+
             }
             else  if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Tel-Aviv Branch")) {
-                page = "TelAviv Menu Page";
+                MenuController.setRestaurantInterest(2);
+                page = "Menu Page";
             }
             else  if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Nahariya Branch")) {
-                page = "Nahariya Menu Page";
+                MenuController.setRestaurantInterest(3);
+                page = "Menu Page";
             }
 
             else if (sourceButton == PersonalAreaButton) {
                 page = "Personal Area Page";
             }
-            else if(sourceButton == feedbackButton){
+
+            else if(sourceButton == feedbackButton&& ChooseRestaurantBox.getValue().equals("Haifa Branch")){
+                MenuController.setRestaurantInterest(1);
                 page = "Feedback Page";
             }
+            else if(sourceButton == feedbackButton&& ChooseRestaurantBox.getValue().equals("Tel-Aviv Branch")){
+                MenuController.setRestaurantInterest(2);
+                page = "Feedback Page";
+            }
+            else if(sourceButton == feedbackButton&& ChooseRestaurantBox.getValue().equals("Nahariya Branch")){
+                MenuController.setRestaurantInterest(3);
+                page = "Feedback Page";
+            }
+
             else if(sourceButton == orderTablesButton){
                 page = "Order Tables Page";
             }

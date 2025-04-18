@@ -3,6 +3,7 @@ package il.cshaifasweng.OCSFMediatorExample.entities;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.persistence.*;
+
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -22,14 +23,18 @@ public class Feedback implements Serializable {
 
     private LocalDateTime submittedAt;
 
+    private String restaurant;
+
     public Feedback() {
     }
 
-    public Feedback(int userId, String message, int rating, LocalDateTime submittedAt) {
+    public Feedback(int userId, String message, int rating, LocalDateTime submittedAt, String restaurant) {
         this.userId = userId;
         this.message = message;
         this.rating = rating;
         this.submittedAt = submittedAt;
+        this.restaurant = restaurant;
+
     }
 
     // Getters and Setters
@@ -73,4 +78,13 @@ public class Feedback implements Serializable {
     public void setSubmittedAt(LocalDateTime submittedAt) {
         this.submittedAt = submittedAt;
     }
+
+    public String getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurant(String restaurant) {
+        this.restaurant = restaurant;
+    }
 }
+

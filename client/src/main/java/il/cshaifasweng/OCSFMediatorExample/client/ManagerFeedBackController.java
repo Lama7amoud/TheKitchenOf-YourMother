@@ -3,140 +3,107 @@ package il.cshaifasweng.OCSFMediatorExample.client;
 import il.cshaifasweng.OCSFMediatorExample.entities.Feedback;
 import il.cshaifasweng.OCSFMediatorExample.entities.PriceConfirmation;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static il.cshaifasweng.OCSFMediatorExample.client.Client.userAtt;
 
 public class ManagerFeedBackController {
-    @FXML
-    private TextField feedback0;
 
     @FXML
-    private TextField feedback1;
+    private TableView<Feedback> feedbackTable;
 
     @FXML
-    private TextField feedback2;
-    @FXML
-    private TextField feedback3;
-    @FXML
-    private TextField feedback4;
-    @FXML
-    private TextField feedback5;
-    @FXML
-    private TextField feedback6;
-
-    Client client = Client.getClient();
+    private TableColumn<Feedback, String> messageColumn;
 
     @FXML
-    void initialize() throws IOException {
+    private TableColumn<Feedback, Integer> ratingColumn;
+
+    @FXML
+    private TableColumn<Feedback, String> restaurantColumn;
+
+    @FXML
+    private TableColumn<Feedback, String> submittedAtColumn;
+
+    @FXML
+    private Button backButton;
+
+    private ObservableList<Feedback> feedbackList = FXCollections.observableArrayList();
+
+    @FXML
+    public void initialize() throws IOException {
 
         EventBus.getDefault().register(this);
-        try {
-            Client.getClient().sendToServer("Get Manager feedback");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+        feedbackTable.setItems(feedbackList);
 
-    private List<Feedback> feedbacks;
-    @Subscribe
-    public void ExternalIntervention(Object msg) {
-        Platform.runLater(() -> {
-            try {
-                if (msg instanceof List) {
-                    feedbacks = (List<Feedback>) msg;
-                    fillTextFields(feedbacks);
+        messageColumn.setCellValueFactory(new PropertyValueFactory<>("message"));
+        ratingColumn.setCellValueFactory(new PropertyValueFactory<>("rating"));
+        restaurantColumn.setCellValueFactory(new PropertyValueFactory<>("restaurant"));
 
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        submittedAtColumn.setCellValueFactory(cellData -> {
+            LocalDateTime time = cellData.getValue().getSubmittedAt();
+            String formatted = (time != null) ? time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : "";
+            return new ReadOnlyStringWrapper(formatted);
         });
+
+        Client.getClient().sendToServer("Get Manager feedback");
     }
+
+    @Subscribe
+    public void handleFeedbackList(Object msg) {
+        if (msg instanceof List<?>) {
+            List<?> list = (List<?>) msg;
+            if (!list.isEmpty() && list.get(0) instanceof Feedback) {
+                List<Feedback> allFeedbacks = (List<Feedback>) list;
+
+                List<Feedback> filtered;
+
+                if (userAtt.getPermissionLevel()==4)
+                {
+                    filtered = allFeedbacks;
+                }
+                else {
+                    int restaurantId = userAtt.getRestaurantId();
+                    System.out.println(restaurantId);
+                    if (restaurantId == 1) {
+                        filtered = allFeedbacks.stream()
+                                .filter(f -> f.getRestaurant().equalsIgnoreCase("Haifa"))
+                                .collect(Collectors.toList());
+                    } else if (restaurantId == 2) {
+                        filtered = allFeedbacks.stream()
+                                .filter(f -> f.getRestaurant().equalsIgnoreCase("Tel-Aviv"))
+                                .collect(Collectors.toList());
+                    } else if (restaurantId == 3) {
+                        filtered = allFeedbacks.stream()
+                                .filter(f -> f.getRestaurant().equalsIgnoreCase("Nahariya"))
+                                .collect(Collectors.toList());
+                    } else {
+                        filtered = allFeedbacks;
+                    }
+                }
+
+                Platform.runLater(() -> feedbackList.setAll(filtered));
+            }
+        }
+    }
+
 
     @FXML
-    public void fillTextFields(List<Feedback> confirmations) {
-        int size = confirmations.size();
-
-        if (size >= 1) {
-            feedback0.setText(confirmations.get(0).getMessage());
-        }
-
-        if (size >= 2) {
-            feedback1.setText(confirmations.get(1).getMessage());
-        }
-
-        if(size >= 3) {
-            feedback2.setText(confirmations.get(2).getMessage());
-
-        }
-        if(size >= 4) {
-            feedback3.setText(confirmations.get(3).getMessage());
-
-        }
-        if(size >= 5) {
-            feedback4.setText(confirmations.get(4).getMessage());
-
-        }
-        if(size >= 6) {
-            feedback5.setText(confirmations.get(5).getMessage());
-
-        }
-
-
-        reorder();
-    }
-
-    public void reorder()
-    {
-        if (!feedback0.getText().trim().isEmpty()) {
-            feedback0.setVisible(true);
-        }
-        else{
-            feedback0.setVisible(false);
-
-        }
-        if (!feedback1.getText().trim().isEmpty()) {
-           feedback1.setVisible(true);
-        }
-        else{
-            feedback1.setVisible(false);
-        }
-        if (!feedback2.getText().trim().isEmpty()) {
-            feedback2.setVisible(true);
-        }
-        else {
-            feedback2.setVisible(false);
-        }
-        if (!feedback3.getText().trim().isEmpty()) {
-            feedback3.setVisible(true);
-        }
-        else {
-            feedback3.setVisible(false);
-        }
-        if (!feedback4.getText().trim().isEmpty()) {
-            feedback4.setVisible(true);
-        }
-        else {
-            feedback4.setVisible(false);
-        }
-        if (!feedback5.getText().trim().isEmpty()) {
-            feedback5.setVisible(true);
-        }
-        else {
-            feedback5.setVisible(false);
-        }
-    }
-
-    @FXML
-    void back_func(ActionEvent event) {
-        String page = "Management Page";
-        App.switchScreen(page);
+    void goBack(ActionEvent event) {
+        App.switchScreen("Management Page");
     }
 
 }

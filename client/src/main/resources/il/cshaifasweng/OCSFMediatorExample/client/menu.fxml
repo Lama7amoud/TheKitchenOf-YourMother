@@ -1,74 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane prefHeight="820.0" prefWidth="997.0" style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MenuController">
-    <GridPane fx:id="menuGrid" gridLinesVisible="true" layoutX="33.0" layoutY="77.0" prefHeight="490.0" prefWidth="676.0" style="-fx-background-color: orange; -fx-grid-lines-visible: false;">
-        <!-- First Row -->
-        <TextField fx:id="textField00" editable="false" style="-fx-font-weight: bold; -fx-background-color: orange; -fx-font-family: Papyrus;" text="Meal Name" />
-        <TextField fx:id="textField01" editable="false" style="-fx-font-weight: bold; -fx-background-color: orange; -fx-font-family: Papyrus;" text="Personal Prefrences" GridPane.columnIndex="1" />
-        <TextField fx:id="textField02" editable="false" style="-fx-font-weight: bold; -fx-background-color: orange; -fx-font-family: Papyrus;" text="Ingredients" GridPane.columnIndex="2" />
-        <TextField fx:id="textField03" editable="false" prefHeight="25.0" prefWidth="166.0" style="-fx-font-weight: bold; -fx-background-color: orange; -fx-font-family: Papyrus;" text="Price" GridPane.columnIndex="3" />
+<AnchorPane prefHeight="601.0" prefWidth="1009.0" style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MenuController">
 
-        <!-- Second Row -->
-        <TextField fx:id="textField20" editable="false" prefHeight="95.0" prefWidth="170.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.rowIndex="3" />
-        <TextField fx:id="textField11" editable="false" prefHeight="94.0" prefWidth="283.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        <TextField fx:id="textField12" editable="false" prefHeight="93.0" prefWidth="168.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-        <TextField fx:id="textField13" editable="false" prefHeight="96.0" prefWidth="166.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+    <TableView fx:id="menuTable" layoutX="30.0" layoutY="26.0" prefHeight="504.0" prefWidth="750.0">
+        <columns>
+            <TableColumn fx:id="nameColumn" prefWidth="120" text="Meal Name" />
+            <TableColumn fx:id="descriptionColumn" prefWidth="160" text="Description" />
+            <TableColumn fx:id="preferencesColumn" prefWidth="140" text="Preferences" />
+            <TableColumn fx:id="priceColumn" prefWidth="80" text="Price" />
+            <TableColumn fx:id="imageColumn" prefWidth="120" text="Image" />
+            <TableColumn fx:id="editColumn" prefWidth="125.99995930989587" text="Edit Price" />
+        </columns>
+    </TableView>
+   <Button fx:id="backToMainButton" layoutX="14.0" layoutY="565.0" mnemonicParsing="false" onAction="#back_to_main_func" text="Back To Main Page" />
 
-        <!-- Third Row -->
-        <TextField fx:id="textField30" editable="false" prefHeight="104.0" prefWidth="170.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.rowIndex="5" />
-        <TextField fx:id="textField21" editable="false" prefHeight="97.0" prefWidth="170.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-        <TextField fx:id="textField22" editable="false" prefHeight="98.0" prefWidth="168.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-        <TextField fx:id="textField23" editable="false" prefHeight="98.0" prefWidth="166.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="3" GridPane.rowIndex="3" />
-
-        <!-- Fourth Row -->
-        <TextField fx:id="textField40" editable="false" prefHeight="95.0" prefWidth="170.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.rowIndex="6" />
-        <TextField fx:id="textField31" editable="false" prefHeight="102.0" prefWidth="171.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-        <TextField fx:id="textField32" editable="false" prefHeight="102.0" prefWidth="168.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-        <TextField fx:id="textField33" editable="false" prefHeight="103.0" prefWidth="166.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="3" GridPane.rowIndex="5" />
-        <TextField fx:id="textField41" editable="false" prefHeight="98.0" prefWidth="171.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-        <TextField fx:id="textField42" editable="false" prefHeight="98.0" prefWidth="168.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-        <TextField fx:id="textField43" editable="false" prefHeight="101.0" prefWidth="166.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="3" GridPane.rowIndex="6" />
-      <TextField fx:id="textField10" editable="false" prefHeight="96.0" prefWidth="170.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.rowIndex="1" />
-      <TextField fx:id="textField50" editable="false" prefHeight="92.0" prefWidth="170.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.rowIndex="7" />
-      <TextField fx:id="textField51" editable="false" prefHeight="90.0" prefWidth="170.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-      <TextField fx:id="textField52" editable="false" prefHeight="80.0" prefWidth="170.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-      <TextField fx:id="textField53" editable="false" prefHeight="79.0" prefWidth="166.0" style="-fx-font-weight: bold; -fx-background-color: orange;" GridPane.columnIndex="3" GridPane.rowIndex="7" />
-      <columnConstraints>
-         <ColumnConstraints maxWidth="165.60001220703126" minWidth="92.0" prefWidth="144.7999755859375" />
-         <ColumnConstraints maxWidth="465.6" minWidth="159.8000244140625" prefWidth="351.2000244140625" />
-         <ColumnConstraints maxWidth="178.99997558593753" minWidth="22.400012207031295" prefWidth="101.6000366210937" />
-         <ColumnConstraints maxWidth="160.80002441406248" minWidth="14.399987792968773" prefWidth="59.19998779296873" />
-      </columnConstraints>
-      <rowConstraints>
-         <RowConstraints maxHeight="27.199990844726564" minHeight="25.6" prefHeight="27.199990844726564" />
-         <RowConstraints maxHeight="96.0" minHeight="94.40000915527344" prefHeight="94.40000915527344" />
-         <RowConstraints />
-         <RowConstraints />
-         <RowConstraints />
-         <RowConstraints maxHeight="104.0" minHeight="56.199987792968756" prefHeight="104.0" />
-         <RowConstraints maxHeight="96.39998779296877" minHeight="29.600018310546886" prefHeight="95.99998779296874" />
-         <RowConstraints maxHeight="84.20001220703125" minHeight="3.9999755859374773" prefHeight="68.0" />
-         <RowConstraints maxHeight="87.40001220703124" minHeight="0.0" prefHeight="0.0" />
-      </rowConstraints>
-    </GridPane>
-   <Button fx:id="savebtn" layoutX="530.0" layoutY="390.0" mnemonicParsing="false" onAction="#saveFunc" style="-fx-background-color: red;" text="Ask the server for update" visible="false" />
-   <Button fx:id="editMeal1" layoutX="795.0" layoutY="661.0" mnemonicParsing="false" onAction="#edit1" text="edit price " />
-   <Button fx:id="editMeal2" layoutX="795.0" layoutY="687.0" mnemonicParsing="false" onAction="#edit2" text="edit price " />
-   <Button fx:id="editMeal4" layoutX="795.0" layoutY="739.0" mnemonicParsing="false" onAction="#edit4" text="edit price " />
-   <Button fx:id="editMeal5" layoutX="871.0" layoutY="661.0" mnemonicParsing="false" onAction="#edit5" text="edit price " />
-   <Button fx:id="editMeal3" layoutX="795.0" layoutY="713.0" mnemonicParsing="false" onAction="#edit3" text="edit price " />
-   <ImageView fx:id="imageView1" fitHeight="95.0" fitWidth="129.0" layoutX="730.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true" />
-   <ImageView fx:id="imageView2" fitHeight="95.0" fitWidth="129.0" layoutX="730.0" layoutY="155.0" pickOnBounds="true" preserveRatio="true" />
-   <ImageView fx:id="imageView3" fitHeight="95.0" fitWidth="129.0" layoutX="730.0" layoutY="250.0" pickOnBounds="true" preserveRatio="true" />
-   <ImageView fx:id="imageView4" fitHeight="95.0" fitWidth="129.0" layoutX="730.0" layoutY="335.0" pickOnBounds="true" preserveRatio="true" />
-   <ImageView fx:id="imageView5" fitHeight="95.0" fitWidth="129.0" layoutX="730.0" layoutY="430.0" pickOnBounds="true" preserveRatio="true" />
-   <TextField layoutX="55.0" layoutY="567.0" style="-fx-font-weight: bold; -fx-background-color: orange; " text="Special Meals" />
 </AnchorPane>

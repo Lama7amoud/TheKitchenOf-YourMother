@@ -18,6 +18,7 @@ public class feedbackpageController implements Initializable {
 
     private String feedbackText;
     private String complaintText;
+
     @FXML
     private Button backButton;
 
@@ -64,12 +65,24 @@ public class feedbackpageController implements Initializable {
             emtpyFeedbackMessage.setVisible(true);
         }
         else {
-            sendFeedbackToServer();
+            String restaurant ="";
+            if (MenuController.getRestaurantInterest() ==  1)
+            {
+                restaurant = "Haifa";
+            }
+            else if (MenuController.getRestaurantInterest() ==  2)
+            {
+                restaurant = "Tel-Aviv";
+            }
+            else if (MenuController.getRestaurantInterest() ==  3)
+            {
+                restaurant = "Nahariya";
+            }
             feedbackTextArea.clear();
             emtpyFeedbackMessage.setTextFill(Color.GREEN);
             emtpyFeedbackMessage.setText("Feedback sent successfully");
             int rating = ratingComboBox.getValue();
-            String msg = String.format("feedback;%d;%s;%d", getUserId(), feedbackText, rating);
+            String msg = String.format("feedback;%d;%s;%d;%s", getUserId(), feedbackText, rating,restaurant);
             Client.getClient().sendToServer(msg);
         }
 

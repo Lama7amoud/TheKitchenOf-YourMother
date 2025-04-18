@@ -44,19 +44,23 @@ public class SimpleServer extends AbstractServer {
 			}
 		}
 		else if (msgString.startsWith("feedback;")) {
-			String[] parts = msgString.split(";", 4);
-			if (parts.length < 4) {
-				System.out.println("Invalid feedback format");
-				return;
-			}
+			System.out.println("1111111111111");
+			String[] parts = msgString.split(";", 5);
+
 			int userId = Integer.parseInt(parts[1]);
 			String message = parts[2];
 			int rating = Integer.parseInt(parts[3]);
+			String restaurant = parts[4];
+			System.out.println(restaurant);
 
-			Feedback feedback = new Feedback(userId, message, rating, LocalDateTime.now());
-			DataManager.saveFeedback(DataManager.getPassword(),feedback);
+			Feedback feedback = new Feedback(userId, message, rating, LocalDateTime.now(), restaurant);
+			DataManager.saveFeedback(DataManager.getPassword(), feedback);
 			System.out.println("Feedback saved successfully.");
+
+			List<Feedback> updatedFeedback = DataManager.getManagerFeedback();
+			sendToAllClients(updatedFeedback);
 		}
+
 
 		else if(msgString.startsWith("logIn:")){
 			AuthorizedUser currentUser = DataManager.checkPermission(msgString);
@@ -87,16 +91,18 @@ public class SimpleServer extends AbstractServer {
 			try {
 				List<Feedback> list = DataManager.getManagerFeedback();
 				if (list != null && !list.isEmpty()) {
-					client.sendToClient(list);
+					sendToAllClients(list);
+
 				} else {
-					client.sendToClient(new ArrayList<Feedback>());
+					sendToAllClients(new ArrayList<Feedback>());
+
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
 
-		} else if (msgString.startsWith("Request")) {
+		} else if (msgString.equals("Request Menu")) {
 			try {
 				List<Meal> menu = DataManager.requestMenu();
 				if(menu != null && !menu.isEmpty()) {
@@ -111,47 +117,6 @@ public class SimpleServer extends AbstractServer {
 			}
 
 		}
-		/*else if (msgString.equals("Request Haifa menu")) {
-			try {
-				List<Meal> HaifaMenu = DataManager.requestHaifaMenu();
-				if (HaifaMenu != null && !HaifaMenu.isEmpty()) {
-					client.sendToClient(HaifaMenu);
-				} else {
-					System.out.println("empty menu");
-					client.sendToClient("No menu available");
-				}
-			} catch (Exception exception) {
-				exception.printStackTrace();
-			}
-		}
-
-		else if (msgString.equals("Request Tel-Aviv menu")) {
-			try {
-				List<Meal> TelAvivMenu = DataManager.requestTelAvivMenu();
-				if (TelAvivMenu != null && !TelAvivMenu.isEmpty()) {
-					client.sendToClient(TelAvivMenu);
-				} else {
-					System.out.println("empty menu");
-					client.sendToClient("No menu available");
-				}
-			} catch (Exception exception) {
-				exception.printStackTrace();
-			}
-		}
-
-		else if (msgString.equals("Request Nahariya menu")) {
-			try {
-				List<Meal> NahariyaMenu = DataManager.requestNahariyaMenu();
-				if (NahariyaMenu != null && !NahariyaMenu.isEmpty()) {
-					client.sendToClient(NahariyaMenu);
-				} else {
-					System.out.println("empty menu");
-					client.sendToClient("No menu available");
-				}
-			} catch (Exception exception) {
-				exception.printStackTrace();
-			}
-		}*/
 
 		else if (msgString.startsWith("Update price")) {
 			String details = msgString.substring("Update price".length()).trim();
@@ -161,7 +126,8 @@ public class SimpleServer extends AbstractServer {
 			double newPrice = Double.parseDouble(parts[3].trim());
 			double oldPrice = DataManager.getCurrentMealPrice(mealName);
 			sendToAllClients("Get Confirm \""+mealName+"\""+oldPrice+"\""+newPrice);
-			DataManager.addPriceConfirmation(mealName, oldPrice, newPrice);
+			List<PriceConfirmation> listPrice = DataManager.addPriceConfirmation(mealName, oldPrice, newPrice);
+			sendToAllClients(listPrice);
 		}
 
 		else if (msgString.startsWith("Update discount")) {
@@ -171,21 +137,19 @@ public class SimpleServer extends AbstractServer {
 			double percentage = Double.parseDouble(parts[1].trim());
 			String category = parts[3].trim();
 			System.out.println(percentage);
+			System.out.println(category);
 			sendToAllClients("Get Discount Confirm \"" + percentage);
-			DataManager.addDiscountConfirmation(percentage,category);
+			List<Discounts> dis =DataManager.addDiscountConfirmation(percentage,category);
+			sendToAllClients(dis);
 		}
 
 
 
-		else if (msgString.startsWith("Update Ingredient ")) {
-			// Remove the "Update Ingredient" prefix
-			String details = msgString.substring("Update Ingredient ".length()).trim();
+		else if (msgString.startsWith("Update description")) {
+			String details = msgString.substring("Update Description".length()).trim();
 
-			// Assuming meal name and price are enclosed in double quotes!
 			String[] parts = details.split("\"");
 
-			// Extract meal name (inside the first quotes) and meal price (inside the second quotes)
-			// Remember that parts[] now looks like this: ["","meal name","","meal price"]
 			String mealName = parts[1];
 			String mealIngredient = parts[3].trim();
 
@@ -193,10 +157,10 @@ public class SimpleServer extends AbstractServer {
 				// Call the DataManager function to update the meal price
 				if(DataManager.updateMealIngredient(mealName, mealIngredient) != 1){
 					System.out.println("Update meal failed");
-					client.sendToClient(mealName + " Ingredient update has failed");
+					client.sendToClient(mealName + " Description update has failed");
 				}
 				else {
-					client.sendToClient(mealName + "Ingredient has updated successfully");
+					client.sendToClient(mealName + " Description has updated successfully");
 					try {
 						List<Meal> menu = DataManager.requestMenu();
 						if(menu != null && !menu.isEmpty()) {
@@ -209,17 +173,35 @@ public class SimpleServer extends AbstractServer {
 					} catch (Exception exception){
 						exception.printStackTrace();
 					}
-					System.out.println("Ingredient has updated successfully");
+					System.out.println("Description has updated successfully");
 
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				try {
-					client.sendToClient(mealName + " Ingredient update has failed");
+					client.sendToClient(mealName + "Description update has failed");
 				} catch (IOException ioException) {
 					ioException.printStackTrace();
 				}
 			}
+		}
+
+		else if (msgString.startsWith("RequestMealCategory")) {
+			String name = msgString.substring("RequestMealCategory".length()).trim().replace("\"", "");
+			String category = DataManager.getMealCategoryByName(name);
+			if (category != null) {
+                try {
+                    client.sendToClient( "MealCategory:" + category);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                try {
+                    client.sendToClient( "MealCategory:NotFound");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 		}
 
 		else if (msgString.startsWith("remove client")) {
@@ -258,29 +240,30 @@ public class SimpleServer extends AbstractServer {
 				String Image = parts[9];
 				String Category = parts[11];
 
+				if (DataManager.mealExist(Name)) {
+					client.sendToClient("MealExists");
+				}
+				else {
 
+					if (DataManager.addMeal(Name, Description, Preferences, Price, Image, Category) != 1) {
+						client.sendToClient(Name + " add failed");
+					} else {
+						client.sendToClient("Meal has been added successfully");
 
-				// Call your data manager to insert the meal
-				if (DataManager.addMeal(Name, Description, Preferences, Price, Image,Category) != 1) {
-					System.out.println("Add meal failed");
-					client.sendToClient(Name + " add failed");
-				} else {
-					client.sendToClient( "Meal has been added successfully");
+						try {
+							List<Meal> menu = DataManager.requestMenu();
+							if (menu != null && !menu.isEmpty()) {
+								sendToAllClients(menu);
+							} else {
 
-					// Optionally update the menu for all clients
-					try {
-						List<Meal> menu = DataManager.requestMenu();
-						if (menu != null && !menu.isEmpty()) {
-							sendToAllClients(menu);
-						} else {
-							System.out.println("empty menu");
-							client.sendToClient("No menu available");
+								client.sendToClient("No menu available");
+							}
+						} catch (Exception exception) {
+							exception.printStackTrace();
 						}
-					} catch (Exception exception) {
-						exception.printStackTrace();
-					}
 
-					System.out.println("Meal has been added successfully");
+
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -353,7 +336,6 @@ public class SimpleServer extends AbstractServer {
 			String mealName = parts[1];
 			double newPrice = Double.parseDouble(parts[3]);
 			int id = Integer.parseInt(parts[5]);
-
 			int updated = DataManager.updateMealPrice(mealName, newPrice);
 			boolean x = DataManager.removePriceConfirmation(id);
 			if (updated == 1 && x) {
