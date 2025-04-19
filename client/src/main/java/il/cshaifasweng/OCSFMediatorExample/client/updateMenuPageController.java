@@ -155,6 +155,11 @@ public class updateMenuPageController {
             return;
         }
 
+        if (!isValidPreferencesFormat(Preferences)) {
+            showAlert("Preferences must contain parts separated by commas, with no extra or missing commas.");
+            return;
+        }
+
         double Price;
         try {
             Price = Double.parseDouble(mealPrice.getText());
@@ -378,6 +383,23 @@ public class updateMenuPageController {
             alert.showAndWait();
         });
     }
+
+    private boolean isValidPreferencesFormat(String preferences) {
+        // Check no leading/trailing commas and no consecutive commas
+        if (preferences.startsWith(",") || preferences.endsWith(",") || preferences.contains(",,")) {
+            return false;
+        }
+
+        // Split by comma and check for non-empty trimmed parts
+        String[] parts = preferences.split(",");
+        for (String part : parts) {
+            if (part.trim().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
 
 }

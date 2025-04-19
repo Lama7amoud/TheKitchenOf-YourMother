@@ -8,25 +8,36 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="700.0" prefWidth="900.0" style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MenuController">
+<ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="700.0" prefWidth="900.0"
+            style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MenuController">
 
-<AnchorPane prefHeight="601.0" prefWidth="1009.0" style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <AnchorPane prefHeight="800.0" prefWidth="1009.0" style="-fx-background-color: orange;">
 
-    <TableView fx:id="menuTable" layoutX="61.0" layoutY="67.0" prefHeight="504.0" prefWidth="750.0">
-        <columns>
-            <TableColumn fx:id="nameColumn" prefWidth="120" text="Meal Name" />
-            <TableColumn fx:id="descriptionColumn" prefWidth="160" text="Description" />
-            <TableColumn fx:id="preferencesColumn" prefWidth="140" text="Preferences" />
-            <TableColumn fx:id="priceColumn" prefWidth="80" text="Price" />
-            <TableColumn fx:id="imageColumn" prefWidth="120" text="Image" />
-            <TableColumn fx:id="editColumn" prefWidth="125.99995930989587" text="Edit Price" />
-        </columns>
-    </TableView>
-   <Button fx:id="backToMainButton" layoutX="14.0" layoutY="565.0" mnemonicParsing="false" onAction="#back_to_main_func" text="Back To Main Page" />
-    <TextField fx:id="searchText" layoutX="265.0" layoutY="26.0" prefHeight="26.0" prefWidth="566.0" promptText="Search" style="-fx-background-radius: 30; -fx-background-color: white;" />
-    <Button fx:id="searchButton" layoutX="793.0" layoutY="24.0" minWidth="38.0" mnemonicParsing="false" onAction="#searchFunc" prefHeight="30.0" prefWidth="38.0" style="-fx-background-color: blue; -fx-background-radius: 30;" text="🔍" />
-    <ComboBox fx:id="combo" layoutX="53.0" layoutY="25.0" prefHeight="18.0" prefWidth="193.0" promptText="Pick a search criterion" style="-fx-background-radius: 30; -fx-background-color: white;" />
-      <Button layoutX="1010.0" layoutY="672.0" mnemonicParsing="false" text="Button" />
+        <TableView fx:id="menuTable" layoutX="61.0" layoutY="67.0" prefHeight="600.0" prefWidth="750.0">
+            <columns>
+                <TableColumn fx:id="nameColumn" prefWidth="120" text="Meal Name" />
+                <TableColumn fx:id="descriptionColumn" prefWidth="160" text="Description" />
+                <TableColumn fx:id="preferencesColumn" prefWidth="140" text="Preferences" />
+                <TableColumn fx:id="priceColumn" prefWidth="80" text="Price" />
+                <TableColumn fx:id="imageColumn" prefWidth="120" text="Image" />
+                <TableColumn fx:id="editColumn" prefWidth="125.9999" text="Edit Price" />
+            </columns>
+        </TableView>
 
-</AnchorPane>
+        <TextField fx:id="searchText" layoutX="265.0" layoutY="26.0" prefHeight="26.0" prefWidth="566.0"
+                   promptText="Search" style="-fx-background-radius: 30; -fx-background-color: white;" />
+        <Button fx:id="searchButton" layoutX="793.0" layoutY="24.0" mnemonicParsing="false"
+                onAction="#searchFunc" prefHeight="30.0" prefWidth="38.0"
+                style="-fx-background-color: blue; -fx-background-radius: 30;" text="🔍" />
+        <ComboBox fx:id="combo" layoutX="53.0" layoutY="25.0" prefHeight="18.0" prefWidth="193.0"
+                  promptText="Pick a search criterion" style="-fx-background-radius: 30; -fx-background-color: white;" />
+
+        <!-- ✅ Small button at the bottom-left -->
+        <Button fx:id="backToMainButton" layoutX="20.0" layoutY="760.0" mnemonicParsing="false"
+                onAction="#back_to_main_func" text="Back To Main Page"
+                prefHeight="28.0" prefWidth="140.0"
+                style="-fx-background-radius: 20; -fx-background-color: white; -fx-text-fill: black;" />
+
+    </AnchorPane>
 </ScrollPane>

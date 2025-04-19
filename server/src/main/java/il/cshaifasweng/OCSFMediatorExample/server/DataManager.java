@@ -207,10 +207,10 @@ public class DataManager {
 
 
 // Create Italian meals with the same image path
-        Meal meal1 = new Meal("Margherita Pizza", "Classic pizza with fresh mozzarella and basil", "Vegetarian", 10.99 , "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal0.jpg","special1");
-        Meal meal2 = new Meal("Spaghetti Carbonara", "Pasta with pancetta, eggs, and Parmesan cheese", "Contains dairy", 13.99 , "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal1.jpg","shared meal");
-        Meal meal3 = new Meal("Lasagna", "Layered pasta with rich meat sauce and creamy béchamel", "Contains dairy", 14.99,"/il/cshaifasweng/OCSFMediatorExample/client/meals/meal2.jpg","shared meal");
-        Meal meal4 = new Meal("Risotto alla Milanese", "Creamy risotto with saffron and Parmesan", "Vegetarian", 12.99,"/il/cshaifasweng/OCSFMediatorExample/client/meals/meal3.jpg","shared meal");
+        Meal meal1 = new Meal("Margherita Pizza", "Classic pizza with fresh mozzarella and basil", "Vegetarian,qwes", 10.99 , "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal0.jpg","special1");
+        Meal meal2 = new Meal("Spaghetti Carbonara", "Pasta with pancetta, eggs, and Parmesan cheese", "Contains dairy,erf,efe,ef", 13.99 , "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal1.jpg","shared meal");
+        Meal meal3 = new Meal("Lasagna", "Layered pasta with rich meat sauce and creamy béchamel", "Contains dairy,efeeee", 14.99,"/il/cshaifasweng/OCSFMediatorExample/client/meals/meal2.jpg","shared meal");
+        Meal meal4 = new Meal("Risotto alla Milanese", "Creamy risotto with saffron and Parmesan", "Vegetarian,ppoipip", 12.99,"/il/cshaifasweng/OCSFMediatorExample/client/meals/meal3.jpg","shared meal");
         Meal meal5 = new Meal("Fettuccine Alfredo", "Pasta in a creamy Parmesan cheese sauce", "Vegetarian", 12.49,"/il/cshaifasweng/OCSFMediatorExample/client/meals/meal4.jpg","shared meal");
         Meal meal6 = new Meal("Penne Arrabbiata", "Penne pasta with a spicy tomato and garlic sauce", "Vegan, Spicy", 11.99, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal5.jpg","special2");
         Meal meal7 = new Meal("Ravioli Ricotta e Spinaci", "Pasta pockets filled with ricotta cheese and spinach", "Vegetarian", 13.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal6.jpg","special3");
@@ -986,6 +986,44 @@ public class DataManager {
             CriteriaUpdate<Meal> updateQuery = builder.createCriteriaUpdate(Meal.class);
             Root<Meal> root = updateQuery.from(Meal.class);
             updateQuery.set("mealDescription", Ingredient)
+                    .where(builder.equal(root.get("mealName"), mealName)); // Find the meal by name
+
+
+
+            int rowsUpdated = session.createQuery(updateQuery).executeUpdate();
+
+            // Commit the transaction
+            session.getTransaction().commit();
+
+            return rowsUpdated; // Return number of rows updated (1 for success, 0 for failure)
+        } catch (Exception e) {
+            if (session != null && session.isOpen()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return 0; // Indicate failure
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+    static int updateMealPref(String mealName, String pref) {
+        try {
+            System.out.println("update method reached");
+            // Start a session and transaction
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            System.out.println("meal name in update function" + mealName);
+            System.out.println("meal preferences in update function" + pref);
+            // Build the query to update the meal price
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaUpdate<Meal> updateQuery = builder.createCriteriaUpdate(Meal.class);
+            Root<Meal> root = updateQuery.from(Meal.class);
+            updateQuery.set("mealPreferences", pref)
                     .where(builder.equal(root.get("mealName"), mealName)); // Find the meal by name
 
 

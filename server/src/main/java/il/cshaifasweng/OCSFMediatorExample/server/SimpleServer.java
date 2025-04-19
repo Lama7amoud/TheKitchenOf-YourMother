@@ -186,6 +186,47 @@ public class SimpleServer extends AbstractServer {
 			}
 		}
 
+		else if (msgString.startsWith("Update preferences")) {
+			String details = msgString.substring("Update preferences".length()).trim();
+
+			String[] parts = details.split("\"");
+
+			String mealName = parts[1];
+			String mealIngredient = parts[3].trim();
+
+			try {
+
+				if(DataManager.updateMealPref(mealName, mealIngredient) != 1){
+					System.out.println("Update meal failed");
+					client.sendToClient(mealName + " preferences update has failed");
+				}
+				else {
+					client.sendToClient(mealName + " preferences has updated successfully");
+					try {
+						List<Meal> menu = DataManager.requestMenu();
+						if(menu != null && !menu.isEmpty()) {
+							sendToAllClients(menu); //
+						}
+						else{
+							System.out.println("empty menu");
+							client.sendToClient("No menu available");
+						}
+					} catch (Exception exception){
+						exception.printStackTrace();
+					}
+					System.out.println("preferences has updated successfully");
+
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				try {
+					client.sendToClient(mealName + "preferences update has failed");
+				} catch (IOException ioException) {
+					ioException.printStackTrace();
+				}
+			}
+		}
+
 		else if (msgString.startsWith("RequestMealCategory")) {
 			String name = msgString.substring("RequestMealCategory".length()).trim().replace("\"", "");
 			String category = DataManager.getMealCategoryByName(name);

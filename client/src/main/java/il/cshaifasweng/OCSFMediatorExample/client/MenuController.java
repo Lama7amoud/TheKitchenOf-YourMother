@@ -17,6 +17,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.control.Control;
 import javafx.scene.text.Text;
+import javafx.scene.layout.VBox;
+import javafx.scene.control.CheckBox;
+
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -86,65 +89,158 @@ public class MenuController {
         AuthorizedUser user = Client.getClientAttributes();
 
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("mealName"));
+        nameColumn.setCellFactory(column -> new TableCell<>() {
+            private final Text text = new Text();
+
+            {
+                text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
+                setPrefHeight(Control.USE_COMPUTED_SIZE);
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    Meal meal = getTableView().getItems().get(getIndex());
+                    if (meal.getMealCategory().equals("header")) {
+                        text.setStyle("-fx-font-weight: bold; -fx-fill: #333;");
+                    } else {
+                        text.setStyle(""); // reset
+                    }
+                    text.setText(item);
+                    setGraphic(text);
+                }
+            }
+        });
         preferencesColumn.setCellValueFactory(new PropertyValueFactory<>("mealPreferences"));
+        preferencesColumn.setCellFactory(column -> new TableCell<Meal, String>() {
+            private final VBox vbox = new VBox(5);
+            private final Text text = new Text();
+
+            {
+                text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                vbox.getChildren().clear();
+
+                if (empty || item == null || item.isEmpty()) {
+                    setGraphic(null);
+                    setText(null);
+                } else {
+                    Meal meal = getTableView().getItems().get(getIndex());
+
+                    if (meal.getMealCategory().equals("header")) {
+                        setGraphic(null);
+                        setText(null);
+                        return;
+                    }
+
+                    AuthorizedUser user = Client.getClientAttributes();
+
+                    if (user != null) {
+                        if (user.getPermissionLevel() == 0) { // Customer - editable checkboxes
+                            String[] preferences = item.split(",");
+                            for (String pref : preferences) {
+                                CheckBox checkBox = new CheckBox(pref.trim());
+                                checkBox.setDisable(false); // Customer can edit
+                                vbox.getChildren().add(checkBox);
+                            }
+                            setGraphic(vbox);
+                            setText(null);
+                        } else if (user.getPermissionLevel() == 5) { // Dietitian - plain text
+                            setGraphic(null);
+                            setText(item); // Just show text, no checkboxes
+                        } else { // All other users - non-editable checkboxes
+                            String[] preferences = item.split(",");
+                            for (String pref : preferences) {
+                                CheckBox checkBox = new CheckBox(pref.trim());
+                                checkBox.setDisable(true); // Non-editable
+                                vbox.getChildren().add(checkBox);
+                            }
+                            setGraphic(vbox);
+                            setText(null);
+                        }
+                    } else { // If user is null, default non-editable checkboxes
+                        String[] preferences = item.split(",");
+                        for (String pref : preferences) {
+                            CheckBox checkBox = new CheckBox(pref.trim());
+                            checkBox.setDisable(true); // Default to non-editable
+                            vbox.getChildren().add(checkBox);
+                        }
+                        setGraphic(vbox);
+                        setText(null);
+                    }
+                }
+            }
+        });
+
+
+
+
+
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("mealPrice"));
+
+
+        priceColumn.setCellFactory(column -> new TableCell<>() {
+
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    Meal meal = getTableView().getItems().get(getIndex());
+                    if (meal.getMealCategory().equals("header")) {
+                        setText("");
+                        return;
+                    }
+                    setText(String.format("%.2f", item));
+                }
+            }
+        });
+
+
+
+
+
         imageColumn.setCellValueFactory(new PropertyValueFactory<>("imagePath"));
         combo.getItems().addAll("Meal Name", "Ingredients","Description", "Price");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("mealDescription"));
-
         descriptionColumn.setCellFactory(column -> new TableCell<>() {
             private final Text text = new Text();
             {
                 text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
                 setPrefHeight(Control.USE_COMPUTED_SIZE);
             }
+
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setGraphic(null);
                 } else {
+                    Meal meal = getTableView().getItems().get(getIndex());
+                    if (meal.getMealCategory().equals("header")) {
+                        setGraphic(null);
+                        setText("");
+                        return;
+                    }
                     text.setText(item);
                     setGraphic(text);
                 }
             }
         });
 
-        nameColumn.setCellFactory(column -> new TableCell<>() {
-            private final Text text = new Text();
-            {
-                text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
-                setPrefHeight(Control.USE_COMPUTED_SIZE);
-            }
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setGraphic(null);
-                } else {
-                    text.setText(item);
-                    setGraphic(text);
-                }
-            }
-        });
 
-        preferencesColumn.setCellFactory(column -> new TableCell<>() {
-            private final Text text = new Text();
-            {
-                text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
-                setPrefHeight(Control.USE_COMPUTED_SIZE);
-            }
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setGraphic(null);
-                } else {
-                    text.setText(item);
-                    setGraphic(text);
-                }
-            }
-        });
+
+
+
 
 
 
@@ -189,6 +285,31 @@ public class MenuController {
                 }
             });
 
+            preferencesColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+            preferencesColumn.setOnEditCommit(event -> {
+                Meal meal = event.getRowValue();
+                String newPref = event.getNewValue();
+
+                if (newPref.isEmpty())
+                {
+                    showAlert("Preferences cannot be empty.");
+                    return;
+                }
+
+                if (!isValidPreferences(newPref)) {
+                    showAlert("Preferences must be separated by commas (,) with no leading, trailing, or consecutive commas.");
+                    return;
+                }
+
+                meal.setMealPreferences(newPref);
+                try {
+                    Client.getClient().sendToServer("Update preferences \"" + meal.getMealName() + "\" \"" + newPref + "\"");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
+
             editColumn.setCellFactory(col -> new TableCell<>() {
                 private final TextField priceField = new TextField();
                 private final Button editButton = new Button("Edit");
@@ -198,8 +319,19 @@ public class MenuController {
                         Meal meal = getTableView().getItems().get(getIndex());
                         String text = priceField.getText().trim();
                         try {
-                            double newPrice = Double.parseDouble(text);
-                            Client.getClient().sendToServer("Update price \"" + meal.getMealName() + "\" \"" + newPrice + "\"");
+                            try {
+                                double newPrice = Double.parseDouble(text);
+                                if (newPrice < 0) {
+                                    showAlert("Price must be non-negative.");
+
+                                    return;
+                                }
+                                Client.getClient().sendToServer("Update price \"" + meal.getMealName() + "\" \"" + newPrice + "\"");
+                                priceField.clear();
+                            } catch (NumberFormatException ex) {
+                                showAlert("Price must be a valid number.");
+                            }
+
                             priceField.clear();
                         } catch (Exception ex) {
                             System.err.println("Invalid price entered.");
@@ -218,11 +350,16 @@ public class MenuController {
                     if (empty) {
                         setGraphic(null);
                     } else {
-                        HBox box = new HBox(5, priceField, editButton);
-                        setGraphic(box);
+                        Meal meal = getTableView().getItems().get(getIndex());
+                        if (meal.getMealCategory().equals("header")) {
+                            setGraphic(null); // Hide for header rows
+                            return;
+                        }
+                        setGraphic(new HBox(5, priceField, editButton));
                     }
                 }
             });
+
 
             TableColumn<Meal, Void> removeColumn = new TableColumn<>("Remove");
             removeColumn.setCellFactory(col -> new TableCell<>() {
@@ -236,8 +373,6 @@ public class MenuController {
                         try {
                             String messageToSend = String.format("Remove Meal \"%s\"", mealName);
                             Client.getClient().sendToServer(messageToSend);
-
-                            System.out.println("Remove Meal \"" + meal.getMealName() + "\"");
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }
@@ -247,9 +382,19 @@ public class MenuController {
                 @Override
                 protected void updateItem(Void item, boolean empty) {
                     super.updateItem(item, empty);
-                    setGraphic(empty ? null : removeButton);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        Meal meal = getTableView().getItems().get(getIndex());
+                        if (meal.getMealCategory().equals("header")) {
+                            setGraphic(null); // Hide for header rows
+                            return;
+                        }
+                        setGraphic(removeButton);
+                    }
                 }
             });
+
 
             menuTable.getColumns().add(removeColumn);
         } else {
@@ -291,6 +436,11 @@ public class MenuController {
                     if (empty) {
                         setGraphic(null);
                     } else {
+                        Meal meal = getTableView().getItems().get(getIndex());
+                        if (meal.getMealCategory().equals("header")) {
+                            setGraphic(null);
+                            return;
+                        }
                         HBox box = new HBox(5, subButton, qtyField, addButton);
                         setGraphic(box);
                     }
@@ -321,22 +471,48 @@ public class MenuController {
                 Platform.runLater(() -> {
                     List<Meal> allMeals = (List<Meal>) list;
                     List<Meal> filtered = filterByInterest(allMeals);
-                    fullMealList = filtered;         // Save original full list
-                    menuData.clear();
-                    menuData.addAll(fullMealList);   // Set to TableView
+                    fullMealList = filtered; // Save original full list
+                    menuData.setAll(fullMealList); // Set data to TableView
 
-
-                    // Dynamically resize table height to fit rows
-                    menuTable.setFixedCellSize(60);
-                    menuTable.prefHeightProperty().bind(
-                            menuTable.fixedCellSizeProperty().multiply(Bindings.size(menuTable.getItems()).add(1.01))
-                    );
-                    menuTable.minHeightProperty().bind(menuTable.prefHeightProperty());
-                    menuTable.maxHeightProperty().bind(menuTable.prefHeightProperty());
+                    // Use dynamic row height adjustment instead of fixed cell size
+                    menuTable.setRowFactory(tv -> new TableRow<>() {
+                        @Override
+                        protected void updateItem(Meal item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (empty || item == null) {
+                                setPrefHeight(Control.USE_COMPUTED_SIZE);
+                            } else if ("header".equals(item.getMealCategory())) {
+                                setPrefHeight(35); // Slightly smaller for header
+                            } else {
+                                setPrefHeight(Control.USE_COMPUTED_SIZE); // Adjust for content dynamically
+                            }
+                        }
+                    });
                 });
             }
         }
     }
+
+    private boolean isValidPreferences(String preferences) {
+        if (preferences.startsWith(",") || preferences.endsWith(",")) return false;
+        if (preferences.contains(",,")) return false;
+
+        String[] parts = preferences.split(",");
+        for (String part : parts) {
+            if (part.trim().isEmpty()) return false;
+        }
+        return true;
+    }
+
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Invalid Input");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+
 
     private List<Meal> filterByInterest(List<Meal> meals) {
         String specialCategory = switch (restaurantInterest) {
@@ -355,10 +531,22 @@ public class MenuController {
                 .collect(Collectors.toList());
 
         List<Meal> result = new ArrayList<>();
+
+        // Fake header for shared meals
+        Meal sharedHeader = new Meal("🍽 Shared Meals", "", "", 0.0, "", "header");
+        result.add(sharedHeader);
         result.addAll(shared);
+
+        // Fake header for special meals
+        Meal specialHeader = new Meal("🌟 Special Meals", "", "", 0.0, "", "header");
+        result.add(specialHeader);
         result.addAll(special);
+
         return result;
     }
+
+
+
     @FXML
     void searchFunc(ActionEvent event) {
         String selectedCriterion = combo.getValue();

@@ -81,6 +81,7 @@
             <ComboBox fx:id="comboDiscount" layoutX="136.0" layoutY="307.0" prefHeight="25.0" prefWidth="133.0" promptText="Choose Category" />
             <Label layoutX="94.0" layoutY="311.0" prefHeight="17.0" prefWidth="125.0" text="\%    For" />
             <Button fx:id="discountButton" layoutX="283.0" layoutY="307.0" mnemonicParsing="false" onAction="#discount_func" prefHeight="25.0" prefWidth="115.0" text="Apply Discount" />
+            <TextField fx:id="discountValue" layoutX="68.0" layoutY="307.0" prefHeight="25.0" prefWidth="25.0" />
          </children>
       </AnchorPane>
    </right>
