@@ -207,19 +207,16 @@ public class DataManager {
 
 
 // Create Italian meals with the same image path
-        Meal meal1 = new Meal("Margherita Pizza", "Classic pizza with fresh mozzarella and basil", "Vegetarian,qwes", 10.99 , "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal0.jpg","special1");
-        Meal meal2 = new Meal("Spaghetti Carbonara", "Pasta with pancetta, eggs, and Parmesan cheese", "Contains dairy,erf,efe,ef", 13.99 , "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal1.jpg","shared meal");
-        Meal meal3 = new Meal("Lasagna", "Layered pasta with rich meat sauce and creamy béchamel", "Contains dairy,efeeee", 14.99,"/il/cshaifasweng/OCSFMediatorExample/client/meals/meal2.jpg","shared meal");
-        Meal meal4 = new Meal("Risotto alla Milanese", "Creamy risotto with saffron and Parmesan", "Vegetarian,ppoipip", 12.99,"/il/cshaifasweng/OCSFMediatorExample/client/meals/meal3.jpg","shared meal");
-        Meal meal5 = new Meal("Fettuccine Alfredo", "Pasta in a creamy Parmesan cheese sauce", "Vegetarian", 12.49,"/il/cshaifasweng/OCSFMediatorExample/client/meals/meal4.jpg","shared meal");
-        Meal meal6 = new Meal("Penne Arrabbiata", "Penne pasta with a spicy tomato and garlic sauce", "Vegan, Spicy", 11.99, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal5.jpg","special2");
-        Meal meal7 = new Meal("Ravioli Ricotta e Spinaci", "Pasta pockets filled with ricotta cheese and spinach", "Vegetarian", 13.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal6.jpg","special3");
-        Meal meal8 = new Meal("Calzone Classico", "Folded pizza with ham, mozzarella, and mushrooms", "Contains pork and dairy", 13.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal7.jpg","special1");
-        Meal meal9 = new Meal("Arancini", "Fried risotto balls stuffed with cheese and peas", "Contains dairy", 8.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal8.jpg","special2");
-        Meal meal10 = new Meal("Polenta ai Funghi", "Creamy polenta topped with sautéed wild mushrooms", "Vegetarian", 11.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal9.jpg","special3");
-
-
-
+        Meal meal1 = new Meal("Margherita Pizza", "Classic pizza with fresh mozzarella and basil", "tuna, olive, corn, mushroom", 10.99 , "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal0.jpg", "special1");
+        Meal meal2 = new Meal("Spaghetti Carbonara", "Pasta with pancetta, eggs, and Parmesan cheese", "pancetta, egg, parmesan", 13.99 , "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal1.jpg", "shared meal");
+        Meal meal3 = new Meal("Lasagna", "Layered pasta with rich meat sauce and creamy béchamel", "beef, tomato sauce, béchamel", 14.99, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal2.jpg", "shared meal");
+        Meal meal4 = new Meal("Risotto alla Milanese", "Creamy risotto with saffron and Parmesan", "saffron, parmesan, butter", 12.99, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal3.jpg", "shared meal");
+        Meal meal5 = new Meal("Fettuccine Alfredo", "Pasta in a creamy Parmesan cheese sauce", "cream, parmesan, butter", 12.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal4.jpg", "shared meal");
+        Meal meal6 = new Meal("Penne Arrabbiata", "Penne pasta with a spicy tomato and garlic sauce", "tomato, garlic, chili", 11.99, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal5.jpg", "special2");
+        Meal meal7 = new Meal("Ravioli Ricotta e Spinaci", "Pasta pockets filled with ricotta cheese and spinach", "ricotta, spinach, nutmeg", 13.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal6.jpg", "special3");
+        Meal meal8 = new Meal("Calzone Classico", "Folded pizza with ham, mozzarella, and mushrooms", "ham, mozzarella, mushroom", 13.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal7.jpg", "special1");
+        Meal meal9 = new Meal("Arancini", "Fried risotto balls stuffed with cheese and peas", "cheese, peas, breadcrumbs", 8.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal8.jpg", "special2");
+        Meal meal10 = new Meal("Polenta ai Funghi", "Creamy polenta topped with sautéed wild mushrooms", "mushrooms, garlic, butter", 11.49, "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal9.jpg", "special3");
 
         // Associate meals with restaurants
         meal1.getRestaurants().add(restaurant1);

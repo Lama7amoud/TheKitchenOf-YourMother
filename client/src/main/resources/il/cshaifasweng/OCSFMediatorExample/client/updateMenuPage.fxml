@@ -41,7 +41,7 @@
          <children>
             <TextField fx:id="addMealName" layoutX="14.0" layoutY="82.0" prefHeight="25.0" prefWidth="185.0" />
             <TextField fx:id="mealDescription" layoutX="14.0" layoutY="134.0" prefHeight="25.0" prefWidth="182.0" />
-            <TextField fx:id="mealPreferences" layoutX="232.0" layoutY="82.0" />
+            <TextField fx:id="mealPreferences" layoutX="232.0" layoutY="82.0" promptText="P1,P2,P3...." />
             <Button fx:id="addMealButton" layoutX="287.0" layoutY="219.0" mnemonicParsing="false" onAction="#add_meal_func" prefHeight="25.0" prefWidth="98.0" text="Add Meal" />
             <ComboBox fx:id="mealCategoryCombo" layoutX="231.0" layoutY="134.0" prefWidth="162.0" promptText="Choose Category" />
             <TextField fx:id="mealPrice" layoutX="235.0" layoutY="187.0" prefHeight="25.0" prefWidth="146.0" />
