@@ -295,6 +295,7 @@ public class MenuController {
                     showAlert("Preferences cannot be empty.");
                     return;
                 }
+                ///
 
                 if (!isValidPreferences(newPref)) {
                     showAlert("Preferences must be separated by commas (,) with no leading, trailing, or consecutive commas.");
