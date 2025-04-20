@@ -129,9 +129,6 @@ public class DataManager {
         session.flush();
 
 
-
-
-
 // Create Italian meals with the same image path
         Meal meal1 = new Meal("Margherita Pizza", "Classic pizza with fresh mozzarella and basil", "Vegetarian", 10.99 , "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal0.jpg","special1");
         Meal meal2 = new Meal("Spaghetti Carbonara", "Pasta with pancetta, eggs, and Parmesan cheese", "Contains dairy", 13.99 , "/il/cshaifasweng/OCSFMediatorExample/client/meals/meal1.jpg","shared meal");

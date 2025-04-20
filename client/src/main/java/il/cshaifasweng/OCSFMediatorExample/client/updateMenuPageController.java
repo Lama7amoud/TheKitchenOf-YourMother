@@ -10,7 +10,9 @@ import org.greenrobot.eventbus.EventBus;
 
 import javafx.scene.control.Button;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class updateMenuPageController {
 
@@ -116,37 +118,59 @@ public class updateMenuPageController {
     @FXML
     void add_meal_func(ActionEvent event) {
 
-        String Name = addMealName.getText();
-        String Description = mealDescription.getText();
-        String Preferences = mealPreferences.getText();
-        double Price = Double.parseDouble(mealPrice.getText());
-        String Image = imagePath.getText();
+        String name = addMealName.getText();
+        String description = mealDescription.getText();
+        String preferences = mealPreferences.getText();
+        double price = Double.parseDouble(mealPrice.getText());
+        String inputImagePath = imagePath.getText().trim(); // full path from user
+
         Client client = Client.getClient();
 
-        String Category ="";
-
-        if(mealCategory.getText().equals("Haifa")){
-            Category = "special1";
+        String category = "";
+        if (mealCategory.getText().equals("Haifa")) {
+            category = "special1";
         } else if (mealCategory.getText().equals("Tel-Aviv")) {
-            Category = "special2";
+            category = "special2";
         } else if (mealCategory.getText().equals("Nahariya")) {
-            Category = "special3";
+            category = "special3";
         } else if (mealCategory.getText().equals("All")) {
-            Category = "shared meal";
+            category = "shared meal";
         }
 
-        //String Category = mealCategory.getText();
+        // Path to meals folder inside your project
+        File destinationDir = new File("C:\\Users\\lamah\\IdeaProjects\\TheKitchenOf-YourMotherJDED\\client\\src\\main\\resources\\il\\cshaifasweng\\OCSFMediatorExample\\client\\meals");
+        if (!destinationDir.exists()) {
+            destinationDir.mkdirs();
+        }
 
+        File sourceFile = new File(inputImagePath);
+        if (!sourceFile.exists()) {
+            System.out.println("❌ Image file does not exist at: " + inputImagePath);
+            return;
+        }
+
+        // Only use the file name, not full path
+        String imageFileName = sourceFile.getName();
+        File destinationFile = new File(destinationDir, imageFileName);
 
         try {
-            String messageToSend = String.format("Add Meal \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"", Name, Description, Preferences, Price, Image,Category);
-            client.sendToServer(messageToSend);
-            System.out.println("Sending to server: " + messageToSend);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            // Copy the image to your project meals folder
+            Files.copy(sourceFile.toPath(), destinationFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("✅ Image copied to: " + destinationFile.getAbsolutePath());
+            imageFileName = "/il/cshaifasweng/OCSFMediatorExample/client/meals/" + imageFileName;
 
+            // Send the filename only (the path in the project will be resolved later)
+            String messageToSend = String.format("Add Meal \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"", name, description, preferences, price, imageFileName, category
+            );
+            client.sendToServer(messageToSend);
+            System.out.println("✅ Sent to server: " + messageToSend);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("❌ Failed to copy image.");
+        }
     }
+
 
     @FXML
     void remove_meal_func(ActionEvent event) {

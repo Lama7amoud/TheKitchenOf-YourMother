@@ -63,15 +63,24 @@ public class Client extends AbstractClient {
             EventBus.getDefault().post(new WarningEvent((Warning) msg));
         }
 
-        else if (msg instanceof List) {
-            List<Meal> menu = (List<Meal>) msg;
-            List<PriceConfirmation> PriceConfirmation= (List<PriceConfirmation>) msg;
-            List<Discounts> Discounts= (List<Discounts>) msg;
-            EventBus.getDefault().post(menu);
-            EventBus.getDefault().post(PriceConfirmation);
-            EventBus.getDefault().post(Discounts);
+        else if (msg instanceof List<?>) {
+            List<?> list = (List<?>) msg;
 
+            if (!list.isEmpty()) {
+                Object first = list.get(0);
+
+                if (first instanceof Meal) {
+                    EventBus.getDefault().post((List<Meal>) list);
+                } else if (first instanceof PriceConfirmation) {
+                    EventBus.getDefault().post((List<PriceConfirmation>) list);
+                } else if (first instanceof Discounts) {
+                    EventBus.getDefault().post((List<Discounts>) list);
+                } else {
+                    System.out.println("Unknown list type received from server.");
+                }
+            }
         }
+
         else if (msg instanceof AuthorizedUser) {
             userAtt.copyUser((AuthorizedUser) msg);
             System.out.println("response: " + userAtt.getMessageToServer());

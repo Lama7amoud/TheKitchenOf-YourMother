@@ -566,7 +566,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 1");
                     }
                 }
                 if (i==2) {
@@ -577,7 +577,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 2");
                     }
 
                 }
@@ -589,7 +589,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 3");
                     }
                 }
                 if (i==4) {
@@ -600,7 +600,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 4");
                     }
                 }
                 if (i==5) {
@@ -611,7 +611,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 5");
                     }
                 }
                 if (i==6) {
@@ -622,7 +622,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 6");
                     }
                 }
             }
@@ -636,7 +636,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 7");
                     }
                 }
                 if (i==1) {
@@ -647,7 +647,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 8");
                     }
                 }
                 if (i==2) {
@@ -658,7 +658,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 9");
                     }
                 }
                 if (i==3) {
@@ -669,7 +669,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 10");
                     }
                 }
                 if (i==4) {
@@ -680,7 +680,7 @@ public class HaifaMenuController {
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("Failed to load image at index: 0");
+                        System.err.println("Failed to load image at index: 11");
                     }
                 }
             }
