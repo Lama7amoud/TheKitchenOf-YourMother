@@ -8,6 +8,16 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
+
+
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
+import org.greenrobot.eventbus.EventBus;
+import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
+
+import java.io.File;
+import java.nio.file.Files;
 import java.util.List;
 
 import javafx.scene.control.Button;
@@ -18,6 +28,28 @@ import java.util.stream.Collectors;
 
 
 public class updateMenuPageController {
+
+    @FXML
+    private Button chooseImageButton;
+
+
+
+    @FXML
+    void chooseImage(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Meal Image");
+
+        FileChooser.ExtensionFilter imageFilter =
+                new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.jpeg", "*.png", "*.gif");
+        fileChooser.getExtensionFilters().add(imageFilter);
+
+        File selectedFile = fileChooser.showOpenDialog(chooseImageButton.getScene().getWindow());
+
+        if (selectedFile != null) {
+            imagePath.setText(selectedFile.getAbsolutePath());
+
+        }
+    }
 
     @FXML
     private Label helloTitleLabel;
@@ -146,11 +178,13 @@ public class updateMenuPageController {
         String Name = addMealName.getText().trim();
         String Description = mealDescription.getText().trim();
         String Preferences = mealPreferences.getText().trim();
-        String Image = imagePath.getText().trim();
+        //String Image = imagePath.getText().trim();
         String selectedCategory = mealCategoryCombo.getValue();  // ComboBox instead of TextField
+        String inputImagePath = imagePath.getText().trim();
+
 
         if (Name.isEmpty() || Description.isEmpty() || Preferences.isEmpty() ||
-                Image.isEmpty() || selectedCategory == null || mealPrice.getText().isEmpty()) {
+                inputImagePath.isEmpty() || selectedCategory == null || mealPrice.getText().isEmpty()) {
             showAlert("All fields must be filled to add a meal!");
             return;
         }
@@ -181,10 +215,30 @@ public class updateMenuPageController {
             case "All" -> "shared meal";
             default -> "";
         };
+// Path to meals folder inside your project
+        File destinationDir = new File("C:\\Users\\97254\\IdeaProjects\\TheKitchenOf-YourMother-m3lama\\client\\src\\main\\resources\\il\\cshaifasweng\\OCSFMediatorExample\\client\\meals");
+        if (!destinationDir.exists()) {
+            destinationDir.mkdirs();
+        }
+
+        File sourceFile = new File(inputImagePath);
+        if (!sourceFile.exists()) {
+            System.out.println("Image file does not exist at: " + inputImagePath);
+            return;
+        }
+
+        // Only use the file name, not full path
+        String imageFileName = sourceFile.getName();
+        File destinationFile = new File(destinationDir, imageFileName);
+
 
         try {
+            // Copy the image to your project meals folder
+            Files.copy(sourceFile.toPath(), destinationFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("Image copied to: " + destinationFile.getAbsolutePath());
+            imageFileName = "/il/cshaifasweng/OCSFMediatorExample/client/meals/" + imageFileName;
             String messageToSend = String.format("Add Meal \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",
-                    Name, Description, Preferences, Price, Image, Category);
+                    Name, Description, Preferences, Price, imageFileName, Category);
             Client.getClient().sendToServer(messageToSend);
         } catch (Exception e) {
             e.printStackTrace();
@@ -276,7 +330,7 @@ public class updateMenuPageController {
                             break;
                     }
 
-                    oldCategory.setText(displayCategory);
+                    fromCategoryField.setText(displayCategory);
 
                     toCategoryCombo.getItems().setAll(
                             allCategories.stream()

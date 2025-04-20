@@ -20,7 +20,7 @@ import javafx.scene.text.Text;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.CheckBox;
 
-
+import java.io.File;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
@@ -250,16 +250,28 @@ public class MenuController {
             @Override
             protected void updateItem(String imagePath, boolean empty) {
                 super.updateItem(imagePath, empty);
-                if (empty || imagePath == null) {
+                if (empty || imagePath == null || imagePath.isEmpty()) {
                     setGraphic(null);
                 } else {
                     imageView.setFitHeight(50);
                     imageView.setFitWidth(50);
+
+                    Image image = null;
+
                     try {
-                        imageView.setImage(new Image(String.valueOf(PrimaryController.class.getResource(imagePath))));
+                        // Try loading from file system (real-time image after adding)
+                        File diskImage = new File(System.getProperty("user.dir") + "/src/main/resources" + imagePath);
+                        if (diskImage.exists()) {
+                            image = new Image(diskImage.toURI().toString());
+                        } else {
+                            // Fallback to resource if not found on disk (for built-in meals)
+                            image = new Image(String.valueOf(PrimaryController.class.getResource(imagePath)));
+                        }
                     } catch (Exception e) {
-                        imageView.setImage(null);
+                        System.out.println("Failed to load image for: " + imagePath);
                     }
+
+                    imageView.setImage(image);
                     setGraphic(imageView);
                 }
             }
