@@ -2,6 +2,7 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
 
@@ -87,6 +88,29 @@ public class Client extends AbstractClient {
         } else if (msg instanceof Reservation) {
             EventBus.getDefault().post(msg);
         }
-
+        else if (msg instanceof String) {
+            String strMsg = (String) msg;
+            if (strMsg.equals("Reservation failed: ID already used.")) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Reservation Failed");
+                    alert.setHeaderText(null);
+                    alert.setContentText("A reservation already exists for this ID.");
+                    alert.showAndWait();
+                });
+            }
+        else if (msg.equals("Reservation saved successfully")) {
+            Platform.runLater(() -> {
+                // Alert success and redirect to Main Page
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText(null);
+                alert.setContentText("Your reservation has been saved successfully.");
+                alert.showAndWait();
+                App.switchScreen("Main Page");
+            });
+        }
     }
+}
+
 }

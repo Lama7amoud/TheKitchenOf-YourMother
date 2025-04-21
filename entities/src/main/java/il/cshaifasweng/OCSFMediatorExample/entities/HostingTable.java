@@ -15,7 +15,7 @@ public class HostingTable implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     private int tableNumber;
     private int seatsNumber;

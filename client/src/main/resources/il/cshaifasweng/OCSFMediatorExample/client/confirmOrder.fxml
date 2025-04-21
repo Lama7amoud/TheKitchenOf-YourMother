@@ -38,7 +38,7 @@
         <AnchorPane prefWidth="470.0" BorderPane.alignment="CENTER">
             <children>
 
-                <Label layoutX="56.0" layoutY="14.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="We are almost there!" textFill="ORANGE">
+                <Label layoutX="141.0" layoutY="15.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="We are almost there!" textFill="ORANGE">
                     <font>
                         <Font size="20.0" />
                     </font>
@@ -46,7 +46,7 @@
 
                 <!-- SINGLE COMBOBOX -->
                 <Label layoutX="30.0" layoutY="60.0" text="Select Time:" />
-                <ComboBox fx:id="AvailableTimeBox" layoutX="120.0" layoutY="56.0" prefWidth="288.0" promptText="Please select one of below options" style="-fx-background-color: #FDF8E2; -fx-background-radius: 5em;" visibleRowCount="1" />
+                <ComboBox fx:id="AvailableTimeBox" layoutX="120.0" layoutY="56.0" prefWidth="288.0" promptText="Please select one of below options" style="-fx-background-color: #FDF8E2; -fx-background-radius: 5em;" visibleRowCount="10" />
 
                 <!-- User Info Labels and Fields -->
                 <Label alignment="CENTER" layoutX="78.0" layoutY="128.0" prefWidth="314.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Please enter your info's for Reservation:" textAlignment="CENTER" textFill="#151515" />
@@ -77,6 +77,11 @@
                 <Label fx:id="sittingTypeLabel" layoutX="50.0" layoutY="70.0" text="Sitting:" visible="false" />
                 <Label fx:id="guestCountLabel" layoutX="50.0" layoutY="110.0" text="Guests:" visible="false" />
                 <Label fx:id="notesLabel" layoutX="50.0" layoutY="150.0" text="Note:" visible="false" />
+            <Label fx:id="nameLabel" layoutX="320.0" layoutY="160.0" text="Please enter your full name" textFill="#ec290f" />
+            <Label fx:id="phoneLabel" layoutX="332.0" layoutY="197.0" text="Invalid Phone Number" textFill="#ec290f" />
+            <Label fx:id="idLabel" layoutX="361.0" layoutY="237.0" text="Invalid ID" textFill="#ec290f" />
+            <Label fx:id="addressLabel" layoutX="346.0" layoutY="272.0" text="Invalid Address" textFill="#ec290f" />
+            <Label fx:id="errorTimeLabel" layoutX="120.0" layoutY="88.0" text="Sorry! there is no available time at your preferred time, &#10;here is an alternative times" textFill="#ec290f" />
 
             </children>
         </AnchorPane>

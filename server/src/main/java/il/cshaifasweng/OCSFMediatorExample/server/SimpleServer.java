@@ -22,176 +22,153 @@ public class SimpleServer extends AbstractServer {
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		try {
-			// Check if msg is a String command like "save_reservation"
 			if (msg instanceof String) {
 				String command = (String) msg;
 
 				if (command.equals("save_reservation")) {
-					// Set a flag or state that the next Reservation object should be saved
-					client.setInfo("save_reservation", true); // Store flag on the client
+					client.setInfo("save_reservation", true);
 					return;
 				}
 
-				// Handle other string commands...
+				if (command.startsWith("check_reservation_id;")) {
+					String idToCheck = command.split(";")[1].trim();
+					boolean exists = DataManager.checkIfIdHasReservation(idToCheck);
+					try {
+						client.sendToClient("id_exists:" + exists);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					return;
+				}
+
+				if (command.startsWith("add client")) {
+					SubscribedClient connection = new SubscribedClient(client);
+					SubscribersList.add(connection);
+					try {
+						client.sendToClient("client added successfully");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					return;
+				}
+
+				if (command.startsWith("logIn:")) {
+					AuthorizedUser currentUser = DataManager.checkPermission(command);
+					try {
+						client.sendToClient(currentUser);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					return;
+				}
+
+				if (command.startsWith("Get branch details")) {
+					try {
+						int index = command.indexOf(";");
+						String restaurantId = command.substring(index + 1).trim();
+						Restaurant restaurant = DataManager.getRestaurant(restaurantId);
+						if (restaurant != null) {
+							client.sendToClient(restaurant);
+						} else {
+							client.sendToClient("No available restaurant details");
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					return;
+				}
+
+				if (command.equals("Request menu")) {
+					try {
+						List<Meal> menu = DataManager.requestMenu();
+						client.sendToClient(menu != null && !menu.isEmpty() ? menu : "No menu available");
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					return;
+				}
+
+				if (command.startsWith("Update price")) {
+					String details = command.substring("Update price".length()).trim();
+					String[] parts = details.split("\"");
+					String mealName = parts[1];
+					double mealPrice = Double.parseDouble(parts[3].trim());
+
+					try {
+						if (DataManager.updateMealPrice(mealName, mealPrice) != 1) {
+							client.sendToClient(mealName + " price update has failed");
+						} else {
+							client.sendToClient(mealName + " price has updated successfully");
+							List<Meal> menu = DataManager.requestMenu();
+							if (menu != null && !menu.isEmpty()) {
+								sendToAllClients(menu);
+							}
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+						try {
+							client.sendToClient(mealName + " price update has failed");
+						} catch (IOException ioException) {
+							ioException.printStackTrace();
+						}
+					}
+					return;
+				}
+
+				if (command.startsWith("remove client")) {
+					String username = command.split(";")[1].trim();
+					if (!username.equals("Customer")) {
+						DataManager.disconnectUser(username);
+					}
+					SubscribersList.removeIf(sub -> sub.getClient().equals(client));
+					return;
+				}
+
+				if (command.startsWith("log out")) {
+					String username = command.split(";")[1].trim();
+					DataManager.disconnectUser(username);
+					return;
+				}
+
+				if (command.startsWith("#warning")) {
+					Warning warning = new Warning("Warning from server!");
+					try {
+						client.sendToClient(warning);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					return;
+				}
+
+				System.out.println("The server didn't recognize this " + command + " signal");
 			}
 
-			// Check if msg is a Reservation object
 			if (msg instanceof Reservation) {
 				Reservation reservation = (Reservation) msg;
 
-				// Check if we were expecting to save the reservation
 				Object saveFlag = client.getInfo("save_reservation");
 				if (saveFlag != null && (boolean) saveFlag) {
 					System.out.println("Saving reservation to DB...");
-					DataManager.saveReservation(reservation);
-					client.setInfo("save_reservation", false); // Reset flag
-					client.sendToClient("Reservation saved successfully");
-					return;
-				}
+					boolean exists = DataManager.checkIfIdHasReservation(reservation.getIdNumber());
+					if (exists) {
+						client.sendToClient("Reservation failed: ID already used.");
+					} else {
+						DataManager.saveReservation(reservation);
+						client.sendToClient("Reservation saved successfully");
+					}
+					client.setInfo("save_reservation", false);
 
-				// Otherwise, just return available tables
-				System.out.println("Checking availability for reservation...");
-				List<HostingTable> availability = DataManager.getAvailableTables(reservation);
-				System.out.println("Available tables: " + availability.size());
-				client.sendToClient(availability);
-				return;
+				} else {
+					System.out.println("Checking availability for reservation...");
+					List<HostingTable> availability = DataManager.getAvailableTables(reservation);
+					System.out.println("Available tables: " + availability.size());
+					client.sendToClient(availability);
+				}
 			}
 
-			// Continue with other commands...
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		String msgString = msg.toString();
-		System.out.println(msgString);
-		if (msgString.startsWith("#warning")) {
-			Warning warning = new Warning("Warning from server!");
-			try {
-				client.sendToClient(warning);
-				System.out.format("Sent warning to client %s\n", client.getInetAddress().getHostAddress());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		else if(msgString.startsWith("add client")){
-			SubscribedClient connection = new SubscribedClient(client);
-			SubscribersList.add(connection);
-			try {
-				client.sendToClient("client added successfully");
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		else if(msgString.startsWith("logIn:")){
-			AuthorizedUser currentUser = DataManager.checkPermission(msgString);
-			try {
-				System.out.println(currentUser.getMessageToServer());
-				client.sendToClient(currentUser);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		else if(msgString.startsWith("Get branch details")){
-			try {
-				int index = msgString.indexOf(";");
-				String restaurantId = msgString.substring(index + 1).trim();
-//				RestaurantsService.getRestaurantById(id);
-//				RestaurantsService.getRestaurantByName(id);
-				Restaurant restaurant = DataManager.getRestaurant(restaurantId);
-				if(restaurant != null) {
-					client.sendToClient(restaurant);
-				}
-				else{
-					System.out.println("Restaurant not found");
-					client.sendToClient("No available restaurant details");
-				}
-			}
-			catch (Exception exception){
-				exception.printStackTrace();
-			}
-		}
-		else if (msgString.equals("Request menu")) {
-			try {
-				List<Meal> menu = DataManager.requestMenu();
-				if(menu != null && !menu.isEmpty()) {
-					client.sendToClient(menu);
-				}
-				else{
-					System.out.println("empty menu");
-					client.sendToClient("No menu available");
-				}
-			} catch (Exception exception){
-				exception.printStackTrace();
-			}
-
-		}
-
-		else if (msgString.startsWith("Update price")) {
-			// Remove the "Update price" prefix
-			String details = msgString.substring("Update price".length()).trim();
-
-			// Assuming meal name and price are enclosed in double quotes!
-			String[] parts = details.split("\"");
-
-			// Extract meal name (inside the first quotes) and meal price (inside the second quotes)
-			// Remember that parts[] now looks like this: ["","meal name","","meal price"]
-			String mealName = parts[1];
-			double mealPrice = Double.parseDouble(parts[3].trim());
-
-			try {
-				// Call the DataManager function to update the meal price
-				if(DataManager.updateMealPrice(mealName, mealPrice) != 1){
-					System.out.println("Update meal failed");
-					client.sendToClient(mealName + " price update has failed");
-				}
-				else {
-					client.sendToClient(mealName + " price has updated successfully");
-					try {
-						List<Meal> menu = DataManager.requestMenu();
-						if(menu != null && !menu.isEmpty()) {
-							sendToAllClients(menu); // update to all clients
-						}
-						else{
-							System.out.println("empty menu");
-							client.sendToClient("No menu available");
-						}
-					} catch (Exception exception){
-						exception.printStackTrace();
-					}
-					System.out.println("price has updated successfully");
-
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				try {
-					client.sendToClient(mealName + " price update has failed");
-				} catch (IOException ioException) {
-					ioException.printStackTrace();
-				}
-			}
-		} else if (msgString.startsWith("remove client")) {
-			int index = msgString.indexOf(";");
-			String username = msgString.substring(index + 1).trim();
-			if(!(username.equals("Customer"))){
-				DataManager.disconnectUser(username);
-			}
-			if(!SubscribersList.isEmpty()){
-				for (SubscribedClient subscribedClient : SubscribersList) {
-					if (subscribedClient.getClient().equals(client)) {
-						SubscribersList.remove(subscribedClient);
-						break;
-					}
-				}
-			}
-
-		} else if(msgString.startsWith("log out")){
-			int index = msgString.indexOf(";");
-			String username = msgString.substring(index + 1).trim();
-			DataManager.disconnectUser(username);
-		}
-		else  {
-			System.out.println("The server didn't recognize this " + msgString + " signal");
-		}
-
 	}
 
 	public void sendToAllClients(Object message) {

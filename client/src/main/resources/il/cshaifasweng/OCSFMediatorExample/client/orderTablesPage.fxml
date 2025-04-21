@@ -36,7 +36,7 @@
          <children>
             <Pane layoutX="32.0" layoutY="109.0" prefHeight="75.0" prefWidth="304.0" style="-fx-background-color: #D6D8E0; -fx-background-radius: 5em;">
                <children>
-                  <ComboBox fx:id="PrefferedTimeBox" layoutX="23.0" layoutY="38.0" prefHeight="25.0" prefWidth="260.0" promptText="choose preferred time" style="-fx-background-color: #FDF8E2; -fx-background-radius: 5em;" visibleRowCount="1" />
+                  <ComboBox fx:id="PrefferedTimeBox" layoutX="23.0" layoutY="38.0" prefHeight="25.0" prefWidth="260.0" promptText="choose preferred time" style="-fx-background-color: #FDF8E2; -fx-background-radius: 5em;" visibleRowCount="10" />
                   <Label alignment="CENTER" layoutX="22.0" layoutY="8.0" prefHeight="30.0" prefWidth="261.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Available Times" textFill="ORANGE">
                      <font>
                         <Font size="20.0" />

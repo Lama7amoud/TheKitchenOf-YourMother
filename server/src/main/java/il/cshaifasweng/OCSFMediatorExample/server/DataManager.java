@@ -2,14 +2,11 @@ package il.cshaifasweng.OCSFMediatorExample.server;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.Reservation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
-import java.util.Scanner;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,6 +16,7 @@ import il.cshaifasweng.OCSFMediatorExample.entities.HostingTable;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
 import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
 import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
+import il.cshaifasweng.OCSFMediatorExample.entities.ReservedTime;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -27,6 +25,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 
 public class DataManager {
@@ -37,14 +36,18 @@ public class DataManager {
 
     private static SessionFactory getSessionFactory(String password) throws HibernateException {
 
+
         Configuration configuration = new Configuration();
         // Override the password
         configuration.setProperty("hibernate.connection.password", password);
+        configuration.setProperty("hibernate.hbm2ddl.auto", "update");
         configuration.addAnnotatedClass(Meal.class);
         configuration.addAnnotatedClass(AuthorizedUser.class);
         configuration.addAnnotatedClass(Restaurant.class);
         configuration.addAnnotatedClass(HostingTable.class);
         configuration.addAnnotatedClass(Reservation.class);
+        configuration.addAnnotatedClass(ReservedTime.class);
+
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         return configuration.buildSessionFactory(serviceRegistry);
     }
@@ -85,7 +88,7 @@ public class DataManager {
         restaurant3.setLocation("Nahariya");
         restaurant3.setPhoneNumber("555-123-4567");
         restaurant3.setOpeningTime(11.00);  // 11:00 AM
-        restaurant3.setClosingTime(24.00);  // 12:00 AM (midnight)
+        restaurant3.setClosingTime(23.00);  // 11:00 PM
         restaurant3.setHolidays("Monday");
 
 
@@ -391,10 +394,7 @@ public class DataManager {
         }
     }
 
-    //TODO: implement
-//    static Restaurant getRestaurantByName(String restaurantName) {
-//
-//    }
+
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -456,82 +456,135 @@ public class DataManager {
         session.beginTransaction();
 
         try {
+            // Do not save if ID already exists
+            boolean exists = checkIfIdHasReservation(reservation.getIdNumber());
+            if (exists) {
+                System.out.println("Reservation ID already exists. Skipping save.");
+                session.getTransaction().rollback();
+                return;
+            }
+
+            // Save the reservation FIRST to assign its ID
+            session.save(reservation);
+
+            // Save ReservedTime instances using the now-persistent reservation
             if (reservation.getReservedTables() != null) {
+                LocalDateTime startTime = reservation.getReservationTime();
                 for (HostingTable table : reservation.getReservedTables()) {
-                    session.update(table);
+                    ReservedTime rt = new ReservedTime(table, startTime, reservation);
+                    session.save(rt);
                 }
             }
 
-            session.save(reservation);
             session.getTransaction().commit();
+            System.out.println(">>> Reservation and reserved times committed");
+
         } catch (Exception e) {
             session.getTransaction().rollback();
+            System.err.println(">>> Error during reservation save:");
             e.printStackTrace();
         } finally {
             session.close();
         }
     }
 
+
+
+
     public static List<HostingTable> getAvailableTables(Reservation reservation) {
         SessionFactory sessionFactory = getSessionFactory(password);
-        session = sessionFactory.openSession();
+        Session session = sessionFactory.openSession();
         session.beginTransaction();
 
         List<HostingTable> availableTables = new ArrayList<>();
 
-        try {
-            // Get the Restaurant object from the ID
-            Restaurant restaurant = session.get(Restaurant.class, reservation.getRestaurantId());
+        if (reservation.getSittingType() == null) {
+            System.err.println("Sitting type is null in reservation!");
+            return new ArrayList<>();
+        }
 
-            // 1. Get all hosting tables for the restaurant
+        try {
+            Restaurant restaurant = reservation.getRestaurant();
+            LocalDateTime requestedTime = reservation.getReservationTime();
+            LocalDateTime requestedEnd = requestedTime.plusMinutes(60);
+
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<HostingTable> tableQuery = cb.createQuery(HostingTable.class);
             Root<HostingTable> tableRoot = tableQuery.from(HostingTable.class);
-            tableQuery.select(tableRoot).where(cb.equal(tableRoot.get("restaurant").get("id"), reservation.getRestaurantId()));
-
+            tableQuery.select(tableRoot).where(
+                    cb.equal(tableRoot.get("restaurant").get("id"), restaurant.getId())
+            );
 
             List<HostingTable> allTables = session.createQuery(tableQuery).getResultList();
 
-            LocalDate date = reservation.getDate(); // e.g., 2025-04-06
-            LocalTime time = LocalTime.parse(reservation.getTimeSlot()); // e.g., "12:00"
-            LocalDateTime requestedStart = LocalDateTime.of(date, time);
+            boolean wantInside = reservation.getSittingType().equalsIgnoreCase("Inside");
+            allTables = allTables.stream()
+                    .filter(table -> table.isInside() == wantInside)
+                    .collect(Collectors.toList());
+            // Step 1: Fetch all ReservedTimes for the given restaurant
+            CriteriaQuery<ReservedTime> reservedQuery = cb.createQuery(ReservedTime.class);
+            Root<ReservedTime> reservedRoot = reservedQuery.from(ReservedTime.class);
+            reservedQuery.select(reservedRoot).where(
+                    cb.equal(reservedRoot.get("table").get("restaurant").get("id"), restaurant.getId())
+            );
 
-            // 2. Filter tables based on reservedTimes overlap
-            /*LocalDateTime requestedStart = LocalDateTime.parse(reservation.getTimeSlot());*/
-
-            LocalDateTime requestedEnd = requestedStart.plusMinutes(90);
+            List<ReservedTime> reservedList = session.createQuery(reservedQuery).getResultList();
 
             for (HostingTable table : allTables) {
                 boolean isAvailable = true;
+                for (ReservedTime rt : reservedList) {
+                    if (rt.getTable() == null || !Objects.equals(rt.getTable().getId(), table.getId())) continue;
 
-                List<LocalDateTime> reservedTimes = table.getReservedTimes();
-                if (reservedTimes != null) {
-                    for (LocalDateTime reservedStart : reservedTimes) {
-                        LocalDateTime reservedEnd = reservedStart.plusMinutes(90);
-                        boolean overlaps = requestedStart.isBefore(reservedEnd) && reservedStart.isBefore(requestedEnd);
-                        if (overlaps) {
-                            isAvailable = false;
-                            break;
-                        }
+                    LocalDateTime reservedStart = rt.getReservedTime();
+                    LocalDateTime blockStart = reservedStart.minusMinutes(60); // block 1 hour before
+                    LocalDateTime blockEnd = reservedStart.plusMinutes(60);    // block 1 hour after
+
+
+                    if (requestedTime.isBefore(blockEnd) && blockStart.isBefore(requestedEnd)) {
+                        isAvailable = false;
+                        break;
                     }
                 }
 
                 if (isAvailable) {
+                    table.getReservedTimes().size(); // force initialize
                     availableTables.add(table);
                 }
             }
 
+
+            session.getTransaction().commit();
             return availableTables;
 
         } catch (Exception e) {
             e.printStackTrace();
+            if (session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
             return availableTables;
         } finally {
             session.close();
         }
     }
+    public static boolean checkIfIdHasReservation(String idNumber) {
+        SessionFactory sessionFactory = getSessionFactory(password);
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
 
+        try {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Long> query = cb.createQuery(Long.class);
+            Root<Reservation> root = query.from(Reservation.class);
+            query.select(cb.count(root)).where(cb.equal(root.get("idNumber"), idNumber));
 
+            Long count = session.createQuery(query).getSingleResult();
+            return count > 0;
 
-
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
+    }
 }

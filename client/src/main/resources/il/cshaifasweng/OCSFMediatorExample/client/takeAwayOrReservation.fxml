@@ -15,14 +15,13 @@
                     <Font size="25.0" />
                 </font>
             </Label>
-            <Button fx:id="backButton" alignment="CENTER" layoutX="56.0" layoutY="351.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Back To Main Page" textFill="WHITE" />
+            <Button fx:id="backButton" alignment="CENTER" layoutX="56.0" layoutY="351.0" mnemonicParsing="false" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Back To Main Page" textFill="WHITE" />
             <Label fx:id="branchNameLabel" layoutX="38.0" layoutY="77.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Branch Name" textFill="ORANGE">
                 <font>
                     <Font size="25.0" />
                 </font>
             </Label>
-            <Button fx:id="viewMapButton" alignment="CENTER" layoutX="8.0" layoutY="174.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="View tables availability in the map" textAlignment="CENTER" textFill="WHITE" />
-            <Button fx:id="branchDetailsButton" alignment="CENTER" layoutX="56.0" layoutY="315.0" mnemonicParsing="false" onAction="#switchPage" prefHeight="26.0" prefWidth="124.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="See Branch Details" textAlignment="CENTER" textFill="WHITE" />
+            <Button fx:id="branchDetailsButton" alignment="CENTER" layoutX="56.0" layoutY="315.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="124.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="See Branch Details" textAlignment="CENTER" textFill="WHITE" />
         </children>
     </AnchorPane>
 </left>
@@ -34,7 +33,7 @@
                   <Font size="20.0" />
                </font>
             </Button>
-            <Button fx:id="takeAwayButton" alignment="CENTER" layoutX="96.0" layoutY="218.0" mnemonicParsing="false"  onAction="#goToMenu" prefHeight="71.0" prefWidth="171.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Take Away" textAlignment="CENTER" textFill="WHITE">
+            <Button fx:id="takeAwayButton" alignment="CENTER" layoutX="96.0" layoutY="218.0" mnemonicParsing="false" prefHeight="71.0" prefWidth="171.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Take Away" textAlignment="CENTER" textFill="WHITE">
                <font>
                   <Font size="20.0" />
                </font>

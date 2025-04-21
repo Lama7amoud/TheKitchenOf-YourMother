@@ -16,6 +16,8 @@
 
     import java.time.DayOfWeek;
     import java.time.LocalDate;
+    import java.time.LocalTime;
+    import java.time.format.DateTimeFormatter;
     import java.util.*;
     import java.util.stream.Collectors;
 
@@ -130,7 +132,8 @@
             outsideButton.setStyle("-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;");
             checkFormCompletion();
 
-            Reservation.getReservation().setSittingType("Inside");
+            OrderData.getInstance().setSittingType("Inside");
+
         }
 
 
@@ -143,7 +146,8 @@
             insideButton.setStyle("-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;");
             checkFormCompletion();
 
-            Reservation.getReservation().setSittingType("Outside");
+            OrderData.getInstance().setSittingType("Outside");
+
         }
 
         // Handle restaurant object from server
@@ -153,6 +157,11 @@
                 this.selectedRestaurant = restaurant;
 
                 branchNameLabel.setText(restaurant.getName());
+
+                OrderData.getInstance().setSelectedRestaurant(restaurant);
+
+                // Set restaurant globally for next page
+                Client.getClientAttributes().setRestaurant(restaurant);
 
                 setUpHolidayFilter(restaurant.getHolidays());
             });
@@ -190,15 +199,49 @@
             double close = restaurant.getClosingTime();
 
             LocalDate selectedDate = datePicker.getValue();
-            int startHour = selectedDate.equals(LocalDate.now())
-                    ? Math.max((int) open, java.time.LocalTime.now().getHour())
-                    : (int) open;
+            LocalTime now = LocalTime.now();
 
-            for (int hour = startHour; hour < close; hour++) {
-                availableTimes.add(String.format("%02d:00", hour));
-                availableTimes.add(String.format("%02d:30", hour));
+            // Convert open/close to LocalTime
+            LocalTime openingTime = LocalTime.of((int) open, (int) ((open - (int) open) * 60));
+            int closingHour = (int) close;
+            int closingMinute = (int) ((close - closingHour) * 60);
+            if (closingHour >= 24) {
+                closingHour = 23;
+                closingMinute = 59;
+            }
+            LocalTime closingTime = LocalTime.of(closingHour, closingMinute);
+            LocalTime latestStartTime = closingTime.minusMinutes(90);  // 90 mins = 1.5 hours
+
+            // Determine startTime
+            LocalTime startTime;
+            if (selectedDate.equals(LocalDate.now())) {
+                // Round to next 15-minute slot
+                int minute = now.getMinute();
+                int nextQuarter = ((minute + 14) / 15) * 15;
+                if (nextQuarter == 60) {
+                    now = now.plusHours(1).withMinute(0);
+                } else {
+                    now = now.withMinute(nextQuarter).withSecond(0).withNano(0);
+                }
+
+                // Ensure not before opening time
+                startTime = now.isBefore(openingTime) ? openingTime : now;
+            } else {
+                // For future dates, start at opening time
+                startTime = openingTime;
+            }
+
+            // Generate slots from startTime to latestStartTime (inclusive)
+            for (LocalTime time = startTime; !time.isAfter(latestStartTime); time = time.plusMinutes(15)) {
+                availableTimes.add(time.format(DateTimeFormatter.ofPattern("HH:mm")));
             }
 
             PrefferedTimeBox.setItems(availableTimes);
+            PrefferedTimeBox.setVisibleRowCount(Math.min(availableTimes.size(), 10));
         }
+
+
+
+
+
     }

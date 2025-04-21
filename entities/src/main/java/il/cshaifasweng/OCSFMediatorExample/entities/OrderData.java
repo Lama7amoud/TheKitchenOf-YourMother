@@ -12,6 +12,8 @@ public class OrderData {
     private int guestCount;
     private String generalNote;
     private LocalDate date;
+    private Restaurant selectedRestaurant;
+
 
 
     // Additional future fields (optional)
@@ -91,4 +93,13 @@ public class OrderData {
                 ", generalNote='" + generalNote + '\'' +
                 '}';
     }
+
+    public Restaurant getSelectedRestaurant() {
+        return selectedRestaurant;
+    }
+
+    public void setSelectedRestaurant(Restaurant selectedRestaurant) {
+        this.selectedRestaurant = selectedRestaurant;
+    }
+
 }
