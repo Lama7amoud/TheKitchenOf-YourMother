@@ -24,11 +24,6 @@
                <Font size="16.0" />
             </font>
          </Button>
-         <Button fx:id="cancelOrderButton" layoutX="51.0" layoutY="89.0" onAction="#switchPage" prefHeight="37.0" prefWidth="133.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Personal Area" textFill="WHITE">
-            <font>
-               <Font size="16.0" />
-            </font>
-         </Button>
       </children>
    </AnchorPane>
    <Text fill="ORANGE" layoutX="257.0" layoutY="123.0" style="-fx-font-style: italic;" text="Good food, warm hearts, and the love of mom in every bite" wrappingWidth="391.8937988281252">

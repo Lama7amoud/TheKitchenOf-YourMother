@@ -16,13 +16,13 @@ public class Reservation implements Serializable {
     private String idNumber;
     private String address;
     private String phoneNumber;
-/*    private String timeSlot;
-    private LocalDate date;*/
     private int totalGuests;
     private String sittingType;
     private String visa;
     private LocalDateTime reservationTime;
     private boolean isPayed;
+    private LocalDateTime receivingTime;
+    private String status = "on";
 
     @ManyToOne
     private Restaurant restaurant;
@@ -31,6 +31,18 @@ public class Reservation implements Serializable {
     private List<HostingTable> reservedTables;
 
     public Reservation() {}
+
+
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    public LocalDateTime getReceivingTime() { return receivingTime; }
+    public void setReceivingTime(LocalDateTime receivingTime) { this.receivingTime = receivingTime; }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -46,11 +58,6 @@ public class Reservation implements Serializable {
 
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-/*
-    public String getTimeSlot() { return timeSlot; }
-    public void setTimeSlot(String timeSlot) { this.timeSlot = timeSlot; }
-    public LocalDate getDate() { return date; }
-    public void setDate(LocalDate date) { this.date = date; }*/
 
     public int getTotalGuests() { return totalGuests; }
     public void setTotalGuests(int totalGuests) { this.totalGuests = totalGuests; }

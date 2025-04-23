@@ -1,5 +1,5 @@
-
 package il.cshaifasweng.OCSFMediatorExample.client;
+
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -22,7 +22,6 @@ public class Client extends AbstractClient {
         this.port = port;
     }
 
-
     public static Client getClient() {
         if (client == null) {
             client = new Client(host, port);
@@ -42,54 +41,67 @@ public class Client extends AbstractClient {
         }
     }
 
-    public static void resetClientAttributes(){
+    public static void resetClientAttributes() {
         userAtt.resetAttributes();
     }
 
-    public static AuthorizedUser getClientAttributes(){
-        if (userAtt == null)
-        {
+    public static AuthorizedUser getClientAttributes() {
+        if (userAtt == null) {
             return userAtt = new AuthorizedUser();
         }
         return userAtt;
     }
 
-    public static String getClientUsername(){
-        if (userAtt.getUsername() != null)
-        {
+    public static String getClientUsername() {
+        if (userAtt.getUsername() != null) {
             return userAtt.getUsername();
         }
         return null;
     }
 
+
     @Override
     protected void handleMessageFromServer(Object msg) {
-        if(msg instanceof String) {
-            System.out.println(msg);
-            if(msg.equals("client added successfully")){
-                App.switchScreen("Log In Page");
-            }
-        } else if (msg instanceof Warning) {
-            // Handle warning message
-            EventBus.getDefault().post(new WarningEvent((Warning) msg));
-        } else if (msg instanceof List) {
-            List<Meal> menu = (List<Meal>) msg;
-            EventBus.getDefault().post(menu);
-        }
-        else if (msg instanceof AuthorizedUser) {
-            userAtt.copyUser((AuthorizedUser) msg);
-            System.out.println("response: " + userAtt.getMessageToServer());
-            String response = "Authorized user request:" + userAtt.getMessageToServer();
-            EventBus.getDefault().post(response);
-        }
-        else if (msg instanceof Restaurant) {
-            System.out.println("Restaurant " + ((Restaurant) msg).getId() + " has received to client side");
-            EventBus.getDefault().post(msg);
-        } else if (msg instanceof Reservation) {
-            EventBus.getDefault().post(msg);
-        }
-        else if (msg instanceof String) {
+        if (msg instanceof String) {
+
             String strMsg = (String) msg;
+
+            if (strMsg.equals("Reservation cancelled successfully")) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Cancelled");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Your reservation has been cancelled.");
+                    alert.showAndWait();
+                    App.switchScreen("Main Page");
+                });
+                return;
+            }
+
+            if (strMsg.equals("Cancellation failed: Reservation not found")) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Cancellation failed. Reservation not found.");
+                    alert.showAndWait();
+                });
+                return;
+            }
+            // ✅ Handle ID check response
+            if (strMsg.startsWith("id_exists:")) {
+                boolean exists = Boolean.parseBoolean(strMsg.split(":")[1].trim());
+                EventBus.getDefault().post(new IdCheckEvent(exists));
+                return;
+            }
+
+            System.out.println(strMsg); // Log any other message
+
+            if (strMsg.equals("client added successfully")) {
+                App.switchScreen("Log In Page");
+                return;
+            }
+
             if (strMsg.equals("Reservation failed: ID already used.")) {
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -98,19 +110,42 @@ public class Client extends AbstractClient {
                     alert.setContentText("A reservation already exists for this ID.");
                     alert.showAndWait();
                 });
+                return;
             }
-        else if (msg.equals("Reservation saved successfully")) {
-            Platform.runLater(() -> {
-                // Alert success and redirect to Main Page
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Success");
-                alert.setHeaderText(null);
-                alert.setContentText("Your reservation has been saved successfully.");
-                alert.showAndWait();
-                App.switchScreen("Main Page");
-            });
+
+            if (strMsg.equals("Reservation saved successfully")) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Success");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Your reservation has been saved successfully.");
+                    alert.showAndWait();
+                    App.switchScreen("Main Page");
+                });
+                return;
+            }
+        }
+
+
+        // Handle other object types
+        if (msg instanceof Warning) {
+            EventBus.getDefault().post(new WarningEvent((Warning) msg));
+        } else if (msg instanceof List) {
+            List<?> list = (List<?>) msg;
+            if (!list.isEmpty() && list.get(0) instanceof Meal) {
+                EventBus.getDefault().post((List<Meal>) list);
+            } else if (!list.isEmpty() && list.get(0) instanceof HostingTable) {
+                EventBus.getDefault().post((List<HostingTable>) list);
+            }
+        } else if (msg instanceof AuthorizedUser) {
+            userAtt.copyUser((AuthorizedUser) msg);
+            String response = "Authorized user request:" + userAtt.getMessageToServer();
+            EventBus.getDefault().post(response);
+        } else if (msg instanceof Restaurant) {
+            System.out.println("Restaurant " + ((Restaurant) msg).getId() + " has received to client side");
+            EventBus.getDefault().post(msg);
+        } else if (msg instanceof Reservation) {
+            EventBus.getDefault().post(msg);
         }
     }
-}
-
 }

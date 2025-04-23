@@ -3,10 +3,7 @@ package il.cshaifasweng.OCSFMediatorExample.server;
 import il.cshaifasweng.OCSFMediatorExample.entities.Reservation;
 
 import java.util.*;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -488,9 +485,6 @@ public class DataManager {
         }
     }
 
-
-
-
     public static List<HostingTable> getAvailableTables(Reservation reservation) {
         SessionFactory sessionFactory = getSessionFactory(password);
         Session session = sessionFactory.openSession();
@@ -587,4 +581,47 @@ public class DataManager {
             session.close();
         }
     }
+
+    public static boolean cancelReservationById(String idNumber) {
+        SessionFactory sessionFactory = getSessionFactory(password);
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        try {
+            // Fetch the reservation
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Reservation> query = cb.createQuery(Reservation.class);
+            Root<Reservation> root = query.from(Reservation.class);
+            query.select(root).where(cb.equal(root.get("idNumber"), idNumber));
+
+            Reservation reservation = session.createQuery(query).uniqueResult();
+            if (reservation == null) {
+                session.getTransaction().rollback();
+                return false;
+            }
+
+            // Set status to "off"
+            reservation.setStatus("off");
+            session.update(reservation);
+
+            // Delete all related ReservedTime entries
+            CriteriaDelete<ReservedTime> deleteQuery = cb.createCriteriaDelete(ReservedTime.class);
+            Root<ReservedTime> rtRoot = deleteQuery.from(ReservedTime.class);
+            deleteQuery.where(cb.equal(rtRoot.get("reservation").get("id"), reservation.getId()));
+            session.createQuery(deleteQuery).executeUpdate();
+
+            session.getTransaction().commit();
+            return true;
+
+        } catch (Exception e) {
+            if (session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
+    }
+
 }

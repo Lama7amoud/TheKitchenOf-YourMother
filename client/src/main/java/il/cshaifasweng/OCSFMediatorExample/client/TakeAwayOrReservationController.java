@@ -1,10 +1,13 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.scene.control.Button;
 
@@ -12,6 +15,8 @@ import java.io.IOException;
 
 public class TakeAwayOrReservationController {
 
+    @FXML
+    private TextField IDtextField;
     private Stage stage;
     private Scene scene;
     private Parent root;
@@ -55,6 +60,18 @@ public class TakeAwayOrReservationController {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
+        }
+    }
+
+    @FXML
+    public void handleCancelReservation(ActionEvent event) {
+        String id = IDtextField.getText().trim(); // Or wherever you store the reservation ID
+        if (id.matches("\\d{9}")) {
+            Client.getClient().sendToServer("cancel_reservation;" + id);
+        } else {
+            // Show validation alert
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid ID number.");
+            alert.showAndWait();
         }
     }
 

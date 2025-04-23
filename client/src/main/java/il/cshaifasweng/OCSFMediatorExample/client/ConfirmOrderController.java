@@ -1,9 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
-import il.cshaifasweng.OCSFMediatorExample.entities.HostingTable;
-import il.cshaifasweng.OCSFMediatorExample.entities.OrderData;
-import il.cshaifasweng.OCSFMediatorExample.entities.Reservation;
-import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
+import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -30,19 +27,16 @@ public class ConfirmOrderController {
     private ComboBox<String> AvailableTimeBox;
 
     @FXML
-    private Button ConfirmOrderButton;
+    private TextField addressField, idField, nameField, phoneField,visaTextField;
 
     @FXML
-    private TextField addressField, idField, nameField, phoneField;
+    private Button backToMainPageButton, backToOrderTablesButton, branchDetailsButton, viewMapButton, ConfirmOrderButton;
 
     @FXML
-    private Button backToMainPageButton, backToOrderTablesButton, branchDetailsButton, viewMapButton;
+    private Label guestCountLabel, notesLabel, preferredTimeLabel, sittingTypeLabel,visaLabel;
 
     @FXML
-    private Label guestCountLabel, notesLabel, preferredTimeLabel, sittingTypeLabel;
-
-    @FXML
-    private  Label phoneLabel,nameLabel,idLabel,addressLabel;
+    private  Label phoneLabel,nameLabel,idLabel,addressLabel,errorTimeLabel;
 
     private List<HostingTable> lastReceivedTables = new ArrayList<>();
 
@@ -79,6 +73,8 @@ public class ConfirmOrderController {
         phoneLabel.setVisible(false);
         idLabel.setVisible(false);
         addressLabel.setVisible(false);
+        visaLabel.setVisible(false);
+
 
         OrderData order = OrderData.getInstance();
 
@@ -86,18 +82,18 @@ public class ConfirmOrderController {
         sittingTypeLabel.setText(order.getSittingType());
         guestCountLabel.setText(String.valueOf(order.getGuestCount()));
         notesLabel.setText(order.getGeneralNote());
+
         Reservation tempReservation = new Reservation();
         tempReservation.setRestaurant(Client.getClientAttributes().getRestaurant());
 
-        // This reservation is just for availability checking. Use reservationTime:
+        // This reservation is just for availability checking
         String raw = order.getPreferredTime(); // e.g., "Inside - 20:30"
         String timePart = raw.contains(" - ") ? raw.split(" - ")[1].trim() : raw;
         LocalDateTime reservationTime = LocalDateTime.of(order.getDate(), LocalTime.parse(timePart));
         tempReservation.setReservationTime(reservationTime);
         tempReservation.setSittingType(order.getSittingType());
 
-        Client.getClient().sendToServer(tempReservation);
-
+        Client.getClient().sendToServer(new ReservationRequest(tempReservation, false));
 
         AvailableTimeBox.setOnAction(e -> {
             String selected = AvailableTimeBox.getValue();
@@ -108,6 +104,7 @@ public class ConfirmOrderController {
             }
         });
     }
+
 
     private List<HostingTable> findTablesForTime(String preferredTime) {
         LocalDateTime time = LocalDateTime.of(OrderData.getInstance().getDate(), LocalTime.parse(preferredTime));
@@ -134,48 +131,49 @@ public class ConfirmOrderController {
     void handleConfirmReservation() {
         boolean isValid = true;
 
-        // Hide all labels initially
+        // Hide all labels
         nameLabel.setVisible(false);
         phoneLabel.setVisible(false);
         idLabel.setVisible(false);
         addressLabel.setVisible(false);
+        visaLabel.setVisible(false);
 
         String name = nameField.getText().trim();
         String phone = phoneField.getText().trim();
         String id = idField.getText().trim();
         String address = addressField.getText().trim();
+        String visa = visaTextField.getText().trim();
 
-        // Name must have at least 2 parts and no digits
         if (name.split("\\s+").length < 2 || name.matches(".*\\d.*")) {
             nameLabel.setVisible(true);
             isValid = false;
         }
-
-        // Phone must be exactly 10 digits and start with "05"
         if (!phone.matches("^05\\d{8}$")) {
             phoneLabel.setVisible(true);
             isValid = false;
         }
-
-        // ID must be exactly 9 digits
         if (!id.matches("^\\d{9}$")) {
             idLabel.setVisible(true);
             isValid = false;
         }
-
-        // Address must not be empty
         if (address.isEmpty()) {
             addressLabel.setVisible(true);
             isValid = false;
         }
-
-        if (!isValid) {
-            return; // Don't proceed if any field is invalid
+        if (!visa.matches("^\\d{16}$")) {  // validation for 16 digits
+            visaLabel.setVisible(true);
+            isValid = false;
         }
 
-        currentFormData = new String[]{name, phone, id, address};
+
+        if (!isValid) return;
+
+        currentFormData = new String[]{name, phone, id, address, visa};
+
+
         Client.getClient().sendToServer("check_reservation_id;" + id);
-        // Proceed with reservation only if all inputs are valid
+
+        /*// Proceed with reservation only if all inputs are valid
         OrderData order = OrderData.getInstance();
 
 
@@ -197,14 +195,13 @@ public class ConfirmOrderController {
 
         reservation.setRestaurant(Client.getClientAttributes().getRestaurant());
         List<HostingTable> chosenTables = findTablesForTime(order.getPreferredTime());
-        reservation.setReservedTables(chosenTables);
+        reservation.setReservedTables(chosenTables);*/
     }
 
     @Subscribe
     public void onIdCheckResponse(IdCheckEvent event) {
         Platform.runLater(() -> {
             idAlreadyUsed = event.doesExist();
-
             if (idAlreadyUsed) {
                 idLabel.setText("This ID already has a reservation.");
                 idLabel.setVisible(true);
@@ -212,6 +209,7 @@ public class ConfirmOrderController {
             } else {
                 idLabel.setVisible(false);
                 idLabel.setManaged(false);
+                // Only now – proceed and send both save + reservation
                 proceedWithReservation();
             }
         });
@@ -221,10 +219,12 @@ public class ConfirmOrderController {
 
     private void proceedWithReservation() {
         if (currentFormData == null) return;
+
         String name = currentFormData[0];
         String phone = currentFormData[1];
         String id = currentFormData[2];
         String address = currentFormData[3];
+        String visa = currentFormData[4];
 
         OrderData order = OrderData.getInstance();
         String raw = order.getPreferredTime();
@@ -240,15 +240,16 @@ public class ConfirmOrderController {
         reservation.setSittingType(order.getSittingType());
         reservation.setTotalGuests(order.getGuestCount());
         reservation.setReservationTime(reservationDateTime);
-        reservation.setVisa("");
         reservation.setPayed(false);
+        reservation.setVisa(visa);  // Set the visa field instead of empty string
+        reservation.setReceivingTime(LocalDateTime.now());  // Set current time as receiving time
         reservation.setRestaurant(Client.getClientAttributes().getRestaurant());
 
         List<HostingTable> chosenTables = findTablesForTime(order.getPreferredTime());
         reservation.setReservedTables(chosenTables);
 
-        Client.getClient().sendToServer("save_reservation");
-        Client.getClient().sendToServer(reservation);
+        ReservationRequest request = new ReservationRequest(reservation, true);
+        Client.getClient().sendToServer(request);
     }
 
     @Subscribe
@@ -267,50 +268,47 @@ public class ConfirmOrderController {
             restaurant = OrderData.getInstance().getSelectedRestaurant();
         }
 
-        // Get restaurant closing time
+        // Calculate bounds
         int closingHour = (int) restaurant.getClosingTime();
         int closingMinutes = (int) ((restaurant.getClosingTime() - closingHour) * 60);
         LocalTime restaurantClosing = LocalTime.of(closingHour, closingMinutes);
+        LocalDateTime endOfDay = LocalDateTime.of(date, restaurantClosing).minusMinutes(RESERVATION_DURATION_MINUTES);
 
-        // Calculate time bounds
-        LocalDateTime latestAllowedEnd = LocalDateTime.of(date, restaurantClosing).minusMinutes(RESERVATION_DURATION_MINUTES);
-        LocalDateTime maxSlotEnd = start.plusMinutes(RESERVATION_DURATION_MINUTES);
-        LocalDateTime end = maxSlotEnd.isBefore(latestAllowedEnd) ? maxSlotEnd : latestAllowedEnd;
-
+        this.lastReceivedTables = availableTables;
         List<String> timeSlots = new ArrayList<>();
 
-        for (LocalDateTime slot = start; !slot.isAfter(end); slot = slot.plusMinutes(15)) {
-            LocalDateTime currentSlot = slot;
-            List<HostingTable> suitableTables = availableTables.stream()
-                    .filter(table -> table.isInside() == sittingType.equalsIgnoreCase("Inside"))
-                    .filter(table -> isTableAvailable(table, currentSlot))
-                    .collect(Collectors.toList());
-
-            List<List<HostingTable>> combinations = new ArrayList<>();
-            findOptimalCombinations(suitableTables, 0,
-                    new ArrayList<>(), 0, requiredSeats, combinations);
-
-            if (!combinations.isEmpty()) {
-                String formattedTime = currentSlot.toLocalTime().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
-                timeSlots.add(sittingType + " - " + formattedTime);
-            }
-        }
-
-        System.out.println("Final available slots: " + timeSlots);
-        this.lastReceivedTables = availableTables;
+        // Try first: slots within next hour
+        LocalDateTime endOneHour = start.plusMinutes(60);
+        List<String> nextHourSlots = findAvailableSlots(start, endOneHour, availableTables, sittingType, requiredSeats);
+        timeSlots.addAll(nextHourSlots);
 
         Platform.runLater(() -> {
             AvailableTimeBox.getItems().clear();
+            AvailableTimeBox.setDisable(false);
+
             if (!timeSlots.isEmpty()) {
                 AvailableTimeBox.getItems().addAll(timeSlots);
                 AvailableTimeBox.getSelectionModel().selectFirst();
-                AvailableTimeBox.setDisable(false);
+                errorTimeLabel.setVisible(false);
             } else {
-                AvailableTimeBox.setPromptText("No available times");
-                AvailableTimeBox.setDisable(true);
+                // If no slots in next hour, try to find 5 closest after preferred time today
+                List<String> fallbackSlots = findAvailableSlots(start, endOfDay, availableTables, sittingType, requiredSeats);
+                if (!fallbackSlots.isEmpty()) {
+                    timeSlots.addAll(fallbackSlots.stream().limit(5).collect(Collectors.toList()));
+                    AvailableTimeBox.getItems().addAll(timeSlots);
+                    AvailableTimeBox.getSelectionModel().selectFirst();
+                    errorTimeLabel.setText("No available time in the next hour. Showing closest today:");
+                    errorTimeLabel.setVisible(true);
+                } else {
+                    AvailableTimeBox.setPromptText("No available times");
+                    AvailableTimeBox.setDisable(true);
+                    errorTimeLabel.setText("There is no available time today, please try another day.");
+                    errorTimeLabel.setVisible(true);
+                }
             }
         });
     }
+
 
 
     private boolean isTableAvailable(HostingTable table, LocalDateTime slotStart) {
@@ -346,5 +344,28 @@ public class ConfirmOrderController {
         currentCombo.remove(currentCombo.size() - 1);
         findOptimalCombinations(tables, index + 1, currentCombo, currentSeats, requiredSeats, results);
     }
+
+    private List<String> findAvailableSlots(LocalDateTime start, LocalDateTime end,
+                                            List<HostingTable> availableTables,
+                                            String sittingType, int requiredSeats) {
+        List<String> slots = new ArrayList<>();
+        for (LocalDateTime slot = start; !slot.isAfter(end); slot = slot.plusMinutes(15)) {
+            final LocalDateTime currentSlot = slot;
+            List<HostingTable> suitableTables = availableTables.stream()
+                    .filter(table -> table.isInside() == sittingType.equalsIgnoreCase("Inside"))
+                    .filter(table -> isTableAvailable(table, currentSlot))
+                    .collect(Collectors.toList());
+
+            List<List<HostingTable>> combinations = new ArrayList<>();
+            findOptimalCombinations(suitableTables, 0, new ArrayList<>(), 0, requiredSeats, combinations);
+
+            if (!combinations.isEmpty()) {
+                String formatted = slot.toLocalTime().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
+                slots.add(sittingType + " - " + formatted);
+            }
+        }
+        return slots;
+    }
+
 
 }
