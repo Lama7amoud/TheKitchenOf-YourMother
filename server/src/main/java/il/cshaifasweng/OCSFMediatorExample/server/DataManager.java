@@ -7,6 +7,9 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.fxml.FXML;
 import org.hibernate.HibernateException;
@@ -17,6 +20,8 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
+
+
 public class DataManager {
 
     private static Session session;
@@ -24,6 +29,7 @@ public class DataManager {
     public static String getPassword(){
         return password;
     }
+    private static SessionFactory sessionFactory;
 
     private static SessionFactory getSessionFactory(String password) throws HibernateException {
 
@@ -293,7 +299,7 @@ public class DataManager {
         user3.setFirstname("Mohammed");
         user3.setLastname("Abu Saleh");
         user3.setIDNum("206538466");
-        user3.setAge((short) 25);
+            user3.setAge((short) 25);
         user3.setRestaurant(restaurant1);
         user3.setConnected(false);
         user3.setPermissionLevel((short) 2);
@@ -1264,6 +1270,71 @@ public class DataManager {
         }
     }
 
+    public static MonthlyReport generateReportForRestaurant(Restaurant restaurant) {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+
+            LocalDate today = LocalDate.now();
+            LocalDateTime todayStart = today.atStartOfDay();
+            LocalDateTime now = LocalDateTime.now();
+
+            // Fetch ALL Orders, Reservations, Complaints from the database
+            List<Order> allOrders = session.createQuery("FROM Order", Order.class).getResultList();
+            List<Reservation> allReservations = session.createQuery("FROM Reservation", Reservation.class).getResultList();
+            List<Complaint> allComplaints = session.createQuery("FROM Complaint", Complaint.class).getResultList();
+
+            // Now manually filter them with Java
+
+            int deliveryOrdersCount = 0;
+            for (Order order : allOrders) {
+                if (order.getRestaurant().equals(restaurant)
+                        && order.isDelivery()
+                        && order.getOrderDate().isAfter(todayStart)
+                        && order.getOrderDate().isBefore(now)) {
+                    deliveryOrdersCount++;
+                }
+            }
+
+            int customersServed = 0;
+            for (Reservation reservation : allReservations) {
+                if (reservation.getRestaurant().equals(restaurant)
+                        && reservation.getReservationTime().isAfter(todayStart)
+                        && reservation.getReservationTime().isBefore(now)) {
+                    customersServed += reservation.getTotalGuests();
+                }
+            }
+
+            List<String> complaintSubjects = new ArrayList<>();
+            for (Complaint complaint : allComplaints) {
+                if (complaint.getRestaurant().equals(restaurant)
+                        && complaint.getDate().isAfter(todayStart)
+                        && complaint.getDate().isBefore(now)) {
+                    complaintSubjects.add(complaint.getSubject());
+                }
+            }
+
+            // Now create and save the MonthlyReport
+            MonthlyReport report = new MonthlyReport(
+                    now,
+                    deliveryOrdersCount,
+                    customersServed,
+                    complaintSubjects,
+                    restaurant
+            );
+
+            session.save(report);
+            session.getTransaction().commit();
+            return report;
+        }
+    }
+
+    // Get all restaurants
+    public static List<Restaurant> getAllRestaurants() {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("FROM Restaurant", Restaurant.class).getResultList();
+        }
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter database password: ");
@@ -1294,4 +1365,6 @@ public class DataManager {
             }
         }
     }
+
+
 }

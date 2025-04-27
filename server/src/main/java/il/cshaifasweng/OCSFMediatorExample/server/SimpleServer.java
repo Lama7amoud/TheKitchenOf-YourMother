@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.time.LocalTime;
+import java.util.List;
 
 
 public class SimpleServer extends AbstractServer {
@@ -21,6 +25,7 @@ public class SimpleServer extends AbstractServer {
 		super(port);
 	}
 
+	private Timer reportTimer;
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		String msgString = msg.toString();
@@ -497,6 +502,28 @@ public class SimpleServer extends AbstractServer {
 		}
 	}
 
+	private void scheduleReportGeneration() {
+		reportTimer = new Timer();
+
+		// Immediate first generation
+		generateAllReports();
+
+		// Every 5 minutes after that
+		reportTimer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				generateAllReports();
+			}
+		}, 5 * 60 * 1000, 5 * 60 * 1000); // 5 minutes
+	}
+
+	private void generateAllReports() {
+		List<Restaurant> restaurants = DataManager.getAllRestaurants();
+		for (Restaurant restaurant : restaurants) {
+			DataManager.generateReportForRestaurant(restaurant);
+		}
+		System.out.println("[REPORT SYSTEM] Reports generated at: " + LocalTime.now());
+	}
 
 
 
