@@ -1135,6 +1135,7 @@ public class DataManager {
     }
 
 
+
     public static List<Discounts> getDiscountConfirmations() {
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
@@ -1278,47 +1279,50 @@ public class DataManager {
             LocalDateTime todayStart = today.atStartOfDay();
             LocalDateTime now = LocalDateTime.now();
 
-            // Fetch ALL Orders, Reservations, Complaints from the database
-            List<Order> allOrders = session.createQuery("FROM Order", Order.class).getResultList();
+            // Fetch all reservations and complaints for manual filtering
             List<Reservation> allReservations = session.createQuery("FROM Reservation", Reservation.class).getResultList();
             List<Complaint> allComplaints = session.createQuery("FROM Complaint", Complaint.class).getResultList();
 
-            // Now manually filter them with Java
-
-            int deliveryOrdersCount = 0;
-            for (Order order : allOrders) {
-                if (order.getRestaurant().equals(restaurant)
-                        && order.isDelivery()
-                        && order.getOrderDate().isAfter(todayStart)
-                        && order.getOrderDate().isBefore(now)) {
-                    deliveryOrdersCount++;
+            // Count takeaway orders
+            int takeawayOrdersCount = 0;
+            for (Reservation reservation : allReservations) {
+                if (reservation.getRestaurant().equals(restaurant)
+                        && reservation.getReservationTime().isAfter(todayStart)
+                        && reservation.getReservationTime().isBefore(now)
+                        && reservation.getStatus().equalsIgnoreCase("on")
+                        && reservation.isPayed()
+                        && reservation.isTakeAway()) {
+                    takeawayOrdersCount++;
                 }
             }
 
+            // Count customers served inside the restaurant
             int customersServed = 0;
             for (Reservation reservation : allReservations) {
                 if (reservation.getRestaurant().equals(restaurant)
                         && reservation.getReservationTime().isAfter(todayStart)
-                        && reservation.getReservationTime().isBefore(now)) {
+                        && reservation.getReservationTime().isBefore(now)
+                        && !reservation.isTakeAway()) {
                     customersServed += reservation.getTotalGuests();
                 }
             }
 
-            List<String> complaintSubjects = new ArrayList<>();
+            // Count complaint subjects for histogram
+            int complaintCount = 0;
             for (Complaint complaint : allComplaints) {
                 if (complaint.getRestaurant().equals(restaurant)
-                        && complaint.getDate().isAfter(todayStart)
-                        && complaint.getDate().isBefore(now)) {
-                    complaintSubjects.add(complaint.getSubject());
+                        && complaint.getSubmittedAt().isAfter(todayStart)
+                        && complaint.getSubmittedAt().isBefore(now)) {
+                    complaintCount++;
                 }
             }
 
-            // Now create and save the MonthlyReport
+            // Create and save the report
             MonthlyReport report = new MonthlyReport(
                     now,
-                    deliveryOrdersCount,
+                    takeawayOrdersCount,  // replaced deliveryOrdersCount
                     customersServed,
-                    complaintSubjects,
+                    complaintCount,
                     restaurant
             );
 
