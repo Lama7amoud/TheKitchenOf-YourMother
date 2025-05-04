@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="10" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MonthlyReportViewController">
+
+    <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Monthly Report" textFill="#ffa915" />
+
+    <Label fx:id="restaurantNameLabel" style="-fx-font-size: 18px;" text="Restaurant Name" textFill="#ffa100" />
+    <Label fx:id="generatedTimeLabel" text="Generated Time" />
+
+    <HBox spacing="20">
+        <VBox>
+            <Label text="Total Customers Served:" />
+            <Label fx:id="totalCustomersLabel" text="0" />
+        </VBox>
+        <VBox>
+            <Label text="Delivery Orders:" />
+            <Label fx:id="deliveryOrdersLabel" text="0" />
+        </VBox>
+    </HBox>
+
+    <Label style="-fx-font-size: 16px; -fx-padding: 10 0 0 0;" text="Complaints Submitted (Histogram)" />
+
+    <BarChart fx:id="complaintsHistogram" barGap="10" categoryGap="20" prefHeight="400" prefWidth="600" title="Total Complaints">
+        <xAxis>
+            <CategoryAxis label="Metric" />
+        </xAxis>
+        <yAxis>
+            <NumberAxis label="Count" />
+        </yAxis>
+    </BarChart>
+
+</VBox>
