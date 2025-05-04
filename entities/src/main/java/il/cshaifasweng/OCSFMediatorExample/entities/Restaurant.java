@@ -24,11 +24,17 @@
         private double openingTime;
         private double closingTime;
 
+
         @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
         private List<HostingTable> hostingTables;
 
         @ManyToMany(mappedBy = "restaurants")
         private List<Meal> meals;
+
+        @ManyToOne
+        @JoinColumn(name = "business_id")
+        private Business business;
+
 
         public Restaurant() {}
 
@@ -112,6 +118,15 @@
             this.meals = meals;
         }
 
+        public Business getBusiness() {
+            return business;
+        }
+
+        public void setBusiness(Business business) {
+            this.business = business;
+        }
+
+
         public void addMeal(Meal meal) {
             this.meals.add(meal);
         }
@@ -127,6 +142,7 @@
             this.setClosingTime(restaurant.getClosingTime());
             this.setHostingTables(restaurant.getHostingTables());
             this.setMeals(restaurant.getMeals());
+            this.setBusiness(restaurant.getBusiness());
         }
 
         public void resetAttributes() {
@@ -140,5 +156,6 @@
             this.setClosingTime(0.0);
             this.setHostingTables(null);
             this.setMeals(null);
+            this.setBusiness(null);
         }
     }

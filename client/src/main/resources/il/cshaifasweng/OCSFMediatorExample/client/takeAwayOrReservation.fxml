@@ -35,7 +35,7 @@
                   <Font size="20.0" />
                </font>
             </Button>
-            <Button fx:id="takeAwayButton" alignment="CENTER" layoutX="94.0" layoutY="128.0" mnemonicParsing="false" prefHeight="71.0" prefWidth="171.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Take Away" textAlignment="CENTER" textFill="WHITE">
+            <Button fx:id="takeAwayButton" alignment="CENTER" layoutX="94.0" onAction="#goToTakeAwayPage" layoutY="128.0" mnemonicParsing="false" prefHeight="71.0" prefWidth="171.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Take Away" textAlignment="CENTER" textFill="WHITE">
                <font>
                   <Font size="20.0" />
                </font>

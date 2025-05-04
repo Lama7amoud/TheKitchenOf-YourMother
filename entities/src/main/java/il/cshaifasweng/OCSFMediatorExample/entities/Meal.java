@@ -21,6 +21,9 @@ public class Meal implements Serializable {
     private String mealDescription;
     private String mealPreferences;
     private double mealPrice;
+    private String  imagePath;
+    private String mealCategory;
+
 
     @ManyToMany
     @JoinTable(
@@ -33,12 +36,17 @@ public class Meal implements Serializable {
     public Meal() {
     }
 
-    public Meal(String mealName, String mealDescription, String mealPreferences, double mealPrice) {
+    public Meal(String mealName, String mealDescription, String mealPreferences, double mealPrice , String imagePath , String mealCategory) {
         this.mealName = mealName;
         this.mealDescription = mealDescription;
         this.mealPreferences = mealPreferences;
         this.mealPrice = mealPrice;
+        this.imagePath = imagePath;
+        this.mealCategory = mealCategory;
+
     }
+
+
 
     public int getId() {
         return id;
@@ -76,6 +84,9 @@ public class Meal implements Serializable {
         this.mealPrice = mealPrice;
     }
 
+    public String getImagePath() {return imagePath;}
+    public void setImagePath(String imagePath) {this.imagePath = imagePath;}
+
     public List<Restaurant> getRestaurants() {
         return restaurants;
     }
@@ -83,6 +94,11 @@ public class Meal implements Serializable {
     public void addRestaurant(Restaurant restaurant) {
         this.restaurants.add(restaurant);
     }
+
+    public void setMealCategory(String mealCategory) {
+        this.mealCategory = mealCategory;
+    }
+    public String getMealCategory() {return mealCategory;}
 
     @Override
     public String toString() {
@@ -92,6 +108,7 @@ public class Meal implements Serializable {
                 ", mealDescription='" + mealDescription + '\'' +
                 ", mealPreferences='" + mealPreferences + '\'' +
                 ", mealPrice=" + mealPrice +
+                ", imagePath='" + imagePath + '\'' +
                 ", restaurants=" + restaurants +
                 '}';
     }

@@ -54,13 +54,20 @@
                 Button source = (Button) event.getSource();
                 String page = switch (source.getId()) {
                     case "backButton" -> "Main Page";
-                    case "viewMapButton" -> "Tables Page";
+                    case "viewMapButton" -> {
+                        if (selectedRestaurant != null) {
+                            userAtt.setRestaurantInterest((short) selectedRestaurant.getId());
+                        }
+                        yield "Tables Page"; // ✅ Match the name in App.java switchScreen map
+                    }
                     case "branchDetailsButton" -> "Branch Page";
                     default -> "";
                 };
                 App.switchScreen(page);
             });
         }
+
+
         @FXML
         void initialize() {
             EventBus.getDefault().register(this);
@@ -239,9 +246,5 @@
             PrefferedTimeBox.setItems(availableTimes);
             PrefferedTimeBox.setVisibleRowCount(Math.min(availableTimes.size(), 10));
         }
-
-
-
-
 
     }

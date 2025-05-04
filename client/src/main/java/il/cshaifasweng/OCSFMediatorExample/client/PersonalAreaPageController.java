@@ -24,6 +24,13 @@ public class PersonalAreaPageController {
     @FXML
     private Button backButton;
 
+
+    @FXML
+    private Button customerServiceButton;
+
+    @FXML
+    private Button updateMenuButton;
+
     @FXML
     private Label firstnameLabel;
 
@@ -107,6 +114,13 @@ public class PersonalAreaPageController {
                 page = "Management Page";
             } else if (event.getSource() == backButton) {
                 page = "Main Page";
+            } else if (event.getSource() == customerServiceButton) {
+                //page = "Service Page";
+                page = "Main Page";
+            }
+            else if (event.getSource() == updateMenuButton) {
+                page = "Update Menu Page";
+                //page = "Main Page";
             }
 
             App.switchScreen(page);
@@ -125,7 +139,7 @@ public class PersonalAreaPageController {
                     leftImageButton.setVisible(false);
                     numOfImages = 1;
                     images = new Image[numOfImages];
-                    j = (user.getRestaurantInterest()-1);
+                    j = (user.getRestaurantId()-1);
                     images[0] = new Image(String.valueOf(PersonalAreaPageController.class.getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Maps/" + j + ".jpg")));
                     restaurantMapTitle.setText(restaurantTitles[j] + " restaurant Map:");
                     imageView.setImage(images[0]);
@@ -149,10 +163,13 @@ public class PersonalAreaPageController {
                 e.printStackTrace();
             }
 
-            if(user != null && user.getPermissionLevel() == 1 ){
-                advancedPageButton.setVisible(false);
-            }
-            else {
+            if (user != null && user.getPermissionLevel() == 2) {
+                customerServiceButton.setVisible(true);
+            } else if (user != null && user.getPermissionLevel() == 5) {
+                updateMenuButton.setVisible(true);
+            } else if(user != null && user.getPermissionLevel() == 3) {
+                advancedPageButton.setVisible(true);
+            } else if (user != null && user.getPermissionLevel() == 4) {
                 advancedPageButton.setVisible(true);
             }
 
@@ -163,7 +180,12 @@ public class PersonalAreaPageController {
             lastnameLabel.setText("Lastname: " + user.getLastname());
             IDNumLabel.setText("IDNum: " + user.getIDNum());
             ageLabel.setText("Age: " + user.getAge());
-            restaurantIDLabel.setText("Restaurant ID: " + user.getRestaurantInterest());
+
+            if (user.getPermissionLevel() == 4 || user.getPermissionLevel() == 5) {
+                restaurantIDLabel.setText("Restaurant ID: All");
+            } else {
+                restaurantIDLabel.setText("Restaurant ID: " + user.getRestaurantId());
+            }
             short userPermissionLevel = user.getPermissionLevel();
             jobPositionLabel.setText("Job Position: " + switch (userPermissionLevel) {
                 case 1 -> "Employee";
@@ -173,10 +195,7 @@ public class PersonalAreaPageController {
                 case 5 -> "Dietitian";
                 default -> "Unknown";
             });
-            if(userPermissionLevel == 2){
-                advancedPageButton.setText("Customer Service Page");
-            }
-            else if(userPermissionLevel == 3 || userPermissionLevel == 4){
+            if(userPermissionLevel == 3 || userPermissionLevel == 4){
                 advancedPageButton.setText("Manager Page");
             }
             else if(userPermissionLevel == 5){
@@ -184,4 +203,5 @@ public class PersonalAreaPageController {
             }
         });
     }
+
 }

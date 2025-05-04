@@ -57,7 +57,15 @@ public class App extends Application {
                 entry("Branch Page", "branchPage"),
                 entry("Tables Page", "tablesViewPage"),
                 entry("Confirm Order Page", "confirmOrder"),
-                entry("TakeAwayOrReservation Page", "takeAwayOrReservation")
+                entry("TakeAwayOrReservation Page", "takeAwayOrReservation"),
+                entry("TakeAway Page", "takeAwayPage"),
+                entry("Haifa Menu Page", "HaifaMenu"),
+                entry("TelAviv Menu Page", "Tel_AvivMenu"),
+                entry("Nahariya Menu Page" ,"NahariyaMenu"),
+                entry("Update Menu Page" ,"updateMenuPage"),
+                entry("Price Confirmation Page" ,"PriceConfirmationPage"),
+                entry("Discount Confirmation Page" ,"DiscountConfirmation"),
+                entry("Manager Feedback Page" ,"managerfeedbackpage")
         );
 
         String contentName = screenMappings.get(screenName);

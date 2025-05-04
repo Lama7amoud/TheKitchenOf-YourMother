@@ -11,17 +11,22 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.awt.Point;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static il.cshaifasweng.OCSFMediatorExample.client.Client.*;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+import org.greenrobot.eventbus.Subscribe;
 
 public class TablesViewController {
 
     int numOfImages = 3;
     Image[] images;
     int[] reservedTables;
+
+    @FXML
+    private ComboBox<String> TimeBox;
 
     @FXML
     private Pane DetailsPane;
@@ -143,6 +148,25 @@ public class TablesViewController {
 
 
     @FXML
+    private void TimeBoxHandle(ActionEvent event) {
+        String timeStr = TimeBox.getValue();
+        String restaurantName = RestaurantCombo.getValue();
+        int restaurantId = switch (restaurantName) {
+            case "Haifa Branch" -> 1;
+            case "Tel-Aviv Branch" -> 2;
+            case "Nahariya Branch" -> 3;
+            default -> 0;
+        };
+
+        if (restaurantId != 0 && timeStr != null) {
+            // Send a request for reserved times around ±1 hour
+            String message = "get_reserved_tables_within_hour;" + restaurantId + ";" + timeStr;
+            Client.getClient().sendToServer(message);
+        }
+    }
+
+
+    @FXML
     void backButton(ActionEvent event){
         App.switchScreen("Order Tables Page");
     }
@@ -242,6 +266,8 @@ public class TablesViewController {
     @FXML
     void initialize() {
         Platform.runLater(() -> {
+            int id = Client.getClientAttributes().getRestaurantInterest();
+            imageView.setImage(new Image(getClass().getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Maps/" + (id - 1) + ".jpg").toString()));
             DetailsPane.setDisable(true);
             int employee_permission = userAtt.getPermissionLevel();
             // For manager and service
@@ -308,4 +334,19 @@ public class TablesViewController {
 
         });
     }
+    @Subscribe
+    public void handleReservedTables(List<Integer> takenTables) {
+        Platform.runLater(() -> {
+            for (int i = 0; i < tableButtons.length; i++) {
+                if (takenTables.contains(i + 1)) {  // Tables are 1-indexed
+                    tableButtons[i].setStyle("-fx-background-color: red;"); // Blocked
+                    tableButtons[i].setDisable(true);
+                } else {
+                    tableButtons[i].setStyle("-fx-background-color: transparent;");
+                    tableButtons[i].setDisable(false);
+                }
+            }
+        });
+    }
+
 }

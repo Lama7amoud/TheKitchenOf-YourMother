@@ -3,6 +3,7 @@ package il.cshaifasweng.OCSFMediatorExample.client;
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import net.bytebuddy.asm.Advice;
 import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
 
@@ -15,6 +16,11 @@ public class Client extends AbstractClient {
     public static String host;
     public static int port;
     static AuthorizedUser userAtt;
+
+
+    private static List<Meal> menu;
+
+    private updateMenuPageController updateMenuController;
 
     public Client(String host, int port) {
         super(host, port);
@@ -30,6 +36,10 @@ public class Client extends AbstractClient {
             userAtt = getClientAttributes();
         }
         return client;
+    }
+
+    public void setUpdateMenuController(updateMenuPageController controller) {
+        this.updateMenuController = controller;
     }
 
     @Override
@@ -59,12 +69,16 @@ public class Client extends AbstractClient {
         return null;
     }
 
-
+    public static List<Meal> getMenu() {
+        return menu;
+    }
     @Override
     protected void handleMessageFromServer(Object msg) {
         if (msg instanceof String) {
 
             String strMsg = (String) msg;
+
+
 
             if (strMsg.equals("Reservation cancelled successfully")) {
                 Platform.runLater(() -> {
@@ -78,6 +92,28 @@ public class Client extends AbstractClient {
                 return;
             }
 
+            if (strMsg.equals("MealExists")) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Warning");
+                    alert.setHeaderText(null);
+                    alert.setContentText("A meal with this name already exists!");
+                    alert.showAndWait();
+                    return;
+                });
+            }
+            if (strMsg.startsWith("MealCategory:")) {
+                String category = strMsg.substring("MealCategory:".length()).trim();
+
+                if (updateMenuController != null) {
+                    if (category.equals("NotFound")) {
+                        updateMenuController.handleMealNotFound();
+                    } else {
+                        updateMenuController.handleMealCategoryResponse(category);
+                    }
+                }
+                return;
+            }
             if (strMsg.equals("Cancellation failed: Reservation not found")) {
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -88,7 +124,6 @@ public class Client extends AbstractClient {
                 });
                 return;
             }
-            // ✅ Handle ID check response
             if (strMsg.startsWith("id_exists:")) {
                 boolean exists = Boolean.parseBoolean(strMsg.split(":")[1].trim());
                 EventBus.getDefault().post(new IdCheckEvent(exists));
@@ -130,10 +165,20 @@ public class Client extends AbstractClient {
         // Handle other object types
         if (msg instanceof Warning) {
             EventBus.getDefault().post(new WarningEvent((Warning) msg));
-        } else if (msg instanceof List) {
+        } else if (msg instanceof List<?>) {
             List<?> list = (List<?>) msg;
-            if (!list.isEmpty() && list.get(0) instanceof Meal) {
-                EventBus.getDefault().post((List<Meal>) list);
+            if (!list.isEmpty()) {
+                Object first = list.get(0);
+                if (first instanceof Meal) {
+                    menu = (List<Meal>) list;
+                    EventBus.getDefault().post(menu);
+                } else if (first instanceof PriceConfirmation) {
+                    EventBus.getDefault().post((List<PriceConfirmation>) list);
+                } else if (first instanceof Discounts) {
+                    EventBus.getDefault().post((List<Discounts>) list);
+                } else if (first instanceof Feedback) {
+                    EventBus.getDefault().post((List<Feedback>) list);
+                }
             } else if (!list.isEmpty() && list.get(0) instanceof HostingTable) {
                 EventBus.getDefault().post((List<HostingTable>) list);
             }

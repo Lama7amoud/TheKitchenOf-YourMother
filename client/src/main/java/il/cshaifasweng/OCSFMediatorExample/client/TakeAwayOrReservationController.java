@@ -75,4 +75,9 @@ public class TakeAwayOrReservationController {
         }
     }
 
+    @FXML
+    public void goToTakeAwayPage(ActionEvent event) {
+        App.switchScreen("TakeAway Page");
+    }
+
 }

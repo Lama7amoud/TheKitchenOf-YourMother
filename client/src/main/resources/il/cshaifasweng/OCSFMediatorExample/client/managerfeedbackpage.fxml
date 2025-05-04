@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="700.0" prefWidth="900.0" style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.ManagerFeedBackController">
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" >
+   <children>
+      <Label layoutX="20" layoutY="10" text="Feedback List" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+      <TableView fx:id="feedbackTable" layoutX="20" layoutY="40" prefHeight="400" prefWidth="760">
+         <columns>
+            <TableColumn fx:id="messageColumn" text="Message" prefWidth="250"/>
+            <TableColumn fx:id="ratingColumn" text="Rating" prefWidth="100"/>
+            <TableColumn fx:id="restaurantColumn" text="Restaurant" prefWidth="150"/>
+            <TableColumn fx:id="submittedAtColumn" text="Submitted At" prefWidth="200"/>
+         </columns>
+      </TableView>
+
+      <Button fx:id="backButton" layoutX="20" layoutY="460" text="Back" onAction="#goBack" />
+   </children>
+   </AnchorPane>
+</ScrollPane>

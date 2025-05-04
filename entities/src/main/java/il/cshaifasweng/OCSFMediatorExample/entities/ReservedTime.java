@@ -21,7 +21,7 @@ public class ReservedTime implements Serializable {
     private LocalDateTime reservedTime;
 
     @ManyToOne
-    @JoinColumn(name = "reservation_id", nullable = false) // ✅ YOU MISSED THIS!
+    @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
 
     public ReservedTime() {}

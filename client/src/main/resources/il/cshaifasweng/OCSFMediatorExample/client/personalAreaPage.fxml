@@ -26,12 +26,14 @@
             <Label fx:id="passwordLabel" layoutX="13.0" layoutY="150.0" prefHeight="18.0" prefWidth="215.0" style="-fx-font-style: italic;" text="Password: " textFill="ORANGE" />
             <Label fx:id="IDNumLabel" layoutX="12.0" layoutY="255.0" prefHeight="18.0" prefWidth="215.0" style="-fx-font-style: italic;" text="IDNum:" textFill="ORANGE" />
             <Label fx:id="ageLabel" layoutX="13.0" layoutY="228.0" prefHeight="18.0" prefWidth="215.0" style="-fx-font-style: italic;" text="Age:" textFill="ORANGE" />
-            <Button fx:id="backButton" layoutX="13.0" layoutY="361.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold;" text="Back" textFill="WHITE" AnchorPane.leftAnchor="12.0">
+            <Button fx:id="backButton" layoutX="12.0" layoutY="364.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold;" text="Back" textFill="WHITE" AnchorPane.leftAnchor="12.0">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
             </Button>
-            <Button fx:id="advancedPageButton" layoutX="109.0" layoutY="361.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: #9493b5; -fx-font-style: italic; -fx-font-weight: bold;" text="Advanced Page" textFill="WHITE" AnchorPane.rightAnchor="12.0" />
+            <Button fx:id="advancedPageButton" layoutX="125.00000000000001" layoutY="366.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: #9493b5; -fx-font-style: italic; -fx-font-weight: bold;" text="Advanced Page" textFill="WHITE" visible="false" AnchorPane.rightAnchor="7.666666666666657" />
+            <Button fx:id="customerServiceButton" layoutX="129.0" layoutY="350.0" mnemonicParsing="false" onAction="#switchPage" prefHeight="43.0" prefWidth="95.0" style="-fx-background-color: Blue; -fx-font-style: italic; -fx-font-weight: bold;" text="Customer Service Page" textFill="WHITE" visible="false" wrapText="true" />
+            <Button fx:id="updateMenuButton" layoutX="125.0" layoutY="364.0" mnemonicParsing="false" onAction="#switchPage" style="-fx-background-color: PINK; -fx-font-style: italic; -fx-font-weight: bold;" text="Update Menu" visible="false" />
          </children>
       </AnchorPane>
    </left>
