@@ -40,7 +40,7 @@ public class DataManager {
     public static String getPassword(){
         return password;
     }
-
+    private static SessionFactory sessionFactory;
     private static SessionFactory getSessionFactory(String password) throws HibernateException {
 
 
@@ -53,7 +53,7 @@ public class DataManager {
         configuration.addAnnotatedClass(Discounts.class);
         configuration.addAnnotatedClass(Feedback.class);
         configuration.addAnnotatedClass(Complaint.class);
-        //configuration.addAnnotatedClass(MonthlyReport.class);
+        configuration.addAnnotatedClass(MonthlyReport.class);
 
         configuration.addAnnotatedClass(AuthorizedUser.class);
         configuration.addAnnotatedClass(Restaurant.class);
@@ -1405,6 +1405,79 @@ public class DataManager {
             return false;
         } finally {
             session.close();
+        }
+    }
+    public static MonthlyReport generateReportForRestaurant(Restaurant restaurant) {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+
+            LocalDate today = LocalDate.now();
+            LocalDateTime todayStart = today.atStartOfDay();
+            LocalDateTime now = LocalDateTime.now();
+
+            // Fetch all reservations and complaints for manual filtering
+            List<Reservation> allReservations = session.createQuery("FROM Reservation", Reservation.class).getResultList();
+            List<Complaint> allComplaints = session.createQuery("FROM Complaint", Complaint.class).getResultList();
+
+            // Count takeaway orders
+            int takeawayOrdersCount = 0;
+            for (Reservation reservation : allReservations) {
+                if (reservation.getRestaurant().equals(restaurant)
+                        && reservation.getReservationTime().isAfter(todayStart)
+                        && reservation.getReservationTime().isBefore(now)
+                        && reservation.getStatus().equalsIgnoreCase("on")
+                        && reservation.isPayed()
+                        && reservation.isTakeAway()) {
+                    takeawayOrdersCount++;
+                }
+            }
+
+            // Count customers served inside the restaurant
+            int customersServed = 0;
+            for (Reservation reservation : allReservations) {
+                if (reservation.getRestaurant().equals(restaurant)
+                        && reservation.getReservationTime().isAfter(todayStart)
+                        && reservation.getReservationTime().isBefore(now)
+                        && !reservation.isTakeAway()) {
+                    customersServed += reservation.getTotalGuests();
+                }
+            }
+
+            // Count complaint subjects for histogram
+            int complaintCount = 0;
+            for (Complaint complaint : allComplaints) {
+                if (complaint.getRestaurant().equals(restaurant)
+                        && complaint.getSubmittedAt().isAfter(todayStart)
+                        && complaint.getSubmittedAt().isBefore(now)) {
+                    complaintCount++;
+                }
+            }
+
+            // Create and save the report
+            MonthlyReport report = new MonthlyReport(
+                    now,
+                    takeawayOrdersCount,  // replaced deliveryOrdersCount
+                    customersServed,
+                    complaintCount,
+                    restaurant
+            );
+
+            session.save(report);
+            session.getTransaction().commit();
+            return report;
+        }
+    }
+
+    // Get all restaurants
+    public static List<Restaurant> getAllRestaurants() {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("FROM Restaurant", Restaurant.class).getResultList();
+        }
+    }
+
+    public static List<MonthlyReport> getAllReports() {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("FROM MonthlyReport", MonthlyReport.class).getResultList();
         }
     }
 }

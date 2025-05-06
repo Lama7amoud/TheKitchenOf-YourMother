@@ -179,10 +179,18 @@ public class Client extends AbstractClient {
                 } else if (first instanceof Feedback) {
                     EventBus.getDefault().post((List<Feedback>) list);
                 } else if (first instanceof HostingTable) {
-                    EventBus.getDefault().post((List<HostingTable>) list);  // ✅ THIS WILL NOW RUN
+                    EventBus.getDefault().post((List<HostingTable>) list);
                 }
             }
-    } else if (msg instanceof AuthorizedUser) {
+    }  else if (msg instanceof List<?>) {
+            List<?> dataList = (List<?>) msg;
+            if (!dataList.isEmpty() && dataList.get(0) instanceof MonthlyReport) {
+                List<MonthlyReport> reports = (List<MonthlyReport>) dataList;
+
+                // You can now post the reports to EventBus or open a new page
+                EventBus.getDefault().post(new MonthlyReportsEvent(reports));
+            }
+    }  else if (msg instanceof AuthorizedUser) {
             userAtt.copyUser((AuthorizedUser) msg);
             String response = "Authorized user request:" + userAtt.getMessageToServer();
             EventBus.getDefault().post(response);

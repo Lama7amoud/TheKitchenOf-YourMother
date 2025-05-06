@@ -12,6 +12,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.time.LocalTime;
+import java.util.List;
 
 public class SimpleServer extends AbstractServer {
 
@@ -21,6 +25,7 @@ public class SimpleServer extends AbstractServer {
 		super(port);
 	}
 
+	private Timer reportTimer;
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		String msgString = msg.toString();
@@ -198,7 +203,20 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 		}
+		else if (msg instanceof String) {
+			msgString = (String) msg;
 
+			if (msgString.equals("REQUEST_MONTHLY_REPORTS")) {
+				List<MonthlyReport> reports = DataManager.getAllReports();  // Make sure this method exists
+
+				// Send back the list directly (Java serialization)
+				try {
+					client.sendToClient(reports);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		else if (msgString.startsWith("Update preferences")) {
 			String details = msgString.substring("Update preferences".length()).trim();
 
@@ -549,4 +567,28 @@ public class SimpleServer extends AbstractServer {
 			e1.printStackTrace();
 		}
 	}
+
+	private void scheduleReportGeneration() {
+		reportTimer = new Timer();
+
+		// Immediate first generation
+		generateAllReports();
+
+		// Every 5 minutes after that
+		reportTimer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				generateAllReports();
+			}
+		}, 5 * 60 * 1000, 5 * 60 * 1000); // 5 minutes
+	}
+
+	private void generateAllReports() {
+		List<Restaurant> restaurants = DataManager.getAllRestaurants();
+		for (Restaurant restaurant : restaurants) {
+			DataManager.generateReportForRestaurant(restaurant);
+		}
+		System.out.println("[REPORT SYSTEM] Reports generated at: " + LocalTime.now());
+	}
+
 }

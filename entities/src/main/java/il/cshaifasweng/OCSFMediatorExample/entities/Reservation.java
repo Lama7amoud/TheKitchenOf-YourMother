@@ -23,6 +23,7 @@ public class Reservation implements Serializable {
     private boolean isPayed;
     private LocalDateTime receivingTime;
     private String status = "on";
+    private boolean isTakeAway;
 
     @ManyToOne
     private Restaurant restaurant;
@@ -37,6 +38,11 @@ public class Reservation implements Serializable {
     public String getStatus() {
         return status;
     }
+
+
+    public boolean isTakeAway() { return isTakeAway; }
+    public void setTakeAway(boolean takeAway) { isTakeAway = takeAway; }
+
 
     public void setStatus(String status) {
         this.status = status;

@@ -23,20 +23,33 @@ public class Complaint implements Serializable {
 
     private LocalDateTime submittedAt;
 
-    public Complaint() {
-    }
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id")
+    private Restaurant restaurant;
 
-    public Complaint(int userId, String complaint, String status, LocalDateTime submittedAt) {
+    public Complaint() {}
+
+    public Complaint(int userId, String complaint, String status, LocalDateTime submittedAt, Restaurant restaurant) {
         this.userId = userId;
         this.complaint = complaint;
         this.status = status;
         this.submittedAt = submittedAt;
+        this.restaurant = restaurant;
     }
 
     // Getters and Setters
 
     public int getId() {
         return id;
+    }
+
+
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 
     public void setId(int id) {
