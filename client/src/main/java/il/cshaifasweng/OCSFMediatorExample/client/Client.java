@@ -110,7 +110,17 @@ public class Client extends AbstractClient {
                 }
             }
 
-        } else if (msg instanceof AuthorizedUser) {
+        }
+        else if (msg instanceof List<?>) {
+            List<?> dataList = (List<?>) msg;
+            if (!dataList.isEmpty() && dataList.get(0) instanceof MonthlyReport) {
+                List<MonthlyReport> reports = (List<MonthlyReport>) dataList;
+
+                // You can now post the reports to EventBus or open a new page
+                EventBus.getDefault().post(new MonthlyReportsEvent(reports));
+            }
+        }
+        else if (msg instanceof AuthorizedUser) {
             userAtt.copyUser((AuthorizedUser) msg);
             System.out.println("response: " + userAtt.getMessageToServer());
             EventBus.getDefault().post("Authorized user request:" + userAtt.getMessageToServer());

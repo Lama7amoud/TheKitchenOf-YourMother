@@ -49,7 +49,6 @@ public class SimpleServer extends AbstractServer {
 			}
 		}
 		else if (msgString.startsWith("feedback;")) {
-			System.out.println("1111111111111");
 			String[] parts = msgString.split(";", 5);
 
 			int userId = Integer.parseInt(parts[1]);
@@ -187,6 +186,21 @@ public class SimpleServer extends AbstractServer {
 					client.sendToClient(mealName + "Description update has failed");
 				} catch (IOException ioException) {
 					ioException.printStackTrace();
+				}
+			}
+		}
+
+		else if (msg instanceof String) {
+			msgString = (String) msg;
+
+			if (msgString.equals("REQUEST_MONTHLY_REPORTS")) {
+				List<MonthlyReport> reports = DataManager.getAllReports();  // Make sure this method exists
+
+				// Send back the list directly (Java serialization)
+				try {
+					client.sendToClient(reports);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}

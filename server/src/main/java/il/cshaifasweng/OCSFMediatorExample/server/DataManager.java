@@ -42,7 +42,7 @@ public class DataManager {
 
         configuration.addAnnotatedClass(Feedback.class);
         configuration.addAnnotatedClass(Complaint.class);
-        //configuration.addAnnotatedClass(MonthlyReport.class);
+        configuration.addAnnotatedClass(MonthlyReport.class);
 
         configuration.addAnnotatedClass(AuthorizedUser.class);
         configuration.addAnnotatedClass(Restaurant.class);
@@ -1336,6 +1336,12 @@ public class DataManager {
     public static List<Restaurant> getAllRestaurants() {
         try (Session session = sessionFactory.openSession()) {
             return session.createQuery("FROM Restaurant", Restaurant.class).getResultList();
+        }
+    }
+
+    public static List<MonthlyReport> getAllReports() {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("FROM MonthlyReport", MonthlyReport.class).getResultList();
         }
     }
 
