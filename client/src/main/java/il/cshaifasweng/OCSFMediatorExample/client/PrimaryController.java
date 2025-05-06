@@ -101,8 +101,8 @@ public class PrimaryController {
                 page = "Feedback Page";
             }
 
-            else if(sourceButton == orderButton){
-                page = "Order Tables Page";
+            else if (sourceButton == orderButton) {
+                page = "TakeAwayOrReservation Page";
             }
             if(userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4){
                 String selectedRestaurant = ChooseRestaurantBox.getValue();

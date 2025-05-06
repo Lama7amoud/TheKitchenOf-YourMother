@@ -178,11 +178,11 @@ public class Client extends AbstractClient {
                     EventBus.getDefault().post((List<Discounts>) list);
                 } else if (first instanceof Feedback) {
                     EventBus.getDefault().post((List<Feedback>) list);
+                } else if (first instanceof HostingTable) {
+                    EventBus.getDefault().post((List<HostingTable>) list);  // ✅ THIS WILL NOW RUN
                 }
-            } else if (!list.isEmpty() && list.get(0) instanceof HostingTable) {
-                EventBus.getDefault().post((List<HostingTable>) list);
             }
-        } else if (msg instanceof AuthorizedUser) {
+    } else if (msg instanceof AuthorizedUser) {
             userAtt.copyUser((AuthorizedUser) msg);
             String response = "Authorized user request:" + userAtt.getMessageToServer();
             EventBus.getDefault().post(response);

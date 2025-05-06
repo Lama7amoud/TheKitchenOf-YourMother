@@ -549,8 +549,4 @@ public class SimpleServer extends AbstractServer {
 			e1.printStackTrace();
 		}
 	}
-
-
-
-
 }

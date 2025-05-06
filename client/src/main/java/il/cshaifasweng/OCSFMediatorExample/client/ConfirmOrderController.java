@@ -39,6 +39,7 @@ public class ConfirmOrderController {
     private  Label phoneLabel,nameLabel,idLabel,addressLabel,errorTimeLabel;
 
     private List<HostingTable> lastReceivedTables = new ArrayList<>();
+    private boolean reservationAlreadySent = false;
 
     @FXML
     private void handleBackToMainPage(ActionEvent event) {
@@ -153,7 +154,9 @@ public class ConfirmOrderController {
             isValid = false;
         }
         if (!id.matches("^\\d{9}$")) {
+            idLabel.setText("ID must be exactly 9 digits.");
             idLabel.setVisible(true);
+            idLabel.setManaged(true);
             isValid = false;
         }
         if (address.isEmpty()) {
@@ -166,41 +169,17 @@ public class ConfirmOrderController {
         }
 
 
-        if (!isValid) return;
-
+        if (!isValid || reservationAlreadySent) return;
         currentFormData = new String[]{name, phone, id, address, visa};
-
-
         Client.getClient().sendToServer("check_reservation_id;" + id);
 
-        /*// Proceed with reservation only if all inputs are valid
-        OrderData order = OrderData.getInstance();
-
-
-        String raw = order.getPreferredTime(); // Example: "Outside - 14:30"
-        String timePart = raw.contains(" - ") ? raw.split(" - ")[1].trim() : raw;
-        LocalTime preferredTime = LocalTime.parse(timePart);
-        LocalDateTime reservationDateTime = LocalDateTime.of(order.getDate(), preferredTime);
-
-        Reservation reservation = new Reservation();
-        reservation.setName(name);
-        reservation.setIdNumber(id);
-        reservation.setPhoneNumber(phone);
-        reservation.setAddress(address);
-        reservation.setSittingType(order.getSittingType());
-        reservation.setTotalGuests(order.getGuestCount());
-        reservation.setReservationTime(reservationDateTime);
-        reservation.setVisa("");
-        reservation.setPayed(false);
-
-        reservation.setRestaurant(Client.getClientAttributes().getRestaurant());
-        List<HostingTable> chosenTables = findTablesForTime(order.getPreferredTime());
-        reservation.setReservedTables(chosenTables);*/
     }
 
     @Subscribe
     public void onIdCheckResponse(IdCheckEvent event) {
         Platform.runLater(() -> {
+            System.out.println("ID check result: " + event.doesExist());
+            if (reservationAlreadySent) return;
             idAlreadyUsed = event.doesExist();
             if (idAlreadyUsed) {
                 idLabel.setText("This ID already has a reservation.");
@@ -209,7 +188,8 @@ public class ConfirmOrderController {
             } else {
                 idLabel.setVisible(false);
                 idLabel.setManaged(false);
-                // Only now – proceed and send both save + reservation
+                reservationAlreadySent = true;
+                // Only now – proceed and send both save TakeAway + reservation
                 proceedWithReservation();
             }
         });
@@ -218,6 +198,7 @@ public class ConfirmOrderController {
 
 
     private void proceedWithReservation() {
+
         if (currentFormData == null) return;
 
         String name = currentFormData[0];
@@ -225,6 +206,9 @@ public class ConfirmOrderController {
         String id = currentFormData[2];
         String address = currentFormData[3];
         String visa = currentFormData[4];
+
+        //check error
+        System.out.println("Proceeding to save reservation for ID: " + id);
 
         OrderData order = OrderData.getInstance();
         String raw = order.getPreferredTime();
