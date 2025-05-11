@@ -6,22 +6,95 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="309.0" prefWidth="513.0" style="-fx-background-color: #ADD8E6;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.SecondaryController">
+<AnchorPane prefHeight="450.0" prefWidth="600.0" style="-fx-background-color: linear-gradient(to bottom, #fef9e7, #ffd699);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.SecondaryController">
+
     <children>
-        <Button fx:id="connectBTN" layoutX="202.0" layoutY="205.0" mnemonicParsing="false" onAction="#connect" text="connect">
+
+        <!-- Title -->
+        <Text layoutX="148.0" layoutY="56.0" style="-fx-fill: #ffa500;" text="Welcome to Mom's Kitchen!">
             <font>
-                <Font name="System Bold" size="13.0" />
-            </font></Button>
-        <TextField fx:id="ip" layoutX="208.0" layoutY="80.0" />
-        <Text fx:id="IP" layoutX="155.0" layoutY="97.0" strokeType="OUTSIDE" strokeWidth="0.0" text="IP">
-            <font>
-                <Font name="System Bold" size="17.0" />
-            </font></Text>
-        <TextField fx:id="port" layoutX="208.0" layoutY="123.0" />
-        <Text fx:id="Port" layoutX="145.0" layoutY="140.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Port">
+                <Font name="System Bold Italic" size="26.0" />
+            </font>
+        </Text>
+
+        <!-- IP Label -->
+        <Text layoutX="160.0" layoutY="120.0" style="-fx-fill: #555555;" text="IP Address:">
             <font>
                 <Font name="System Bold" size="16.0" />
-            </font></Text>
+            </font>
+        </Text>
+
+        <!-- IP TextField -->
+        <TextField fx:id="ip" layoutX="255.0" layoutY="100.0" prefWidth="180.0" promptText="Enter IP" style="-fx-background-radius: 10; -fx-background-color: #ffffff;" />
+
+        <!-- Port Label -->
+        <Text layoutX="160.0" layoutY="180.0" style="-fx-fill: #555555;" text="Port:">
+            <font>
+                <Font name="System Bold" size="16.0" />
+            </font>
+        </Text>
+
+        <!-- Port TextField -->
+        <TextField fx:id="port" layoutX="255.0" layoutY="160.0" prefWidth="180.0" promptText="Enter Port" style="-fx-background-radius: 10; -fx-background-color: #ffffff;" />
+
+        <!-- Circular Connect Button (Text Only) -->
+        <Button fx:id="connectBTN" contentDisplay="TOP" layoutX="230.0" layoutY="230.0" onAction="#connect" prefHeight="100.0" prefWidth="140.0" style="-fx-background-color: #ffa500;                -fx-text-fill: white;                -fx-font-weight: bold;                -fx-font-size: 18px;                -fx-background-radius: 70px;                -fx-shape: 'M0,70 a70,70 0 1,0 140,0 a70,70 0 1,0 -140,0';                -fx-alignment: center;" text="Connect" />
+
+
+
+        <Text layoutX="499.0" layoutY="52.0" text="👨‍🍳">
+            <font>
+                <Font size="48.0" />
+            </font>
+        </Text>
+
+        <!-- Individual Food Emojis -->
+
+        <!-- 🍝 Pasta -->
+        <Text layoutX="20.0" layoutY="438.0" text="🍝">
+            <font>
+                <Font size="36.0" />
+            </font>
+        </Text>
+
+        <!-- 🍕 Pizza -->
+        <Text layoutX="65.0" layoutY="394.0" text="🍕">
+            <font>
+                <Font size="36.0" />
+            </font>
+        </Text>
+
+        <!-- 🍔 Burger -->
+        <Text layoutX="20.0" layoutY="394.0" text="🍔">
+            <font>
+                <Font size="36.0" />
+            </font>
+        </Text>
+
+        <!-- 🍲 Soup -->
+        <Text layoutX="65.0" layoutY="439.0" text="🍲">
+            <font>
+                <Font size="36.0" />
+            </font>
+        </Text>
+        <!-- 🍽️ Plate with utensils -->
+        <Text layoutX="444.0" layoutY="127.0" text="🍽️" textAlignment="CENTER" wrappingWidth="36.5390625">
+            <font>
+                <Font size="36.0" />
+            </font>
+        </Text>
+
+        <!-- 🍴 Fork -->
+        <Text layoutX="282.0" layoutY="371.0" text="🍴">
+            <font>
+                <Font size="36.0" />
+            </font>
+        </Text>
+        <Text layoutX="444.0" layoutY="185.0" text="🍽️" textAlignment="CENTER" wrappingWidth="36.5390625">
+            <font>
+                <Font size="36.0" />
+            </font>
+        </Text>
+
     </children>
 </AnchorPane>
-

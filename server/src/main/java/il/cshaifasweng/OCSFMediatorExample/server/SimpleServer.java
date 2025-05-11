@@ -275,7 +275,10 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 		}
-
+		else if (msgString.startsWith("payment-confirmed:")) {
+			String customerId = msgString.split(":")[1];
+			DataManager.markPaymentAsPaidInDatabase(customerId);
+		}
 		else if (msgString.startsWith("remove client")) {
 			int index = msgString.indexOf(";");
 			String username = msgString.substring(index + 1).trim();
@@ -439,6 +442,25 @@ public class SimpleServer extends AbstractServer {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+			}
+		}
+		else if (msgString.equals("get_all_restaurants")) {
+			try {
+				List<Restaurant> restaurants = DataManager.getAllRestaurants();
+				if (restaurants != null && !restaurants.isEmpty()) {
+					System.out.println("Sending list of restaurants to client. Size: " + restaurants.size());
+					client.sendToClient(restaurants);
+				} else {
+					System.out.println("No restaurants found.");
+					client.sendToClient(new ArrayList<Restaurant>());  // Send an empty list to avoid client-side hang
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				try {
+					client.sendToClient("Error: Could not fetch restaurants.");
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
 			}
 		}
 

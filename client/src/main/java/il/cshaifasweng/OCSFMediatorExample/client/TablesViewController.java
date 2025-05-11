@@ -1,5 +1,8 @@
+// Updated TablesViewController based on the latest version provided by the user
+
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,6 +13,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.awt.Point;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +21,7 @@ import java.util.stream.Collectors;
 import static il.cshaifasweng.OCSFMediatorExample.client.Client.*;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 public class TablesViewController {
@@ -42,48 +47,6 @@ public class TablesViewController {
 
     @FXML
     private ComboBox<String> RestaurantCombo;
-
-    @FXML
-    private Button TableButton1;
-
-    @FXML
-    private Button TableButton10;
-
-    @FXML
-    private Button TableButton11;
-
-    @FXML
-    private Button TableButton12;
-
-    @FXML
-    private Button TableButton13;
-
-    @FXML
-    private Button TableButton14;
-
-    @FXML
-    private Button TableButton2;
-
-    @FXML
-    private Button TableButton3;
-
-    @FXML
-    private Button TableButton4;
-
-    @FXML
-    private Button TableButton5;
-
-    @FXML
-    private Button TableButton6;
-
-    @FXML
-    private Button TableButton7;
-
-    @FXML
-    private Button TableButton8;
-
-    @FXML
-    private Button TableButton9;
 
     @FXML
     private TextField TableNumTextField;
@@ -116,37 +79,84 @@ public class TablesViewController {
         return switch (restaurantId) {
             case 2 -> TEL_AVIV_TABLES;
             case 3 -> NAHARIYA_TABLES;
-            default -> HAIFA_TABLES; // for case 1 and for other cases because it's the default for the manager
+            default -> HAIFA_TABLES;
         };
     }
-
-    public void updateReservedTables(String tableNum) {
-        // Convert tableNum to an integer
-        int tableToModify = Integer.parseInt(tableNum);
-
-        if (reservedTables == null) {
-            reservedTables = new int[0]; // Initialize to an empty array if null
-        }
-        // Check if the number exists in the array
-        boolean exists = Arrays.stream(reservedTables).anyMatch(num -> num == tableToModify);
-
-        if (exists) {
-            // If exists, remove it
-            reservedTables = Arrays.stream(reservedTables)
-                    .filter(num -> num != tableToModify)
-                    .toArray();
-        } else {
-            // If not exists, add it
-            int[] newReservedTables = Arrays.copyOf(reservedTables, reservedTables.length + 1);
-            newReservedTables[reservedTables.length] = tableToModify;
-            reservedTables = newReservedTables;
-        }
-
-        // Sort the array
-        Arrays.sort(reservedTables);
+    @FXML
+    void backButton(ActionEvent event) {
+        App.switchScreen("Main Page");
     }
 
 
+    @FXML
+    void comboBoxChoice(ActionEvent event) {
+        String selectedRestaurant = RestaurantCombo.getValue();
+        if (selectedRestaurant != null) {
+            requestRestaurantDetails(selectedRestaurant);
+        }
+    }
+
+
+    private void requestRestaurantDetails(String restaurantName) {
+        String message = "Get branch details;" + restaurantName;
+        Client.getClient().sendToServer(message);
+    }
+
+    private void populateTimeBox(double openingTime, double closingTime) {
+        TimeBox.getItems().clear();
+        ObservableList<String> times = FXCollections.observableArrayList();
+        int startMinutes = (int) (openingTime * 60);
+        int endMinutes = (int) (closingTime * 60);  // Ending time is exclusive
+
+        for (int minutes = startMinutes; minutes < endMinutes; minutes += 15) {
+            int hours = minutes / 60;
+            int mins = minutes % 60;
+            String time = String.format("%02d:%02d", hours, mins);
+            times.add(time);
+        }
+        TimeBox.setItems(times);
+    }
+
+    /*@FXML
+    void comboBoxChoice(ActionEvent event) {
+        Platform.runLater(() -> {
+            String selectedRestaurant = RestaurantCombo.getValue();
+            if (selectedRestaurant != null) {
+                int restaurantId = switch (selectedRestaurant) {
+                    case "Haifa Branch" -> 1;
+                    case "Tel-Aviv Branch" -> 2;
+                    case "Nahariya Branch" -> 3;
+                    default -> 0;
+                };
+
+                // Set the image for the selected restaurant
+                if (images != null && restaurantId > 0 && restaurantId <= images.length) {
+                    imageView.setImage(images[restaurantId - 1]);
+                }
+
+                // Update the table positions based on the selected restaurant
+                positionTables(restaurantId);
+            }
+        });
+    }*/
+    private void positionTables(int restaurantId) {
+        Point[] selectedTables = getTableCoordinates(restaurantId);
+
+        for (int i = 0; i < selectedTables.length && i < tableButtons.length; i++) {
+            if (tableButtons[i] != null) {
+                tableButtons[i].setLayoutX(selectedTables[i].x);
+                tableButtons[i].setLayoutY(selectedTables[i].y);
+                tableButtons[i].setVisible(true); // Ensure the buttons are visible
+            }
+        }
+
+        // Hide any extra buttons that are not used in the selected restaurant
+        for (int i = selectedTables.length; i < tableButtons.length; i++) {
+            if (tableButtons[i] != null) {
+                tableButtons[i].setVisible(false);
+            }
+        }
+    }
     @FXML
     private void TimeBoxHandle(ActionEvent event) {
         String timeStr = TimeBox.getValue();
@@ -159,72 +169,13 @@ public class TablesViewController {
         };
 
         if (restaurantId != 0 && timeStr != null) {
-            // Send a request for reserved times around ±1 hour
+            // Send a request for reserved tables within ±1 hour of the selected time
             String message = "get_reserved_tables_within_hour;" + restaurantId + ";" + timeStr;
             Client.getClient().sendToServer(message);
         }
     }
-
-
     @FXML
-    void backButton(ActionEvent event){
-        App.switchScreen("Order Tables Page");
-    }
-
-    @FXML
-    void comboBoxChoice(){
-        Platform.runLater(() -> {
-            resetInfo();
-
-            String selectedRestaurant = RestaurantCombo.getValue();
-            if (selectedRestaurant != null) {
-
-                int j = 0;
-                int restaurantId = 0;
-
-                switch (selectedRestaurant) {
-                    case "Haifa Branch":
-                        imageView.setImage(images[0]);
-                        j = 13;
-                        restaurantId = 1;
-                        break;
-                    case "Tel-Aviv Branch":
-                        imageView.setImage(images[1]);
-                        j = 8;
-                        restaurantId = 2;
-                        break;
-                    case "Nahariya Branch":
-                        imageView.setImage(images[2]);
-                        j = 14;
-                        restaurantId = 3;
-                        break;
-                }
-                for (int i = 0; i < j; i++){
-                    tableButtons[i].setVisible(true);
-                }
-                for (int i = j; i < 14; i++){
-                    tableButtons[i].setVisible(false);
-                }
-                positionTables(restaurantId);
-
-            }
-        });
-    }
-
-    private void positionTables(int restaurantId) {
-        Point[] selectedTables = getTableCoordinates(restaurantId);
-
-        for (int i = 0; i < selectedTables.length && i < tableButtons.length; i++) {
-            if (tableButtons[i] != null) {
-                tableButtons[i].setLayoutX(selectedTables[i].x);
-                tableButtons[i].setLayoutY(selectedTables[i].y);
-            }
-        }
-    }
-
-
-    @FXML
-    void selectTable(ActionEvent event){
+    private void selectTable(ActionEvent event) {
         Platform.runLater(() -> {
             Button sourceButton = (Button) event.getSource();
             String buttonId = sourceButton.getId(); // Get the fx:id of the clicked button
@@ -239,7 +190,9 @@ public class TablesViewController {
             } else {
                 sourceButton.setStyle("-fx-background-color: green;");
             }
+
             updateReservedTables(tableNum);
+
             // Convert array to comma-separated string and update the text field
             String reservedTablesString = Arrays.stream(reservedTables)
                     .mapToObj(String::valueOf) // Convert each int to a String
@@ -248,105 +201,80 @@ public class TablesViewController {
             TableNumTextField.setText(reservedTablesString);
         });
     }
+    private void updateReservedTables(String tableNum) {
+        // Convert tableNum to an integer
+        int tableToModify = Integer.parseInt(tableNum);
 
-    @FXML
-    void resetInfo(){
-        DetailsPane.setDisable(true);
-
-        GuestsNumTextField.setText("");
-        NameTextField.setText("");
-        NoteTextField.setText("");
-        TableNumTextField.setText("");
-
-        for(int i = 0; i < 14; i++){
-            tableButtons[i].setStyle("-fx-background-color: transparent;");
+        if (reservedTables == null) {
+            reservedTables = new int[0]; // Initialize to an empty array if null
         }
+
+        // Check if the table number exists in the array
+        boolean exists = Arrays.stream(reservedTables).anyMatch(num -> num == tableToModify);
+
+        if (exists) {
+            // If it exists, remove it from the list (deselect)
+            reservedTables = Arrays.stream(reservedTables)
+                    .filter(num -> num != tableToModify)
+                    .toArray();
+        } else {
+            // If not, add it to the list (select)
+            int[] newReservedTables = Arrays.copyOf(reservedTables, reservedTables.length + 1);
+            newReservedTables[reservedTables.length] = tableToModify;
+            reservedTables = newReservedTables;
+        }
+
+        // Sort the array for consistent display
+        Arrays.sort(reservedTables);
     }
 
     @FXML
-    void initialize() {
-        Platform.runLater(() -> {
-            int id = Client.getClientAttributes().getRestaurantInterest();
-            imageView.setImage(new Image(getClass().getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Maps/" + (id - 1) + ".jpg").toString()));
-            DetailsPane.setDisable(true);
-            int employee_permission = userAtt.getPermissionLevel();
-            // For manager and service
-            if (!(employee_permission == 4 || employee_permission == 2)) {
-                RestaurantCombo.setVisible(false);
-            } else {
-                RestaurantCombo.setVisible(true);
-                ObservableList<String> restaurantList = FXCollections.observableArrayList(
-                        "Haifa Branch", "Tel-Aviv Branch", "Nahariya Branch"
-                );
-
-                RestaurantCombo.setItems(restaurantList);
-                RestaurantCombo.setValue(restaurantList.get(userAtt.getRestaurantInterest()-1));
-            }
-
-            tableButtons = new Button[14];
-
-            tableButtons[0] = TableButton1;
-            tableButtons[1] = TableButton2;
-            tableButtons[2] = TableButton3;
-            tableButtons[3] = TableButton4;
-            tableButtons[4] = TableButton5;
-            tableButtons[5] = TableButton6;
-            tableButtons[6] = TableButton7;
-            tableButtons[7] = TableButton8;
-            tableButtons[8] = TableButton9;
-            tableButtons[9] = TableButton10;
-            tableButtons[10] = TableButton11;
-            tableButtons[11] = TableButton12;
-            tableButtons[12] = TableButton13;
-            tableButtons[13] = TableButton14;
-
-            int restaurantId = userAtt.getRestaurantInterest();
-            positionTables(restaurantId); // Set the appropriate tables positions
-
-            switch (restaurantId) {
-                case 2:
-                    TableButton9.setVisible(false);
-                    TableButton10.setVisible(false);
-                    TableButton11.setVisible(false);
-                    TableButton12.setVisible(false);
-                    TableButton13.setVisible(false);
-                    TableButton14.setVisible(false);
-                    break;
-                case 1:
-                    TableButton14.setVisible(false);
-                    break;
-            }
-            try {
-                images = new Image[numOfImages];
-
-                for (int i = 0; i < numOfImages; i++) {
-                    images[i] = new Image(String.valueOf(TablesViewController.class.getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Maps/" + i + ".jpg")));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            if (employee_permission == 4){
-                imageView.setImage(images[0]);
-            }
-            else {
-                imageView.setImage(images[restaurantId - 1]);
-            }
-
-        });
+    public void initialize() {
+        System.out.println("Registering EventBus in TablesViewController...");
+        EventBus.getDefault().register(this);
+        System.out.println("EventBus registered.");
+        requestAllRestaurants();
     }
+
+
+    private void requestAllRestaurants() {
+        String message = "get_all_restaurants";
+        Client.getClient().sendToServer(message);
+        System.out.println("Requested restaurant list from server.");
+    }
+
     @Subscribe
-    public void handleReservedTables(List<Integer> takenTables) {
+    public void onRestaurantListReceived(List<Restaurant> restaurants) {
         Platform.runLater(() -> {
-            for (int i = 0; i < tableButtons.length; i++) {
-                if (takenTables.contains(i + 1)) {  // Tables are 1-indexed
-                    tableButtons[i].setStyle("-fx-background-color: red;"); // Blocked
-                    tableButtons[i].setDisable(true);
-                } else {
-                    tableButtons[i].setStyle("-fx-background-color: transparent;");
-                    tableButtons[i].setDisable(false);
+            if (restaurants != null && !restaurants.isEmpty()) {
+                System.out.println("Populating combo box with " + restaurants.size() + " restaurants.");
+
+                ObservableList<String> restaurantNames = FXCollections.observableArrayList();
+                for (Restaurant restaurant : restaurants) {
+                    System.out.println("Adding to combo box: " + restaurant.getName());
+                    restaurantNames.add(restaurant.getName());
                 }
+                RestaurantCombo.setItems(restaurantNames);
+                System.out.println("Successfully populated combo box.");
+            } else {
+                System.out.println("No restaurants to populate.");
             }
         });
     }
 
+
+
+
+    public void cleanup() {
+        EventBus.getDefault().unregister(this);
+        System.out.println("EventBus unregistered from TablesViewController.");
+    }
+
+
+    @Subscribe
+    public void onRestaurantDetailsReceived(Restaurant restaurant) {
+        Platform.runLater(() -> {
+            populateTimeBox(restaurant.getOpeningTime(), restaurant.getClosingTime());
+        });
+    }
 }

@@ -606,4 +606,16 @@ public class MenuController {
         String page = "Main Page";
         App.switchScreen(page);
     }
+    @FXML
+    void payWithVisa(ActionEvent event) {
+        // Placeholder function for Visa payment
+        System.out.println("Pay with Visa clicked.");
+    }
+
+    @FXML
+    void payWithCash(ActionEvent event) {
+        // Placeholder function for Cash payment
+        System.out.println("Pay with Cash clicked.");
+    }
+
 }

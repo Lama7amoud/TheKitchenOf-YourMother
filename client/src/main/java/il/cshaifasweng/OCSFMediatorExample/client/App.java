@@ -65,8 +65,10 @@ public class App extends Application {
                 entry("Update Menu Page" ,"updateMenuPage"),
                 entry("Price Confirmation Page" ,"PriceConfirmationPage"),
                 entry("Discount Confirmation Page" ,"DiscountConfirmation"),
-                entry("Manager Feedback Page" ,"managerfeedbackpage")
-        );
+                entry("Manager Feedback Page" ,"managerfeedbackpage"),
+                entry("Tables View Page", "tablesViewPage"),
+                entry("VisaPayment Page","visaPayment")
+                );
 
         String contentName = screenMappings.get(screenName);
         if (contentName != null) {

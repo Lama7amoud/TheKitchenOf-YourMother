@@ -75,7 +75,7 @@ import java.util.ResourceBundle;
 
         @FXML
         void switchPage(ActionEvent event) {
-            // Handle action
+            App.switchScreen("Menu Page");
         }
 
         @Override

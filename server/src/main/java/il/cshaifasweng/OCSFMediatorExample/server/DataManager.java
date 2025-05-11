@@ -3,6 +3,10 @@ package il.cshaifasweng.OCSFMediatorExample.server;
 import il.cshaifasweng.OCSFMediatorExample.entities.Reservation;
 
 import java.util.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 
 import java.time.LocalDate;
@@ -1468,16 +1472,79 @@ public class DataManager {
         }
     }
 
-    // Get all restaurants
-    public static List<Restaurant> getAllRestaurants() {
-        try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("FROM Restaurant", Restaurant.class).getResultList();
-        }
-    }
-
     public static List<MonthlyReport> getAllReports() {
         try (Session session = sessionFactory.openSession()) {
             return session.createQuery("FROM MonthlyReport", MonthlyReport.class).getResultList();
         }
     }
+
+    //    visa payment
+    public static void markPaymentAsPaidInDatabase(String customerId) {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("your-persistence-unit");
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            TypedQuery<Reservation> query = em.createQuery(
+                    "SELECT r FROM Reservation r WHERE r.idNumber = :customerId AND r.isPayed = false",
+                    Reservation.class
+            );
+            query.setParameter("customerId", customerId);
+
+            List<Reservation> results = query.getResultList();
+
+            if (!results.isEmpty()) {
+                Reservation reservation = results.get(0);
+                reservation.setPayed(true);
+                em.merge(reservation);
+                System.out.println("Reservation marked as paid for customer ID: " + customerId);
+            } else {
+                System.out.println("No unpaid reservation found for customer ID: " + customerId);
+            }
+
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+        } finally {
+            em.close();
+            emf.close();
+        }
+    }
+
+    public static List<Restaurant> getAllRestaurants() {
+        SessionFactory sessionFactory = getSessionFactory(password);
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        try {
+            List<Restaurant> restaurants = session.createQuery("FROM Restaurant", Restaurant.class).getResultList();
+            session.getTransaction().commit();
+
+            // Log each restaurant name to verify
+            System.out.println("Fetched " + restaurants.size() + " restaurants from database:");
+            for (Restaurant restaurant : restaurants) {
+                System.out.println("Restaurant: " + restaurant.getName());
+            }
+
+            return restaurants;
+        } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return new ArrayList<>();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+
+
+
 }

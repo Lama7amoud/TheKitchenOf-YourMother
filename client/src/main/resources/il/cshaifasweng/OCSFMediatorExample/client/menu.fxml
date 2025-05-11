@@ -38,5 +38,16 @@
                 prefHeight="28.0" prefWidth="140.0"
                 style="-fx-background-radius: 20; -fx-background-color: white; -fx-text-fill: black;" />
 
+        <!-- New Payment Buttons -->
+        <Button fx:id="payWithVisaButton" layoutX="720.0" layoutY="760.0" mnemonicParsing="false"
+                onAction="#payWithVisa" text="Pay with Visa"
+                prefHeight="28.0" prefWidth="140.0"
+                style="-fx-background-radius: 20; -fx-background-color: white; -fx-text-fill: black;" />
+
+        <Button fx:id="payWithCashButton" layoutX="560.0" layoutY="760.0" mnemonicParsing="false"
+                onAction="#payWithCash" text="Pay with Cash"
+                prefHeight="28.0" prefWidth="140.0"
+                style="-fx-background-radius: 20; -fx-background-color: white; -fx-text-fill: black;" />
+
     </AnchorPane>
 </ScrollPane>

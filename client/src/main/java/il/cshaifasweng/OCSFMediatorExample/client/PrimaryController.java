@@ -48,6 +48,9 @@ public class PrimaryController {
     @FXML
     private Text RestaurantDetailsInstructionLabel;
 
+    @FXML
+    private Button viewTablesButton;
+
     void updateResInterest(){
         Platform.runLater(() -> {
             String selectedRestaurant = ChooseRestaurantBox.getValue();
@@ -73,47 +76,48 @@ public class PrimaryController {
             if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Haifa Branch")) {
                 MenuController.setRestaurantInterest(1);
                 page = "Menu Page";
-
-            }
-            else  if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Tel-Aviv Branch")) {
+            } else if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Tel-Aviv Branch")) {
                 MenuController.setRestaurantInterest(2);
                 page = "Menu Page";
-            }
-            else  if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Nahariya Branch")) {
+            } else if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Nahariya Branch")) {
                 MenuController.setRestaurantInterest(3);
                 page = "Menu Page";
-            }
-
-            else if (sourceButton == PersonalAreaButton) {
+            } else if (sourceButton == PersonalAreaButton) {
                 page = "Personal Area Page";
-            }
-
-            else if(sourceButton == feedbackButton&& ChooseRestaurantBox.getValue().equals("Haifa Branch")){
+            } else if (sourceButton == viewTablesButton) {
+                String selectedRestaurant = ChooseRestaurantBox.getValue();
+                if (selectedRestaurant != null) {
+                    int restaurantId = switch (selectedRestaurant) {
+                        case "Haifa Branch" -> 1;
+                        case "Tel-Aviv Branch" -> 2;
+                        case "Nahariya Branch" -> 3;
+                        default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
+                    };
+                    userAtt.setRestaurantInterest((short) restaurantId);
+                    page = "Tables View Page";
+                }
+            } else if (sourceButton == feedbackButton && ChooseRestaurantBox.getValue().equals("Haifa Branch")) {
                 MenuController.setRestaurantInterest(1);
                 page = "Feedback Page";
-            }
-            else if(sourceButton == feedbackButton&& ChooseRestaurantBox.getValue().equals("Tel-Aviv Branch")){
+            } else if (sourceButton == feedbackButton && ChooseRestaurantBox.getValue().equals("Tel-Aviv Branch")) {
                 MenuController.setRestaurantInterest(2);
                 page = "Feedback Page";
-            }
-            else if(sourceButton == feedbackButton&& ChooseRestaurantBox.getValue().equals("Nahariya Branch")){
+            } else if (sourceButton == feedbackButton && ChooseRestaurantBox.getValue().equals("Nahariya Branch")) {
                 MenuController.setRestaurantInterest(3);
                 page = "Feedback Page";
-            }
-
-            else if (sourceButton == orderButton) {
+            } else if (sourceButton == orderButton) {
                 page = "TakeAwayOrReservation Page";
             }
-            if(userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4){
+
+            if (userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4) {
                 String selectedRestaurant = ChooseRestaurantBox.getValue();
-                if(selectedRestaurant != null){
+                if (selectedRestaurant != null) {
                     userAtt.setRestaurantInterest((short) switch (selectedRestaurant) {
-                                case "Haifa Branch" -> 1;
-                                case "Tel-Aviv Branch" -> 2;
-                                case "Nahariya Branch" -> 3;
-                                default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
-                            }
-                    );
+                        case "Haifa Branch" -> 1;
+                        case "Tel-Aviv Branch" -> 2;
+                        case "Nahariya Branch" -> 3;
+                        default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
+                    });
                 }
             }
             updateResInterest();
@@ -155,16 +159,17 @@ public class PrimaryController {
     }
 
     @FXML
-    void comboBoxChoice(){
+    void comboBoxChoice() {
         Platform.runLater(() -> {
             String selectedRestaurant = ChooseRestaurantBox.getValue();
 
             if (selectedRestaurant != null) {
-                ComboChoiceRequestLabel.setVisible(false); // making the label that tells the user to choose a restaurant to invisible
+                ComboChoiceRequestLabel.setVisible(false);
                 RestaurantDetailsInstructionLabel.setVisible(true);
                 orderButton.setDisable(false);
                 feedbackButton.setDisable(false);
                 menuButton.setDisable(false);
+                viewTablesButton.setVisible(true); // Make the View Tables button visible
                 imageView.setVisible(true);
 
                 switch (selectedRestaurant) {
@@ -193,15 +198,14 @@ public class PrimaryController {
             feedbackButton.setDisable(true);
             menuButton.setDisable(true);
             imageView.setVisible(false);
+            viewTablesButton.setVisible(false); // Initially hide the button
 
             try {
                 images = new Image[numOfImages];
-
                 for (int i = 0; i < numOfImages; i++) {
                     images[i] = new Image(String.valueOf(PrimaryController.class.getResource("/il/cshaifasweng/OCSFMediatorExample/client/Restaurant_Maps/" + i + ".jpg")));
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -221,6 +225,5 @@ public class PrimaryController {
                 PersonalAreaButton.setVisible(true);
             }
         });
-
     }
 }

@@ -67,7 +67,7 @@
                 <Label fx:id="notesLabel" layoutX="50.0" layoutY="150.0" text="Note:" visible="false" />
                 <ComboBox fx:id="favTimeComboBox" layoutX="141.0" layoutY="278.0" prefHeight="26.0" prefWidth="160.0" promptText="Choose Favorite Time" />
                 <Label layoutX="26.0" layoutY="282.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Favorite Time:" textFill="#151515" />
-                <Button fx:id="ContinueButton" layoutX="152.0" layoutY="334.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="147.0" text="Continue" />
+                <Button fx:id="ContinueButton" layoutX="152.0" layoutY="334.0" mnemonicParsing="false" prefHeight="30.0" onAction="#switchPage" prefWidth="147.0" text="Continue" />
             </children>
         </AnchorPane>
     </center>

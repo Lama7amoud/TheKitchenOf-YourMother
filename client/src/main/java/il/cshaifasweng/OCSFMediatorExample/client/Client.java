@@ -72,7 +72,7 @@ public class Client extends AbstractClient {
     public static List<Meal> getMenu() {
         return menu;
     }
-    @Override
+/*    @Override
     protected void handleMessageFromServer(Object msg) {
         if (msg instanceof String) {
 
@@ -200,5 +200,121 @@ public class Client extends AbstractClient {
         } else if (msg instanceof Reservation) {
             EventBus.getDefault().post(msg);
         }
+    }*/
+@Override
+protected void handleMessageFromServer(Object msg) {
+    if (msg instanceof String) {
+        String strMsg = (String) msg;
+
+        if (strMsg.equals("Reservation cancelled successfully")) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Cancelled");
+                alert.setHeaderText(null);
+                alert.setContentText("Your reservation has been cancelled.");
+                alert.showAndWait();
+                App.switchScreen("Main Page");
+            });
+            return;
+        }
+
+        if (strMsg.equals("Reservation saved successfully")) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText(null);
+                alert.setContentText("Your reservation has been saved successfully.");
+                alert.showAndWait();
+                App.switchScreen("Main Page");
+            });
+            return;
+        }
+
+        if (strMsg.equals("Reservation failed: ID already used.")) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Reservation Failed");
+                alert.setHeaderText(null);
+                alert.setContentText("A reservation already exists for this ID.");
+                alert.showAndWait();
+            });
+            return;
+        }
+
+        if (strMsg.equals("client added successfully")) {
+            App.switchScreen("Log In Page");
+            return;
+        }
+
+        if (strMsg.startsWith("id_exists:")) {
+            boolean exists = Boolean.parseBoolean(strMsg.split(":")[1].trim());
+            EventBus.getDefault().post(new IdCheckEvent(exists));
+            return;
+        }
+
+        System.out.println("Received from server: " + strMsg); // Log any other message
     }
+
+    // Handle warnings
+    if (msg instanceof Warning) {
+        EventBus.getDefault().post(new WarningEvent((Warning) msg));
+    }
+
+    // Handle list of objects
+    if (msg instanceof List<?>) {
+        List<?> list = (List<?>) msg;
+        if (!list.isEmpty()) {
+            Object first = list.get(0);
+
+            if (first instanceof Meal) {
+                menu = (List<Meal>) list;
+                System.out.println("Received list of meals from server: " + menu.size());
+                EventBus.getDefault().post(menu);
+            } else if (first instanceof PriceConfirmation) {
+                System.out.println("Received list of price confirmations from server.");
+                EventBus.getDefault().post((List<PriceConfirmation>) list);
+            } else if (first instanceof Discounts) {
+                System.out.println("Received list of discounts from server.");
+                EventBus.getDefault().post((List<Discounts>) list);
+            } else if (first instanceof Feedback) {
+                System.out.println("Received list of feedback from server.");
+                EventBus.getDefault().post((List<Feedback>) list);
+            } else if (first instanceof HostingTable) {
+                System.out.println("Received list of hosting tables from server.");
+                EventBus.getDefault().post((List<HostingTable>) list);
+            } else if (first instanceof MonthlyReport) {
+                System.out.println("Received list of monthly reports from server.");
+                EventBus.getDefault().post(new MonthlyReportsEvent((List<MonthlyReport>) list));
+            } else if (first instanceof Restaurant) {
+                List<Restaurant> restaurantList = (List<Restaurant>) list;
+                System.out.println("Received list of restaurants from server: " + restaurantList.size());
+                EventBus.getDefault().post(restaurantList);
+            } else {
+                System.out.println("Received an unrecognized list from server.");
+            }
+        } else {
+            System.out.println("Received an empty list from server.");
+        }
+    }
+
+    // Handle single Restaurant object
+    if (msg instanceof Restaurant) {
+        System.out.println("Restaurant " + ((Restaurant) msg).getId() + " received on client side");
+        EventBus.getDefault().post(msg);
+    }
+
+    // Handle single Reservation object
+    if (msg instanceof Reservation) {
+        EventBus.getDefault().post(msg);
+    }
+
+    // Handle AuthorizedUser object
+    if (msg instanceof AuthorizedUser) {
+        userAtt.copyUser((AuthorizedUser) msg);
+        String response = "Authorized user request: " + userAtt.getMessageToServer();
+        EventBus.getDefault().post(response);
+    }
+}
+
+
 }
