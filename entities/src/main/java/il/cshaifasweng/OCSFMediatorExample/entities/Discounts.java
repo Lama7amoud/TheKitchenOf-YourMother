@@ -22,9 +22,6 @@ public class Discounts implements Serializable {
     private String category;
 
 
-
-
-
     public Discounts() {
     }
 
@@ -32,8 +29,6 @@ public class Discounts implements Serializable {
         this.discount = discount;
         this.category = category;
     }
-
-
 
     public int getId() {
         return id;

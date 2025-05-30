@@ -17,7 +17,7 @@
                     <Font size="25.0" />
                 </font>
             </Label>
-            <Button fx:id="backButton" alignment="CENTER" layoutX="56.0" layoutY="351.0" mnemonicParsing="false" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Back To Main Page" textFill="WHITE" />
+            <Button fx:id="backButton" onAction="#switchPage" alignment="CENTER" layoutX="56.0" layoutY="351.0" mnemonicParsing="false" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Back To Main Page" textFill="WHITE" />
             <Label fx:id="branchNameLabel" layoutX="38.0" layoutY="77.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Branch Name" textFill="ORANGE">
                 <font>
                     <Font size="25.0" />

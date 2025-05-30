@@ -71,7 +71,7 @@
         @FXML
         void initialize() {
             EventBus.getDefault().register(this);
-
+            branchDetailsButton.setVisible(false);
             // Disable confirm button at start
             ConfirmOrderButton.setDisable(true);
 

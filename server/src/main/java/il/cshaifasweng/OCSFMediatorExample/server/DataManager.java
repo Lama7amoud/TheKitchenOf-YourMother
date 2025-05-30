@@ -3,10 +3,7 @@ package il.cshaifasweng.OCSFMediatorExample.server;
 import il.cshaifasweng.OCSFMediatorExample.entities.Reservation;
 
 import java.util.*;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import javax.persistence.criteria.*;
 
 import java.time.LocalDate;
@@ -65,6 +62,7 @@ public class DataManager {
         configuration.addAnnotatedClass(Business.class);
         configuration.addAnnotatedClass(Reservation.class);
         configuration.addAnnotatedClass(ReservedTime.class);
+        configuration.addAnnotatedClass(MealOrder.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         return configuration.buildSessionFactory(serviceRegistry);
@@ -347,10 +345,11 @@ public class DataManager {
             table.setTableNumber(i);
             table.setSeatsNumber((i % 3) + 2);  // Seats: 2–4
             table.setRestaurant(restaurant1);
-            table.setInside(i % 2 == 0);
+            table.setInside(i <= 8);
             table.setReservedTimes(new ArrayList<>());
             session.save(table);
         }
+
 
         // Insert tables for Tel Aviv branch (8 tables)
         for (int i = 1; i <= 8; i++) {
@@ -358,10 +357,11 @@ public class DataManager {
             table1.setTableNumber(i);
             table1.setSeatsNumber((i % 3) + 2);  // Seats: 2–4
             table1.setRestaurant(restaurant2);
-            table1.setInside(i % 2 == 0);
+            table1.setInside(i <= 6);
             table1.setReservedTimes(new ArrayList<>());
             session.save(table1);
         }
+
 
         // Insert tables for Nahariya branch (14 tables)
         for (int i = 1; i <= 14; i++) {
@@ -369,11 +369,12 @@ public class DataManager {
             table2.setTableNumber(i);
             table2.setSeatsNumber((i % 3) + 2);  // Seats: 2–4
             table2.setRestaurant(restaurant3);
-            table2.setInside(i % 2 == 0);
+            table2.setInside(i <= 10);
             table2.setReservedTimes(new ArrayList<>());
             session.save(table2);
         }
     }
+
 
     public static Restaurant getRestaurant(String restaurantId){
         SessionFactory sessionFactory = getSessionFactory(password);
@@ -1537,6 +1538,30 @@ public class DataManager {
             }
             e.printStackTrace();
             return new ArrayList<>();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+    public static void saveMealOrders(List<MealOrder> orders) {
+        SessionFactory sessionFactory = getSessionFactory(password);
+        Session session = null;
+        try {
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            for (MealOrder order : orders) {
+                session.save(order);
+            }
+
+            session.getTransaction().commit();
+            System.out.println("Meal orders saved successfully.");
+        } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
         } finally {
             if (session != null) {
                 session.close();

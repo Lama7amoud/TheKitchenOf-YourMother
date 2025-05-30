@@ -38,6 +38,15 @@ public class ConfirmOrderController {
     @FXML
     private  Label phoneLabel,nameLabel,idLabel,addressLabel,errorTimeLabel;
 
+    @FXML private ComboBox<String> expirationMonthCombo;
+    @FXML private ComboBox<String> expirationYearCombo;
+    @FXML private TextField cvvField;
+    @FXML private TextField emailField;
+
+    @FXML private Label expirationLabel;
+    @FXML private Label cvvLabel;
+    @FXML private Label emailLabel;
+
     private List<HostingTable> lastReceivedTables = new ArrayList<>();
     private boolean reservationAlreadySent = false;
 
@@ -68,6 +77,21 @@ public class ConfirmOrderController {
     @FXML
     void initialize() {
         EventBus.getDefault().register(this);
+        branchDetailsButton.setVisible(false);
+        viewMapButton.setVisible(false);
+
+        // Populate expiration month/year
+        expirationMonthCombo.getItems().addAll("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12");
+        int currentYear = LocalDate.now().getYear();
+        for (int year = currentYear; year <= 2040; year++) {
+            expirationYearCombo.getItems().add(String.valueOf(year));
+        }
+
+        // Hide validation labels
+        expirationLabel.setVisible(false);
+        cvvLabel.setVisible(false);
+        emailLabel.setVisible(false);
+
 
         // Hide error labels when page loads
         nameLabel.setVisible(false);
@@ -145,6 +169,25 @@ public class ConfirmOrderController {
         String address = addressField.getText().trim();
         String visa = visaTextField.getText().trim();
 
+        String expirationMonth = expirationMonthCombo.getValue();
+        String expirationYear = expirationYearCombo.getValue();
+        String cvv = cvvField.getText().trim();
+        String email = emailField.getText().trim();
+
+
+        if (expirationMonth == null || expirationYear == null) {
+            expirationLabel.setVisible(true);
+            isValid = false;
+        }
+        if (!cvv.matches("^\\d{3}$")) {
+            cvvLabel.setVisible(true);
+            isValid = false;
+        }
+        if (!email.matches("^[\\w-.]+@[\\w-]+\\.[a-zA-Z]{2,}$")) {
+            emailLabel.setVisible(true);
+            isValid = false;
+        }
+
         if (name.split("\\s+").length < 2 || name.matches(".*\\d.*")) {
             nameLabel.setVisible(true);
             isValid = false;
@@ -170,7 +213,7 @@ public class ConfirmOrderController {
 
 
         if (!isValid || reservationAlreadySent) return;
-        currentFormData = new String[]{name, phone, id, address, visa};
+        currentFormData = new String[]{name, phone, id, address, visa, expirationMonth, expirationYear, cvv, email};
         Client.getClient().sendToServer("check_reservation_id;" + id);
 
     }
@@ -207,6 +250,11 @@ public class ConfirmOrderController {
         String address = currentFormData[3];
         String visa = currentFormData[4];
 
+        int expirationMonth = Integer.parseInt(currentFormData[5]);
+        int expirationYear = Integer.parseInt(currentFormData[6]);
+        String cvv = currentFormData[7];
+        String email = currentFormData[8];
+
         //check error
         System.out.println("Proceeding to save reservation for ID: " + id);
 
@@ -228,6 +276,13 @@ public class ConfirmOrderController {
         reservation.setVisa(visa);  // Set the visa field instead of empty string
         reservation.setReceivingTime(LocalDateTime.now());  // Set current time as receiving time
         reservation.setRestaurant(Client.getClientAttributes().getRestaurant());
+
+        reservation.setVisa(visa);
+        reservation.setExpirationMonth(expirationMonth);
+        reservation.setExpirationYear(expirationYear);
+        reservation.setCvv(cvv);
+        reservation.setEmail(email);
+
 
         List<HostingTable> chosenTables = findTablesForTime(order.getPreferredTime());
         reservation.setReservedTables(chosenTables);

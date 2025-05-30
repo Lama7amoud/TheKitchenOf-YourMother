@@ -51,41 +51,32 @@ public class PrimaryController {
     @FXML
     private Button viewTablesButton;
 
-    void updateResInterest(){
+    void updateResInterest() {
         Platform.runLater(() -> {
             String selectedRestaurant = ChooseRestaurantBox.getValue();
-            if(selectedRestaurant != null){
-                userAtt.setRestaurantInterest((short) switch (selectedRestaurant) {
-                            case "Haifa Branch" -> 1;
-                            case "Tel-Aviv Branch" -> 2;
-                            case "Nahariya Branch" -> 3;
-                            default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
-                        }
-                );
+            if (selectedRestaurant != null) {
+                short restaurantId = switch (selectedRestaurant) {
+                    case "Haifa Branch" -> 1;
+                    case "Tel-Aviv Branch" -> 2;
+                    case "Nahariya Branch" -> 3;
+                    default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
+                };
+                userAtt.setRestaurantInterest(restaurantId);
+                System.out.println("Saved restaurant in userAtt: " + restaurantId);
             }
         });
     }
+
 
     @FXML
     void switchPage(ActionEvent event) {
         Platform.runLater(() -> {
             String page = "";
             Button sourceButton = (Button) event.getSource();
+            String selectedRestaurant = ChooseRestaurantBox.getValue();
 
             // Check which button triggered the event
-            if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Haifa Branch")) {
-                MenuController.setRestaurantInterest(1);
-                page = "Menu Page";
-            } else if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Tel-Aviv Branch")) {
-                MenuController.setRestaurantInterest(2);
-                page = "Menu Page";
-            } else if (sourceButton == menuButton && ChooseRestaurantBox.getValue().equals("Nahariya Branch")) {
-                MenuController.setRestaurantInterest(3);
-                page = "Menu Page";
-            } else if (sourceButton == PersonalAreaButton) {
-                page = "Personal Area Page";
-            } else if (sourceButton == viewTablesButton) {
-                String selectedRestaurant = ChooseRestaurantBox.getValue();
+            if (sourceButton == menuButton) {
                 if (selectedRestaurant != null) {
                     int restaurantId = switch (selectedRestaurant) {
                         case "Haifa Branch" -> 1;
@@ -93,37 +84,53 @@ public class PrimaryController {
                         case "Nahariya Branch" -> 3;
                         default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
                     };
-                    userAtt.setRestaurantInterest((short) restaurantId);
-                    page = "Tables View Page";
+                    userAtt.setRestaurantInterest((short) restaurantId); // Save the restaurant in userAtt
+                    MenuController.setRestaurantInterest(restaurantId); // Set in MenuController for compatibility
+                    page = "Menu Page";
                 }
-            } else if (sourceButton == feedbackButton && ChooseRestaurantBox.getValue().equals("Haifa Branch")) {
-                MenuController.setRestaurantInterest(1);
-                page = "Feedback Page";
-            } else if (sourceButton == feedbackButton && ChooseRestaurantBox.getValue().equals("Tel-Aviv Branch")) {
-                MenuController.setRestaurantInterest(2);
-                page = "Feedback Page";
-            } else if (sourceButton == feedbackButton && ChooseRestaurantBox.getValue().equals("Nahariya Branch")) {
-                MenuController.setRestaurantInterest(3);
-                page = "Feedback Page";
-            } else if (sourceButton == orderButton) {
-                page = "TakeAwayOrReservation Page";
-            }
-
-            if (userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4) {
-                String selectedRestaurant = ChooseRestaurantBox.getValue();
+            } else if (sourceButton == PersonalAreaButton) {
+                page = "Personal Area Page";
+            } else if (sourceButton == viewTablesButton && selectedRestaurant != null) {
+                int restaurantId = switch (selectedRestaurant) {
+                    case "Haifa Branch" -> 1;
+                    case "Tel-Aviv Branch" -> 2;
+                    case "Nahariya Branch" -> 3;
+                    default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
+                };
+                userAtt.setRestaurantInterest((short) restaurantId); // Save the restaurant in userAtt
+                page = "Tables View Page";
+            } else if (sourceButton == feedbackButton) {
                 if (selectedRestaurant != null) {
-                    userAtt.setRestaurantInterest((short) switch (selectedRestaurant) {
+                    int restaurantId = switch (selectedRestaurant) {
                         case "Haifa Branch" -> 1;
                         case "Tel-Aviv Branch" -> 2;
                         case "Nahariya Branch" -> 3;
                         default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
-                    });
+                    };
+                    userAtt.setRestaurantInterest((short) restaurantId); // Save the restaurant in userAtt
+                    page = "Feedback Page";
+                }
+            } else if (sourceButton == orderButton) {
+                page = "TakeAwayOrReservation Page";
+            }
+
+            // Handle customer or manager restaurant selection
+            if (userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4) {
+                if (selectedRestaurant != null) {
+                    int restaurantId = switch (selectedRestaurant) {
+                        case "Haifa Branch" -> 1;
+                        case "Tel-Aviv Branch" -> 2;
+                        case "Nahariya Branch" -> 3;
+                        default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
+                    };
+                    userAtt.setRestaurantInterest((short) restaurantId); // Save the restaurant in userAtt
                 }
             }
             updateResInterest();
             App.switchScreen(page);
         });
     }
+
 
     @FXML
     void toBranchPage(MouseEvent event){

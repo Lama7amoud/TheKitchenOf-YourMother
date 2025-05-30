@@ -1,7 +1,8 @@
 package il.cshaifasweng.OCSFMediatorExample.entities;
 
-
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OrderData {
 
@@ -14,11 +15,19 @@ public class OrderData {
     private LocalDate date;
     private Restaurant selectedRestaurant;
 
+    // New fields for customer details
+    private String fullName;
+    private String phoneNumber;
+    private String idNumber;
+    private String address;
+    private String email;  // ✅ New field added
+    private String visa;
+    private List<MealOrder> mealOrders = new ArrayList<>();
 
+    private int expirationMonth;
+    private int expirationYear;
+    private String cvv;
 
-    // Additional future fields (optional)
-    // private List<HostingTable> selectedTables;
-    // private boolean paymentConfirmed;
 
     private OrderData() {}
 
@@ -36,36 +45,73 @@ public class OrderData {
         this.generalNote = generalNote;
     }
 
-    public String getPreferredTime() {
-        return preferredTime;
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
+
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
+    public String getIdNumber() { return idNumber; }
+    public void setIdNumber(String idNumber) { this.idNumber = idNumber; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getEmail() { return email; }  // ✅ Getter
+    public void setEmail(String email) { this.email = email; }  // ✅ Setter
+
+    public String getVisa() { return visa; }
+    public void setVisa(String visa) { this.visa = visa; }
+
+    public String getPreferredTime() { return preferredTime; }
+    public void setPreferredTime(String preferredTime) { this.preferredTime = preferredTime; }
+
+    public String getSittingType() { return sittingType; }
+    public void setSittingType(String sittingType) { this.sittingType = sittingType; }
+
+    public int getGuestCount() { return guestCount; }
+    public void setGuestCount(int guestCount) { this.guestCount = guestCount; }
+
+    public String getGeneralNote() { return generalNote; }
+    public void setGeneralNote(String generalNote) { this.generalNote = generalNote; }
+
+    public LocalDate getDate() { return date; }
+    public void setDate(LocalDate date) { this.date = date; }
+
+    public Restaurant getSelectedRestaurant() { return selectedRestaurant; }
+    public void setSelectedRestaurant(Restaurant selectedRestaurant) { this.selectedRestaurant = selectedRestaurant; }
+
+    public int getExpirationMonth() {
+        return expirationMonth;
     }
 
-    public void setPreferredTime(String preferredTime) {
-        this.preferredTime = preferredTime;
+    public void setExpirationMonth(int expirationMonth) {
+        this.expirationMonth = expirationMonth;
     }
 
-    public String getSittingType() {
-        return sittingType;
+    public int getExpirationYear() {
+        return expirationYear;
     }
 
-    public void setSittingType(String sittingType) {
-        this.sittingType = sittingType;
+    public void setExpirationYear(int expirationYear) {
+        this.expirationYear = expirationYear;
     }
 
-    public int getGuestCount() {
-        return guestCount;
+    public String getCvv() {
+        return cvv;
     }
 
-    public void setGuestCount(int guestCount) {
-        this.guestCount = guestCount;
+    public void setCvv(String cvv) {
+        this.cvv = cvv;
     }
 
-    public String getGeneralNote() {
-        return generalNote;
+
+    public void addMealOrder(MealOrder order) {
+        this.mealOrders.add(order);
     }
 
-    public void setGeneralNote(String generalNote) {
-        this.generalNote = generalNote;
+    public List<MealOrder> getMealOrders() {
+        return mealOrders;
     }
 
     public void reset() {
@@ -73,33 +119,30 @@ public class OrderData {
         this.sittingType = null;
         this.guestCount = 0;
         this.generalNote = null;
-        // If more fields added in future, reset them here too
-    }
+        this.fullName = null;
+        this.phoneNumber = null;
+        this.idNumber = null;
+        this.address = null;
+        this.email = null;
+        this.visa = null;
+        this.expirationMonth = 0;
+        this.expirationYear = 0;
+        this.cvv = null;
 
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
     }
 
     @Override
     public String toString() {
         return "OrderData{" +
-                "preferredTime='" + preferredTime + '\'' +
+                "fullName='" + fullName + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", idNumber='" + idNumber + '\'' +
+                ", address='" + address + '\'' +
+                ", email='" + email + '\'' +
+                ", preferredTime='" + preferredTime + '\'' +
                 ", sittingType='" + sittingType + '\'' +
                 ", guestCount=" + guestCount +
                 ", generalNote='" + generalNote + '\'' +
                 '}';
     }
-
-    public Restaurant getSelectedRestaurant() {
-        return selectedRestaurant;
-    }
-
-    public void setSelectedRestaurant(Restaurant selectedRestaurant) {
-        this.selectedRestaurant = selectedRestaurant;
-    }
-
 }

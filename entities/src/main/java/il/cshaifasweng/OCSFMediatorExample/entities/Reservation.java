@@ -24,6 +24,10 @@ public class Reservation implements Serializable {
     private LocalDateTime receivingTime;
     private String status = "on";
     private boolean isTakeAway;
+    private int expirationMonth;
+    private int expirationYear;
+    private String cvv;
+    private String email;
 
     @ManyToOne
     private Restaurant restaurant;
@@ -33,16 +37,22 @@ public class Reservation implements Serializable {
 
     public Reservation() {}
 
-
+    public Reservation(String name, String phoneNumber, String idNumber, String address, LocalDateTime reservationTime) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.idNumber = idNumber;
+        this.address = address;
+        this.reservationTime = reservationTime;
+        this.status = "on"; // default status
+        this.isTakeAway = true; // since it's from the TakeAway page
+    }
 
     public String getStatus() {
         return status;
     }
 
-
     public boolean isTakeAway() { return isTakeAway; }
     public void setTakeAway(boolean takeAway) { isTakeAway = takeAway; }
-
 
     public void setStatus(String status) {
         this.status = status;
@@ -77,9 +87,41 @@ public class Reservation implements Serializable {
     public List<HostingTable> getReservedTables() { return reservedTables; }
     public void setReservedTables(List<HostingTable> reservedTables) { this.reservedTables = reservedTables; }
 
-
     public String getVisa() { return visa; }
     public void setVisa(String visa) { this.visa = visa; }
+
+
+    public int getExpirationMonth() {
+        return expirationMonth;
+    }
+
+    public void setExpirationMonth(int expirationMonth) {
+        this.expirationMonth = expirationMonth;
+    }
+
+    public int getExpirationYear() {
+        return expirationYear;
+    }
+
+    public void setExpirationYear(int expirationYear) {
+        this.expirationYear = expirationYear;
+    }
+
+    public String getCvv() {
+        return cvv;
+    }
+
+    public void setCvv(String cvv) {
+        this.cvv = cvv;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public LocalDateTime getReservationTime() { return reservationTime; }
     public void setReservationTime(LocalDateTime reservationTime) { this.reservationTime = reservationTime; }

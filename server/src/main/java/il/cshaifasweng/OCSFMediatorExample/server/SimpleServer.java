@@ -376,9 +376,19 @@ public class SimpleServer extends AbstractServer {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		} else if (msg instanceof List<?>) {
+		List<?> incoming = (List<?>) msg;
+		if (!incoming.isEmpty() && incoming.get(0) instanceof MealOrder) {
+			List<MealOrder> orders = (List<MealOrder>) incoming;
+			DataManager.saveMealOrders(orders);
+			try {
+				client.sendToClient("Reservation saved successfully");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-
-		else if (msg instanceof ReservationRequest) {
+	}
+		/*else if (msg instanceof ReservationRequest) {
 			ReservationRequest request = (ReservationRequest) msg;
 			Reservation reservation = request.getReservation();
 			boolean shouldSave = request.isShouldSave();
@@ -410,7 +420,42 @@ public class SimpleServer extends AbstractServer {
 					throw new RuntimeException(e);
 				}
 			}
-		} else if (msg instanceof Reservation) {
+		}*/
+		else if (msg instanceof ReservationRequest) {
+			ReservationRequest request = (ReservationRequest) msg;
+			Reservation reservation = request.getReservation();
+			boolean shouldSave = request.isShouldSave();
+
+			if (shouldSave) {
+				System.out.println("Saving reservation to DB...");
+				boolean exists = DataManager.checkIfIdHasReservation(reservation.getIdNumber());
+				if (exists) {
+					try {
+						client.sendToClient("Reservation failed: ID already used.");
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				} else {
+					DataManager.saveReservation(reservation);
+					try {
+						client.sendToClient("Reservation saved successfully");
+						client.sendToClient(reservation);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			} else {
+				System.out.println("Checking availability for reservation...");
+				List<HostingTable> availability = DataManager.getAvailableTables(reservation);
+				System.out.println("Available tables: " + availability.size());
+				try {
+					client.sendToClient(availability);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		else if (msg instanceof Reservation) {
 			System.out.println("Received raw Reservation (availability check assumed)");
 			List<HostingTable> availability = DataManager.getAvailableTables((Reservation) msg);
 			System.out.println("Available tables: " + availability.size());

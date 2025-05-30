@@ -21,6 +21,15 @@ public class TakeAwayOrReservationController {
     private Scene scene;
     private Parent root;
 
+    @FXML
+    private Button branchDetailsButton;
+
+    @FXML
+    void initialize() {
+        branchDetailsButton.setVisible(false);
+
+    }
+
     public void goToOrderTables(ActionEvent event) throws IOException {
         root = FXMLLoader.load(getClass().getResource("OrderTablesPage.fxml"));
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -36,7 +45,6 @@ public class TakeAwayOrReservationController {
         stage.setScene(scene);
         stage.show();
     }
-
     public void switchPage(ActionEvent event) throws IOException {
         Button sourceButton = (Button) event.getSource();
         String buttonId = sourceButton.getId();
@@ -45,23 +53,27 @@ public class TakeAwayOrReservationController {
 
         switch (buttonId) {
             case "backButton":
-                fxmlToLoad = "PrimaryPage.fxml"; // Replace with actual main page FXML name
+                fxmlToLoad = "primary.fxml";
                 break;
             case "viewMapButton":
-                fxmlToLoad = "MapPage.fxml"; // Replace with actual map page
+                fxmlToLoad = "MapPage.fxml";
                 break;
             case "branchDetailsButton":
-                fxmlToLoad = "BranchDetailsPage.fxml"; // Replace with actual details page
+                fxmlToLoad = "BranchDetailsPage.fxml";
                 break;
         }
 
         if (fxmlToLoad != null) {
-            Parent root = FXMLLoader.load(getClass().getResource(fxmlToLoad));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlToLoad));
+            Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
+        } else {
+            System.err.println("No matching FXML found for button ID: " + buttonId);
         }
     }
+
 
     @FXML
     public void handleCancelReservation(ActionEvent event) {

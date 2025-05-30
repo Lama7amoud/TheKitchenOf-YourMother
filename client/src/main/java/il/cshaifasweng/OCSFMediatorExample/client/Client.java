@@ -289,7 +289,12 @@ protected void handleMessageFromServer(Object msg) {
                 List<Restaurant> restaurantList = (List<Restaurant>) list;
                 System.out.println("Received list of restaurants from server: " + restaurantList.size());
                 EventBus.getDefault().post(restaurantList);
-            } else {
+            } else if (first instanceof MealOrder) {
+                System.out.println("Received list of meal orders from server: " + list.size());
+                EventBus.getDefault().post((List<MealOrder>) list);
+            }
+
+            else {
                 System.out.println("Received an unrecognized list from server.");
             }
         } else {
@@ -299,12 +304,17 @@ protected void handleMessageFromServer(Object msg) {
 
     // Handle single Restaurant object
     if (msg instanceof Restaurant) {
-        System.out.println("Restaurant " + ((Restaurant) msg).getId() + " received on client side");
-        EventBus.getDefault().post(msg);
+        Restaurant restaurant = (Restaurant) msg;
+        System.out.println("Restaurant " + restaurant.getId() + " received on client side");
+        userAtt.setRestaurant(restaurant);
+        EventBus.getDefault().post(restaurant);
+        System.out.println("Stored restaurant in userAtt: " + userAtt.getRestaurant().getId());
     }
+
 
     // Handle single Reservation object
     if (msg instanceof Reservation) {
+        System.out.println("Reservation saved, ID: " + ((Reservation) msg).getId());
         EventBus.getDefault().post(msg);
     }
 

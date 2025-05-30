@@ -29,7 +29,7 @@
 
                 <Button fx:id="branchDetailsButton" layoutX="56.0" layoutY="315.0" onAction="#switchPage" prefWidth="124.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="See Branch Details" textFill="WHITE" />
 
-                <Button fx:id="backToMainPageButton" layoutX="56.0" layoutY="351.0" onAction="#handleBackToMainPage" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Back To Main Page" textFill="WHITE" />
+                <Button fx:id="backToMainPageButton" layoutX="56.0" layoutY="351.0" onAction="#switchPage" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Back To Main Page" textFill="WHITE" />
             </children>
         </AnchorPane>
     </left>
@@ -58,16 +58,27 @@
                 <Label layoutX="40.0" layoutY="244.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Address:" textFill="#151515" />
                 <TextField fx:id="addressField" layoutX="130.0" layoutY="240.0" prefWidth="186.0" />
 
-                <Button fx:id="backToOrderTablesButton" layoutX="25.0" layoutY="334.0" onAction="#handleBackToOrderTables" text="Back" />
+                <!-- Email Label and Input -->
+                <Label layoutX="55.0" layoutY="278.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Email:" textFill="#151515" />
+                <TextField fx:id="emailField" layoutX="130.0" layoutY="274.0" prefWidth="186.0" />
+                <Label fx:id="emailErrorLabel" layoutX="326.0" layoutY="278.0" text="Invalid Email" textFill="RED" />
+
+
+                <Button fx:id="backToOrderTablesButton" layoutX="25.0" layoutY="360.0" onAction="#switchPage" text="Back" />
 
                 <!-- Hidden labels for passing state -->
                 <Label fx:id="preferredTimeLabel" layoutX="50.0" layoutY="30.0" text="Time:" visible="false" />
                 <Label fx:id="sittingTypeLabel" layoutX="50.0" layoutY="70.0" text="Sitting:" visible="false" />
                 <Label fx:id="guestCountLabel" layoutX="50.0" layoutY="110.0" text="Guests:" visible="false" />
                 <Label fx:id="notesLabel" layoutX="50.0" layoutY="150.0" text="Note:" visible="false" />
-                <ComboBox fx:id="favTimeComboBox" layoutX="141.0" layoutY="278.0" prefHeight="26.0" prefWidth="160.0" promptText="Choose Favorite Time" />
-                <Label layoutX="26.0" layoutY="282.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Favorite Time:" textFill="#151515" />
-                <Button fx:id="ContinueButton" layoutX="152.0" layoutY="334.0" mnemonicParsing="false" prefHeight="30.0" onAction="#switchPage" prefWidth="147.0" text="Continue" />
+                <ComboBox fx:id="favTimeComboBox" layoutX="141.0" layoutY="312.0" prefHeight="26.0" prefWidth="160.0" promptText="Choose Favorite Time" />
+                <Label layoutX="26.0" layoutY="316.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Favorite Time:" textFill="#151515" />
+                <Label fx:id="favTimeLabel" layoutX="326.0" layoutY="316.0" text="Invalid favorite Time" textFill="RED" />
+                <Button fx:id="ContinueButton" layoutX="152.0" layoutY="360.0" mnemonicParsing="false" onAction="#handleContinue" prefHeight="30.0" prefWidth="147.0" text="Continue" />
+                <Label fx:id="fullNameLabel" layoutX="326.0" layoutY="132.0" text="Invalid Full Name" textFill="RED" />
+            <Label fx:id="numberLabel" layoutX="326.0" layoutY="168.0" text="Invalid Phone Number" textFill="RED" />
+            <Label fx:id="iDLabel" layoutX="326.0" layoutY="207.0" text="Invalid ID" textFill="RED" />
+            <Label fx:id="addressLabel" layoutX="326.0" layoutY="244.0" text="Invalid Address" textFill="RED" />
             </children>
         </AnchorPane>
     </center>
