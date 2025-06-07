@@ -1412,6 +1412,100 @@ public class DataManager {
             session.close();
         }
     }
+
+//addeddddd "order"
+    /**
+     * Given a reservation ID, look up all MealOrder rows whose reservationId matches,
+     * sum their linePrice, and return the total.
+     */
+    public static double getTotalOrderPriceForReservation(long reservationId) {
+        SessionFactory sessionFactory = getSessionFactory(password);
+        Session session = sessionFactory.openSession();
+        double total = 0.0;
+        try {
+            session.beginTransaction();
+
+            @SuppressWarnings("unchecked")
+            List<MealOrder> orders = session
+                    .createQuery("FROM MealOrder mo WHERE mo.reservationId = :resId")
+                    .setParameter("resId", reservationId)
+                    .getResultList();
+
+            for (MealOrder mo : orders) {
+                total += mo.getTotalPrice();
+            }
+
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return total;
+    }
+
+    public static boolean deleteMealOrdersByReservationId(long reservationId) {
+        Session session = getSessionFactory(password).openSession();
+        try {
+            session.beginTransaction();
+            int deletedCount = session.createQuery(
+                            "DELETE FROM MealOrder mo WHERE mo.reservationId = :rid")
+                    .setParameter("rid", reservationId)
+                    .executeUpdate();
+            session.getTransaction().commit();
+            return (deletedCount > 0);
+        } catch (Exception e) {
+            if (session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
+    }
+
+    //addedddd
+// **NEW** Hibernate-based:
+public static Reservation getActiveReservationById(String idNumber) {
+    // Use the same SessionFactory you already have
+    SessionFactory sessionFactory = getSessionFactory(password);
+    try (Session session = sessionFactory.openSession()) {
+        // Start a transaction if you want, although here read-only is fine
+        session.beginTransaction();
+
+        // Equivalent HQL: select a reservation whose idNumber matches and status = 'on'
+        Reservation res = session.createQuery(
+                        "FROM Reservation r WHERE r.idNumber = :idNum AND lower(r.status) = 'on'",
+                        Reservation.class
+                )
+                .setParameter("idNum", idNumber)
+                .uniqueResult();
+
+        session.getTransaction().commit();
+        return res;  // either a Reservation or null
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+    }
+}
+
+//addedddd
+public static void updateReservation(Reservation reservation) {
+    SessionFactory sessionFactory = getSessionFactory(password);
+    try (Session session = sessionFactory.openSession()) {
+        Transaction tx = session.beginTransaction();
+        session.update(reservation);   // or session.merge(reservation) if detached
+        tx.commit();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+
     public static MonthlyReport generateReportForRestaurant(Restaurant restaurant) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();

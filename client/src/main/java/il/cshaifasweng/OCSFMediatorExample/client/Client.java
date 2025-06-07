@@ -8,7 +8,7 @@ import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.List;import il.cshaifasweng.OCSFMediatorExample.client.events.MessageEvent;
 
 public class Client extends AbstractClient {
 
@@ -203,9 +203,11 @@ public class Client extends AbstractClient {
     }*/
 @Override
 protected void handleMessageFromServer(Object msg) {
+
     if (msg instanceof String) {
         String strMsg = (String) msg;
-
+        System.out.println("[Client] <handleMessageFromServer> got raw server message: " + strMsg);
+        EventBus.getDefault().post(new MessageEvent(strMsg));
         if (strMsg.equals("Reservation cancelled successfully")) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -219,7 +221,7 @@ protected void handleMessageFromServer(Object msg) {
         }
 
         if (strMsg.equals("Reservation saved successfully")) {
-            Platform.runLater(() -> {
+             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
                 alert.setHeaderText(null);
@@ -228,7 +230,7 @@ protected void handleMessageFromServer(Object msg) {
                 App.switchScreen("Main Page");
             });
             return;
-        }
+       }
 
         if (strMsg.equals("Reservation failed: ID already used.")) {
             Platform.runLater(() -> {

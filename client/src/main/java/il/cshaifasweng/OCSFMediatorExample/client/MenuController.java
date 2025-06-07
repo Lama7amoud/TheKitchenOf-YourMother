@@ -811,9 +811,11 @@
                 }
 
                 if (paymentType.equals("Cash")) {
-                    reservation.setVisa("cash");
-                    reservation.setPayed(true);
-                } else if (paymentType.equals("Visa")) {
+                    // tell the server “this is a cash order” by leaving Visa = null:
+                    reservation.setVisa(null);
+                    reservation.setPayed(false);   // not paid yet, we’ll collect on pickup
+                } else {
+                    // card‐path
                     reservation.setVisa(data.getVisa());
                     reservation.setPayed(true);
                 }

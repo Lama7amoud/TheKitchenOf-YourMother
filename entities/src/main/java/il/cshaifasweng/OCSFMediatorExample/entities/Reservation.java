@@ -28,6 +28,8 @@ public class Reservation implements Serializable {
     private int expirationYear;
     private String cvv;
     private String email;
+    private double amountDue = 0.0;   //addedddd
+
 
     @ManyToOne
     private Restaurant restaurant;
@@ -60,6 +62,14 @@ public class Reservation implements Serializable {
     public LocalDateTime getReceivingTime() { return receivingTime; }
     public void setReceivingTime(LocalDateTime receivingTime) { this.receivingTime = receivingTime; }
 
+
+    public double getAmountDue() {   //addedddd
+        return amountDue;
+    }
+
+    public void setAmountDue(double amountDue) {//addeddddd
+        this.amountDue = amountDue;
+    }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
