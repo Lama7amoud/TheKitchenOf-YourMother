@@ -63,6 +63,7 @@
                     case "branchDetailsButton" -> "Branch Page";
                     default -> "";
                 };
+                EventBus.getDefault().unregister(this);
                 App.switchScreen(page);
             });
         }
@@ -70,16 +71,17 @@
 
         @FXML
         void initialize() {
-            EventBus.getDefault().register(this);
-            branchDetailsButton.setVisible(false);
-            // Disable confirm button at start
-            ConfirmOrderButton.setDisable(true);
-
-            // Add listeners to check input
-            guestCountField.textProperty().addListener((obs, oldVal, newVal) -> checkFormCompletion());
-            PrefferedTimeBox.valueProperty().addListener((obs, oldVal, newVal) -> checkFormCompletion());
-
             Platform.runLater(() -> {
+                EventBus.getDefault().register(this);
+                branchDetailsButton.setVisible(true);
+                // Disable confirm button at start
+                ConfirmOrderButton.setDisable(true);
+
+                // Add listeners to check input
+                guestCountField.textProperty().addListener((obs, oldVal, newVal) -> checkFormCompletion());
+                PrefferedTimeBox.valueProperty().addListener((obs, oldVal, newVal) -> checkFormCompletion());
+
+
                 int permission = userAtt.getPermissionLevel();
                 viewMapButton.setVisible(permission >= 1);
                 Client.getClient().sendToServer("Get branch details;" + userAtt.getRestaurantInterest());
@@ -122,10 +124,10 @@
                 }
                 generalNote = generalNoteField.getText();
 
-                // You can save the data to a singleton for later use
                 OrderData.getInstance().setDetails(selectedTime, sittingType, guestCount, generalNote);
                 OrderData.getInstance().setDate(datePicker.getValue());
                 System.out.println("Switching to Confirm Order Page...");
+                EventBus.getDefault().unregister(this);
                 App.switchScreen("Confirm Order Page");
             });
         }

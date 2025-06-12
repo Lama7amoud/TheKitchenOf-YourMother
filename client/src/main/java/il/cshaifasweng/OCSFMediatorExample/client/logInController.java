@@ -36,11 +36,18 @@ public class logInController {
             String username = usernameTextField.getText();
             String password = passwordTextField.getText();
 
-            try {
-                Client.getClient().sendToServer( "logIn: " + username + ";" + password);
+            if(username.isEmpty() || password.isEmpty()){
+                connectingMessageLabel.setStyle("-fx-text-fill: red;");
+                connectingMessageLabel.setText("The username or password field is empty");
+                connectButton.setDisable(false);
+                customerButton.setDisable(false);
             }
-            catch (Exception e) {
-                connectingMessageLabel.setText("Connection failed, try again");
+            else {
+                try {
+                    Client.getClient().sendToServer("logIn: " + username + ";" + password);
+                } catch (Exception e) {
+                    connectingMessageLabel.setText("Connection failed, try again");
+                }
             }
         });
     }
@@ -64,14 +71,14 @@ public class logInController {
         if(msg.startsWith("Authorized user request:")){
             Platform.runLater(() -> {
                 int indexOfColon = msg.indexOf(":");
-                String response = msg.substring(indexOfColon + 1);
-
+                String response = msg.substring(indexOfColon + 2);
+                System.out.println(response);
+                connectingMessageLabel.setText(response);
                 if (!response.equals("Login successful")) {
-                    connectingMessageLabel.setStyle("-fx-text-fill: red;");  // Set text color to red for failure
-                    connectingMessageLabel.setText(response);  // Set the text
+                    connectingMessageLabel.setStyle("-fx-text-fill: red;");
+
                 } else {
-                    connectingMessageLabel.setStyle("-fx-text-fill: green;");  // Set text color to green for success
-                    connectingMessageLabel.setText(response);  // Set the text
+                    connectingMessageLabel.setStyle("-fx-text-fill: green;");
                     EventBus.getDefault().unregister(this);
                     App.switchScreen("Main Page");
                 }

@@ -1261,6 +1261,76 @@ public class DataManager {
         }
     }
 
+    public static List<String[]> findOverlappingReservations(String[] details) {
+        Session session = null;
+        try {
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Reservation> query = builder.createQuery(Reservation.class);
+            Root<Reservation> root = query.from(Reservation.class);
+
+            // Parse the details
+            Long restaurantId = Long.parseLong(details[0]);
+            LocalDate date = LocalDate.parse(details[1]);      // e.g., "2025-06-15"
+            LocalTime time = LocalTime.parse(details[2]);      // e.g., "18:30"
+            LocalDateTime startTime = LocalDateTime.of(date, time);
+            LocalDateTime endTime = startTime.plusMinutes(90); // Add 1.5 hours
+
+            // Build predicates
+            Predicate byRestaurant = builder.equal(root.get("restaurant").get("id"), restaurantId);
+            Predicate overlaps = builder.and(
+                    builder.lessThan(root.get("reservationTime"), endTime),
+                    builder.greaterThan(root.get("reservationTime"), startTime.minusMinutes(90))
+            );
+
+            // Execute reservation query
+            query.select(root).where(builder.and(byRestaurant, overlaps));
+            List<Reservation> reservations = session.createQuery(query).getResultList();
+
+            // Get reserved times using reservation IDs
+            List<Long> reservationIds = reservations.stream()
+                    .map(Reservation::getId)
+                    .collect(Collectors.toList());
+
+            if (reservationIds.isEmpty()) {
+                return new ArrayList<>();
+            }
+
+            CriteriaQuery<ReservedTime> rtQuery = builder.createQuery(ReservedTime.class);
+            Root<ReservedTime> rtRoot = rtQuery.from(ReservedTime.class);
+            rtQuery.select(rtRoot).where(rtRoot.get("reservation").get("id").in(reservationIds));
+            List<ReservedTime> reservedTimes = session.createQuery(rtQuery).getResultList();
+
+            List<String[]> results = new ArrayList<>();
+            for (ReservedTime rt : reservedTimes) {
+                String[] row = new String[4];  // Changed size to 4
+                row[0] = String.valueOf(rt.getTable().getId());       // Table ID
+                row[1] = rt.getReservedTime().toLocalTime().toString(); // Only hour part
+                row[2] = rt.getReservation().getName();               // Reservation name
+                row[3] = String.valueOf(rt.getReservation().getTotalGuests());  // totalGuests as string
+                results.add(row);
+            }
+
+            session.getTransaction().commit();
+            return results;
+
+        } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return Collections.emptyList();
+        } finally {
+            if (session != null) {
+                session.close();
+                System.out.println("Session closed");
+            }
+        }
+    }
+
     public static List<HostingTable> getAvailableTables(Reservation reservation) {
         SessionFactory sessionFactory = getSessionFactory(password);
         Session session = sessionFactory.openSession();

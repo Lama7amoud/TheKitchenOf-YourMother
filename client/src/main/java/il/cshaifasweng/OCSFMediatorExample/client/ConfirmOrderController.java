@@ -52,12 +52,18 @@ public class ConfirmOrderController {
 
     @FXML
     private void handleBackToMainPage(ActionEvent event) {
-        Platform.runLater(() -> App.switchScreen("Main Page"));
+        Platform.runLater(() -> {
+            EventBus.getDefault().unregister(this);
+            App.switchScreen("Main Page");
+        });
     }
 
     @FXML
     private void handleBackToOrderTables(ActionEvent event) {
-        Platform.runLater(() -> App.switchScreen("Order Tables Page"));
+        Platform.runLater(() -> {
+            EventBus.getDefault().unregister(this);
+            App.switchScreen("Order Tables Page");
+        });
     }
 
     @FXML
@@ -293,6 +299,13 @@ public class ConfirmOrderController {
 
     @Subscribe
     public void checkingList(List<HostingTable> availableTables) {
+        List<?> list = (List<?>) availableTables;
+        if (!list.isEmpty()) {
+            Object first = list.get(0);
+            if (!(first instanceof HostingTable)) {
+                return;
+            }
+        }
         System.out.println("Received " + availableTables.size() + " available tables from server.");
 
         OrderData order = OrderData.getInstance();

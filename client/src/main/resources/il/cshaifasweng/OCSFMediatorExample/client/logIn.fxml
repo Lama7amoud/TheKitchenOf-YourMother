@@ -42,7 +42,7 @@
             </Label>
             <AnchorPane layoutX="27.0" layoutY="135.0" prefHeight="253.0" prefWidth="310.0" style="-fx-background-color: white;">
                <children>
-                  <Button fx:id="connectButton" layoutX="114.0" layoutY="111.0" mnemonicParsing="false" onAction="#connectButtonClicked" prefHeight="25.0" prefWidth="180.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Connect" textFill="WHITE" AnchorPane.bottomAnchor="111.4" AnchorPane.leftAnchor="114.0" AnchorPane.rightAnchor="13.200000000000045" AnchorPane.topAnchor="111.0">
+                  <Button fx:id="connectButton" layoutX="116.0" layoutY="146.0" mnemonicParsing="false" onAction="#connectButtonClicked" prefHeight="25.0" prefWidth="180.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Connect" textFill="WHITE" AnchorPane.bottomAnchor="77.19999999999999" AnchorPane.leftAnchor="116.0" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="146.0">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>
@@ -64,7 +64,7 @@
                         <Font name="System Bold" size="20.0" />
                      </font>
                   </Button>
-                  <Label fx:id="connectingMessageLabel" alignment="CENTER" layoutX="115.0" layoutY="91.0" prefHeight="18.0" prefWidth="182.0" style="-fx-font-style: italic;" textAlignment="CENTER" />
+                  <Label fx:id="connectingMessageLabel" alignment="CENTER" layoutX="115.0" layoutY="91.0" prefHeight="43.0" prefWidth="182.0" style="-fx-font-style: italic;" textAlignment="CENTER" />
                </children>
             </AnchorPane>
          </children>

@@ -259,7 +259,7 @@ protected void handleMessageFromServer(Object msg) {
     if (msg instanceof Warning) {
         EventBus.getDefault().post(new WarningEvent((Warning) msg));
     }
-
+    
     // Handle list of objects
     if (msg instanceof List<?>) {
         List<?> list = (List<?>) msg;
@@ -292,9 +292,11 @@ protected void handleMessageFromServer(Object msg) {
             } else if (first instanceof MealOrder) {
                 System.out.println("Received list of meal orders from server: " + list.size());
                 EventBus.getDefault().post((List<MealOrder>) list);
-            }
+            } else if (first instanceof String[]) {
+                System.out.println("Received list of reservations for the restaurant map: " + list.size());
+                EventBus.getDefault().post((List<String[]>) list);
 
-            else {
+            } else {
                 System.out.println("Received an unrecognized list from server.");
             }
         } else {
