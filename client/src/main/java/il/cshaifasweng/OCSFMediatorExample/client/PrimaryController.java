@@ -48,8 +48,6 @@ public class PrimaryController {
     @FXML
     private Text RestaurantDetailsInstructionLabel;
 
-    @FXML
-    private Button viewTablesButton;
 
     void updateResInterest() {
         Platform.runLater(() -> {
@@ -90,15 +88,6 @@ public class PrimaryController {
                 }
             } else if (sourceButton == PersonalAreaButton) {
                 page = "Personal Area Page";
-            } else if (sourceButton == viewTablesButton && selectedRestaurant != null) {
-                int restaurantId = switch (selectedRestaurant) {
-                    case "Haifa Branch" -> 1;
-                    case "Tel-Aviv Branch" -> 2;
-                    case "Nahariya Branch" -> 3;
-                    default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
-                };
-                userAtt.setRestaurantInterest((short) restaurantId); // Save the restaurant in userAtt
-                page = "Tables View Page";
             } else if (sourceButton == feedbackButton) {
                 if (selectedRestaurant != null) {
                     int restaurantId = switch (selectedRestaurant) {
@@ -176,7 +165,6 @@ public class PrimaryController {
                 orderButton.setDisable(false);
                 feedbackButton.setDisable(false);
                 menuButton.setDisable(false);
-                viewTablesButton.setVisible(true); // Make the View Tables button visible
                 imageView.setVisible(true);
 
                 switch (selectedRestaurant) {
@@ -205,7 +193,6 @@ public class PrimaryController {
             feedbackButton.setDisable(true);
             menuButton.setDisable(true);
             imageView.setVisible(false);
-            viewTablesButton.setVisible(false); // Initially hide the button
 
             try {
                 images = new Image[numOfImages];

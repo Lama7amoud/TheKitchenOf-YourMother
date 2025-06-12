@@ -1,6 +1,7 @@
 
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.HostingTable;
 import il.cshaifasweng.OCSFMediatorExample.entities.OrderData;
 import il.cshaifasweng.OCSFMediatorExample.entities.Reservation;
 import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
@@ -9,24 +10,27 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.awt.Point;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
-
 
 import static il.cshaifasweng.OCSFMediatorExample.client.Client.*;
 
-import javafx.scene.layout.Pane;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -93,6 +97,8 @@ public class TablesViewController {
     private Button[] tableButtons;
     private Restaurant restaurantToMap;
     private Set<DayOfWeek> blockedDays = new HashSet<>();
+    private Map<String, String[]> reservationMap = new HashMap<>();
+
 
 
     private static final Point[] HAIFA_TABLES = {
@@ -208,30 +214,6 @@ public class TablesViewController {
         }
     }
 
-
-    @FXML
-    void selectTable(ActionEvent event){
-        Platform.runLater(() -> {
-            Button sourceButton = (Button) event.getSource();
-            String buttonId = sourceButton.getId(); // Get the fx:id of the clicked button
-
-            // Extract the number part from the fx:id
-            String tableNum = buttonId.replace("TableButton", "");
-
-            String currentStyle = sourceButton.getStyle();
-            if (currentStyle.contains("green")) {
-                sourceButton.setStyle("-fx-background-color: transparent;");
-            } else {
-                sourceButton.setStyle("-fx-background-color: green;");
-            }
-            updateReservedTables(tableNum);
-            // Convert array to comma-separated string and update the text field
-            String reservedTablesString = Arrays.stream(reservedTables)
-                    .mapToObj(String::valueOf) // Convert each int to a String
-                    .collect(Collectors.joining(",")); // Join with commas
-        });
-    }
-
     private void fillPreferredTimeBox(Restaurant restaurant) {
         ObservableList<String> availableTimes = FXCollections.observableArrayList();
 
@@ -321,6 +303,7 @@ public class TablesViewController {
 
     @FXML
     void checkTimeAvailability(ActionEvent event){
+        resetTablesStatus();
         String time = timePicker.getValue();
         if (time == null || time.isEmpty()){
             return;
@@ -343,13 +326,89 @@ public class TablesViewController {
 
     @Subscribe
     public void handleReservationList(List<String[]> reservedTable) {
-        for (String[] row : reservedTable) {
-            System.out.println("Table ID: " + row[0] + ", Time: " + row[1] + ", name: " + row[2] +
-                    ", Total Guests: " + row[3]);
+        if (reservedTable == null || reservedTable.isEmpty()) {
+            return;
         }
 
+        String[] firstRow = reservedTable.get(0);
+        if (firstRow.length != 4 || !Character.isDigit(firstRow[0].charAt(0))) {
+            return;
+        }
+
+        // Reset UI state
+        List<Button> allTableButtons = resetTablesStatus();
+
+        // Clear previous reservation data
+        reservationMap.clear();
+
+        // Process each reservation
+        for (String[] row : reservedTable) {
+            String tableId = row[0];
+            String time = row[1];
+            String name = row[2];
+            String guests = row[3];
+
+            // Save reservation info for the table
+            reservationMap.put(tableId, new String[]{name, time, guests});
+
+            // Find the corresponding button and mark it as reserved
+            for (Button button : allTableButtons) {
+                if (button.getId().equals("TableButton" + tableId)) {
+                    button.setStyle("-fx-background-color: red; -fx-font-weight: bold; -fx-text-fill: white;");
+                    break;
+                }
+            }
+        }
     }
 
+
+    List<Button> resetTablesStatus(){
+        List<Button> allTableButtons = List.of(
+                TableButton1, TableButton2, TableButton3, TableButton4, TableButton5,
+                TableButton6, TableButton7, TableButton8, TableButton9, TableButton10,
+                TableButton11, TableButton12, TableButton13, TableButton14
+        );
+
+        for (Button tableButton : allTableButtons) {
+            tableButton.setStyle("-fx-background-color: green; -fx-font-weight: bold; -fx-text-fill: white;");
+        }
+
+        return allTableButtons;
+    }
+
+    @FXML
+    void tableDetailsWindowPop(MouseEvent event) {
+        Button sourceButton = (Button) event.getSource();
+        String tableId = sourceButton.getText().replace("Table ", "");
+
+        String[] reservation = reservationMap.get(tableId);
+        if (reservation == null) return;
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("tableDetailsWindow.fxml"));
+            Parent root = loader.load();
+
+            // Get controller of the popup window
+            TableDetailsWindowController controller = loader.getController();
+
+            // Pass details to popup controller
+            controller.setDetails(tableId, reservation[0], reservation[1], reservation[2]);
+
+            Stage popupStage = new Stage();
+            popupStage.setTitle("Table Details");
+            popupStage.setScene(new Scene(root));
+            Bounds bounds = datePicker.localToScreen(datePicker.getBoundsInLocal());
+            double popupX = bounds.getMinX();
+            double popupY = bounds.getMinY();
+            popupStage.setX(popupX-20);
+            popupStage.setY(popupY-20);
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @FXML
     void initialize() {
@@ -358,9 +417,9 @@ public class TablesViewController {
             int employee_permission = userAtt.getPermissionLevel();
             // For manager and service
             if (!(employee_permission == 4 || employee_permission == 2)) {
-                RestaurantCombo.setVisible(false);
+                RestaurantCombo.setDisable(true);
             } else {
-                RestaurantCombo.setVisible(true);
+                RestaurantCombo.setDisable(false);
                 ObservableList<String> restaurantList = FXCollections.observableArrayList(
                         "Haifa Branch", "Tel-Aviv Branch", "Nahariya Branch"
                 );
