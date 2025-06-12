@@ -39,37 +39,37 @@
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="TableButton2" alignment="CENTER" layoutX="77.0" layoutY="36.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="2" textFill="ORANGE">
+            <Button fx:id="TableButton2" alignment="CENTER" layoutX="77.0" layoutY="36.0" mnemonicParsing="false" onMouseMoved="#tableDetailsWindowPop" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="2" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="TableButton3" alignment="CENTER" layoutX="20.0" layoutY="139.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="3" textFill="ORANGE">
+            <Button fx:id="TableButton3" alignment="CENTER" layoutX="20.0" layoutY="139.0" mnemonicParsing="false" onMouseMoved="#tableDetailsWindowPop" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="3" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="TableButton4" alignment="CENTER" layoutX="75.0" layoutY="139.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="4" textFill="ORANGE">
+            <Button fx:id="TableButton4" alignment="CENTER" layoutX="75.0" layoutY="139.0" mnemonicParsing="false" onMouseMoved="#tableDetailsWindowPop" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="4" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="TableButton5" alignment="CENTER" layoutX="239.0" layoutY="162.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="5" textFill="ORANGE">
+            <Button fx:id="TableButton5" alignment="CENTER" layoutX="239.0" layoutY="162.0" mnemonicParsing="false" onMouseMoved="#tableDetailsWindowPop" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="5" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="TableButton6" alignment="CENTER" layoutX="305.0" layoutY="164.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="6" textFill="ORANGE">
+            <Button fx:id="TableButton6" alignment="CENTER" layoutX="305.0" layoutY="164.0" mnemonicParsing="false" onMouseMoved="#tableDetailsWindowPop" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="6" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="TableButton7" alignment="CENTER" layoutX="20.0" layoutY="240.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="7" textFill="ORANGE">
+            <Button fx:id="TableButton7" alignment="CENTER" layoutX="20.0" layoutY="240.0" mnemonicParsing="false" onMouseMoved="#tableDetailsWindowPop" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="7" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="TableButton8" alignment="CENTER" layoutX="75.0" layoutY="240.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="8" textFill="ORANGE">
+            <Button fx:id="TableButton8" alignment="CENTER" layoutX="75.0" layoutY="240.0" mnemonicParsing="false" onMouseMoved="#tableDetailsWindowPop" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="8" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
@@ -84,22 +84,22 @@
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="TableButton11" alignment="CENTER" layoutX="20.0" layoutY="338.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="11" textFill="ORANGE">
+            <Button fx:id="TableButton11" alignment="CENTER" layoutX="20.0" layoutY="338.0" mnemonicParsing="false" onMouseMoved="#tableDetailsWindowPop" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="11" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="TableButton12" alignment="CENTER" layoutX="73.0" layoutY="339.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="12" textFill="ORANGE">
+            <Button fx:id="TableButton12" alignment="CENTER" layoutX="73.0" layoutY="339.0" mnemonicParsing="false" onMouseMoved="#tableDetailsWindowPop" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="12" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="TableButton13" alignment="CENTER" layoutX="241.0" layoutY="339.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="13" textFill="ORANGE">
+            <Button fx:id="TableButton13" alignment="CENTER" layoutX="241.0" layoutY="339.0" mnemonicParsing="false" onMouseMoved="#tableDetailsWindowPop" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="13" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="TableButton14" alignment="CENTER" layoutX="301.0" layoutY="337.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="14" textFill="ORANGE">
+            <Button fx:id="TableButton14" alignment="CENTER" layoutX="301.0" layoutY="337.0" mnemonicParsing="false" onMouseMoved="#tableDetailsWindowPop" style="-fx-background-color: transparent; -fx-font-weight: bold;" text="14" textFill="ORANGE">
                <font>
                   <Font size="15.0" />
                </font>
