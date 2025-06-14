@@ -29,6 +29,7 @@ public class ConfirmOrderController {
     @FXML
     private TextField addressField, idField, nameField, phoneField,visaTextField;
 
+
     @FXML
     private Button backToMainPageButton, backToOrderTablesButton, branchDetailsButton, viewMapButton, ConfirmOrderButton;
 
@@ -218,6 +219,7 @@ public class ConfirmOrderController {
         }
 
 
+
         if (!isValid || reservationAlreadySent) return;
         currentFormData = new String[]{name, phone, id, address, visa, expirationMonth, expirationYear, cvv, email};
         Client.getClient().sendToServer("check_reservation_id;" + id);
@@ -279,7 +281,6 @@ public class ConfirmOrderController {
         reservation.setTotalGuests(order.getGuestCount());
         reservation.setReservationTime(reservationDateTime);
         reservation.setPayed(false);
-        reservation.setVisa(visa);  // Set the visa field instead of empty string
         reservation.setReceivingTime(LocalDateTime.now());  // Set current time as receiving time
         reservation.setRestaurant(Client.getClientAttributes().getRestaurant());
 

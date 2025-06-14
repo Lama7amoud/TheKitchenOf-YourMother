@@ -92,6 +92,24 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         appStage = stage;
+
+        // Register App to receive any WarningEvent
+        EventBus.getDefault().register(this);
+
+        // 1) Configure Client’s host/port
+        Client.host = "127.0.0.1";
+        Client.port = 3000;
+
+        // 2) Open the socket connection now
+        try {
+            Client.getClient().openConnection();
+        } catch (IOException ex) {
+            new Alert(Alert.AlertType.ERROR, "Cannot connect to server:\n" + ex.getMessage()).showAndWait();
+            Platform.exit();
+            return;
+        }
+
+        // 3) Load your mainPage.fxml (or "mainPage") as before
         scene = new Scene(loadFXML("mainPage"), 790, 480);
         stage.setScene(scene);
         stage.show();

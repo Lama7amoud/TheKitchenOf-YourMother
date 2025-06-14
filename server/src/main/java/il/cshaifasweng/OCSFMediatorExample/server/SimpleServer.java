@@ -9,8 +9,11 @@ import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -20,9 +23,11 @@ public class SimpleServer extends AbstractServer {
 
 	public SimpleServer(int port) {
 		super(port);
+		System.out.println("[SimpleServer] Listening for new connections on port " + port);
 	}
 
 	private Timer reportTimer;
+
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		String msgString = msg.toString();
@@ -38,12 +43,12 @@ public class SimpleServer extends AbstractServer {
 		} else if (msgString.startsWith("check_reservation_id;")) {
 			String idToCheck = msgString.split(";")[1].trim();
 			boolean exists = DataManager.checkIfIdHasReservation(idToCheck);
-			try {
-				client.sendToClient("id_exists:" + exists);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		} else if (msgString.startsWith("add client")) {
+            try {
+                client.sendToClient("id_exists:" + exists);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+		} else if(msgString.startsWith("add client")){
 			SubscribedClient connection = new SubscribedClient(client);
 			SubscribersList.add(connection);
 			try {
@@ -51,7 +56,8 @@ public class SimpleServer extends AbstractServer {
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-		} else if (msgString.startsWith("feedback;")) {
+		}
+		else if (msgString.startsWith("feedback;")) {
 			String[] parts = msgString.split(";", 5);
 			int userId = Integer.parseInt(parts[1]);
 			String message = parts[2];
@@ -65,7 +71,10 @@ public class SimpleServer extends AbstractServer {
 
 			List<Feedback> updatedFeedback = DataManager.getManagerFeedback();
 			sendToAllClients(updatedFeedback);
-		} else if (msgString.startsWith("logIn:")) {
+		}
+
+
+		else if(msgString.startsWith("logIn:")){
 			AuthorizedUser currentUser = DataManager.checkPermission(msgString);
 			try {
 				System.out.println(currentUser.getMessageToServer());
@@ -74,63 +83,229 @@ public class SimpleServer extends AbstractServer {
 				throw new RuntimeException(e);
 			}
 		}
-		else if (msgString.startsWith("remove client")) {
-			int index = msgString.indexOf(";");
-			String username = msgString.substring(index + 1).trim();
-			if (!(username.equals("Customer"))) {
-				DataManager.disconnectUser(username);
-			}
-			if (!SubscribersList.isEmpty()) {
-				for (SubscribedClient subscribedClient : SubscribersList) {
-					if (subscribedClient.getClient().equals(client)) {
-						SubscribersList.remove(subscribedClient);
-						break;
-					}
-				}
-			}
-
-		}
-		else if (msgString.startsWith("log out")) {
-			int index = msgString.indexOf(";");
-			String username = msgString.substring(index + 1).trim();
-			System.out.println("sending user to logout: " + username);
-			DataManager.disconnectUser(username);
-
-
-		}
-		else if (msgString.startsWith("Get branch details")) {
+		else if(msgString.startsWith("Get branch details")){
 			try {
 				int index = msgString.indexOf(";");
 				String restaurantId = msgString.substring(index + 1).trim();
 				Restaurant restaurant = DataManager.getRestaurant(restaurantId);
-				if (restaurant != null) {
+				if(restaurant != null) {
 					client.sendToClient(restaurant);
-				} else {
+				}
+				else{
 					System.out.println("Restaurant not found");
 					client.sendToClient("No available restaurant details");
 				}
-			} catch (Exception exception) {
+			}
+			catch (Exception exception){
 				exception.printStackTrace();
 			}
-		} else if (msgString.startsWith("CheckTablesAvailability")) {
-			try {
-				String[] parts = msgString.split(";");
-				String[] details = Arrays.copyOfRange(parts, 1, parts.length);
-				List<String[]> reservedTables = DataManager.findOverlappingReservations(details);
-				client.sendToClient(reservedTables);
-			} catch (Exception exception) {
-				exception.printStackTrace();
-			}
+		}
 
-		} else if (msgString.startsWith("cancel_reservation;")) {
+		else if (msgString.startsWith("cancel_order;")) {
+			System.out.println("[SimpleServer] → Entered cancel_order branch");
 			String idNumber = msgString.split(";")[1].trim();
-			boolean success = DataManager.cancelReservationById(idNumber);
-			try {
-				client.sendToClient(success ? "Reservation cancelled successfully" : "Cancellation failed: Reservation not found");
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+
+			// 1) Fetch the active “on” take‐away reservation
+			Reservation reservation = DataManager.getActiveReservationById(idNumber);
+			if (reservation == null) {
+				try {
+					client.sendToClient("no_order_found");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				if (!reservation.isTakeAway()) {
+					// Not a take‐away order
+					try {
+						client.sendToClient("no_order_found");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				} else {
+					// 3) Compute time difference and fee
+					LocalDateTime now = LocalDateTime.now();
+					LocalDateTime pickupTime = reservation.getReceivingTime();
+					Duration diff = Duration.between(now, pickupTime);
+
+					try {
+						long resId = reservation.getId();
+						double totalOrderPrice = DataManager.getTotalOrderPriceForReservation(resId);
+
+						double feeAmount;
+						if (diff.toHours() >= 3) {
+							feeAmount = 0.0;
+						} else if (diff.toHours() >= 1) {
+							feeAmount = totalOrderPrice * 0.50;
+						} else if (diff.toMinutes() >= 0) {
+							feeAmount = totalOrderPrice;
+						} else {
+							feeAmount = totalOrderPrice;
+						}
+
+						int feeShekels = (int) Math.ceil(feeAmount);
+						String visa = reservation.getVisa();
+						boolean paidByVisa = visa != null && !visa.trim().isEmpty();
+
+						if (feeShekels > 0) {
+							if(paidByVisa) {
+								client.sendToClient("confirm_order_cancellation;" + feeShekels + ";" + idNumber);
+							} else {
+								reservation.setAmountDue(feeShekels);
+								reservation.setStatus("off");
+								reservation.setPayed(false);
+								DataManager.updateReservation(reservation);
+								System.out.println("[SimpleServer] → about to send order_cancellation_debt; fee="
+										+ feeShekels + " id=" + idNumber);
+								client.sendToClient("order_cancellation_debt;" + feeShekels + ";" + idNumber);
+							}
+						} else {
+							// ── ≥ 3 hours → no fee.  Cancel immediately:
+							reservation.setStatus("off");
+							DataManager.updateReservation(reservation);
+
+							if (reservation.getVisa() != null) {
+								client.sendToClient("order_cancellation_success;0");
+							} else {
+								// Even if feeShekels==0 AND cash, we still want a “debt = 0” message
+								reservation.setAmountDue(0);
+								reservation.setPayed(false);
+								DataManager.updateReservation(reservation);
+								System.out.println("[SimpleServer] → about to send order_cancellation_debt; fee="
+										+ feeShekels + " id=" + idNumber);
+								client.sendToClient("order_cancellation_debt;0;" + idNumber);
+							}
+						}
+
+
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
-		} else if (msgString.startsWith("Get Manager feedback")) {
+		}
+		else if (msgString.startsWith("process_order_cancellation;")) {
+			String[] parts = msgString.split(";");
+			String idNumber = parts[1];
+			int fee = Integer.parseInt(parts[2]);
+
+			// Re‐fetch the active reservation (just to be safe):
+			Reservation reservation = DataManager.getActiveReservationById(idNumber);
+			String visa = reservation.getVisa();
+			boolean paidByVisa = visa != null && !visa.trim().isEmpty();
+			if (reservation != null) {
+				if (paidByVisa) {
+					// Visa path: charge VISA and send “order_cancellation_success;<fee>”
+					boolean paymentSucceeded = true;
+					try {
+						if (paymentSucceeded) {
+							reservation.setStatus("off");
+							// Leave isPayed = true for Visa (assuming you had set it true at time of ordering)
+							DataManager.updateReservation(reservation);
+							client.sendToClient("order_cancellation_success;" + fee);
+						} else {
+							client.sendToClient("order_cancellation_failed;visa_error");
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				} else {
+					// ------------- CASH PATH -------------
+					// 1) Compute total due (the same logic you already had):
+					double totalOrderPrice =
+							DataManager.getTotalOrderPriceForReservation(reservation.getId());
+					int totalShekels = (int) Math.ceil(totalOrderPrice);
+
+					// 2) Instead of marking as “paid,” leave isPayed = false, but record “debt”:
+					reservation.setAmountDue(totalShekels);
+					reservation.setStatus("off");      // still “off” (canceled)
+					reservation.setPayed(false);       // explicitly ensure isPayed stays false
+					DataManager.updateReservation(reservation);
+
+					// 3) Notify client – “you have a debt of ₪ totalShekels under your ID”:
+					try {
+						client.sendToClient("order_cancellation_debt;" + totalShekels + ";" + idNumber);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			} else {
+				// No reservation found at all
+				try {
+					client.sendToClient("order_cancellation_failed;no_order_found");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+
+		// ───────── (D) “cancel_reservation;<idNumber>” branch (unchanged) ─────────
+		else if (msgString.startsWith("cancel_reservation;")) {
+			System.out.println("[SimpleServer]   → Entered cancel_reservation branch");
+			String idNumber = msgString.split(";")[1].trim();
+			Reservation reservation = DataManager.getActiveReservationById(idNumber);
+			if (reservation == null) {
+				try {
+					client.sendToClient("no_reservation_found");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				LocalDateTime now = LocalDateTime.now();
+				LocalDateTime reservationTime = reservation.getReservationTime();
+				Duration diff = Duration.between(now, reservationTime);
+
+				try {
+					if (diff.toMinutes() <= 60) {
+						int fee = reservation.getTotalGuests() * 10;
+						System.out.println("[SimpleServer]   → Reservation within one hour (fee=" + fee + "). Sending confirm_cancellation;" + fee + ";" + idNumber);
+						client.sendToClient("confirm_cancellation;" + fee + ";" + idNumber);
+					} else {
+						System.out.println("[SimpleServer]   → Reservation > 1 hour away. Cancelling with no fee.");
+						reservation.setStatus("off");
+						DataManager.updateReservation(reservation);
+						System.out.println("[SimpleServer]   → Sending cancellation_success;0");
+						client.sendToClient("cancellation_success;0");
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		// ───────── (D) “process_cancellation;<idNumber>;<fee>” branch (unchanged) ─────────
+		else if (msgString.startsWith("process_cancellation;")) {
+			String[] parts = msgString.split(";");
+			String idNumber = parts[1];
+			int fee = Integer.parseInt(parts[2]);
+
+			Reservation reservation = DataManager.getActiveReservationById(idNumber);
+
+			try {
+				if (reservation == null) {
+					client.sendToClient("cancellation_failed;no_reservation_found");
+				} else if (reservation.getVisa() != null) {
+					// Visa path
+					reservation.setStatus("off");
+					DataManager.updateReservation(reservation);
+					client.sendToClient("cancellation_success;" + fee);
+				} else {
+					// Cash path
+					reservation.setAmountDue(fee);
+					reservation.setStatus("off");
+					reservation.setPayed(false);
+					DataManager.updateReservation(reservation);
+					client.sendToClient("reservation_cancellation_debt;" + fee + ";" + idNumber);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+
+
+		// ───────── (E) “Get Manager feedback” branch (unchanged) ─────────
+		else if (msgString.startsWith("Get Manager feedback")) {
 			try {
 				List<Feedback> list = DataManager.getManagerFeedback();
 				if (list != null && !list.isEmpty()) {
@@ -148,27 +323,32 @@ public class SimpleServer extends AbstractServer {
 		} else if (msgString.equals("Request Menu")) {
 			try {
 				List<Meal> menu = DataManager.requestMenu();
-				if (menu != null && !menu.isEmpty()) {
+				if(menu != null && !menu.isEmpty()) {
 					client.sendToClient(menu);
-				} else {
+				}
+				else{
 					System.out.println("empty menu");
 					client.sendToClient("No menu available");
 				}
-			} catch (Exception exception) {
+			} catch (Exception exception){
 				exception.printStackTrace();
 			}
 
-		} else if (msgString.startsWith("Update price")) {
+		}
+
+		else if (msgString.startsWith("Update price")) {
 			String details = msgString.substring("Update price".length()).trim();
 			String[] parts = details.split("\"");
 
 			String mealName = parts[1];
 			double newPrice = Double.parseDouble(parts[3].trim());
 			double oldPrice = DataManager.getCurrentMealPrice(mealName);
-			sendToAllClients("Get Confirm \"" + mealName + "\"" + oldPrice + "\"" + newPrice);
+			sendToAllClients("Get Confirm \""+mealName+"\""+oldPrice+"\""+newPrice);
 			List<PriceConfirmation> listPrice = DataManager.addPriceConfirmation(mealName, oldPrice, newPrice);
 			sendToAllClients(listPrice);
-		} else if (msgString.startsWith("Update discount")) {
+		}
+
+		else if (msgString.startsWith("Update discount")) {
 			String details = msgString.substring("Update discount".length()).trim();
 			String[] parts = details.split("\"");
 
@@ -177,9 +357,13 @@ public class SimpleServer extends AbstractServer {
 			System.out.println(percentage);
 			System.out.println(category);
 			sendToAllClients("Get Discount Confirm \"" + percentage);
-			List<Discounts> dis = DataManager.addDiscountConfirmation(percentage, category);
+			List<Discounts> dis =DataManager.addDiscountConfirmation(percentage,category);
 			sendToAllClients(dis);
-		} else if (msgString.startsWith("Update description")) {
+		}
+
+
+
+		else if (msgString.startsWith("Update description")) {
 			String details = msgString.substring("Update Description".length()).trim();
 
 			String[] parts = details.split("\"");
@@ -189,20 +373,22 @@ public class SimpleServer extends AbstractServer {
 
 			try {
 				// Call the DataManager function to update the meal price
-				if (DataManager.updateMealIngredient(mealName, mealIngredient) != 1) {
+				if(DataManager.updateMealIngredient(mealName, mealIngredient) != 1){
 					System.out.println("Update meal failed");
 					client.sendToClient(mealName + " Description update has failed");
-				} else {
+				}
+				else {
 					client.sendToClient(mealName + " Description has updated successfully");
 					try {
 						List<Meal> menu = DataManager.requestMenu();
-						if (menu != null && !menu.isEmpty()) {
+						if(menu != null && !menu.isEmpty()) {
 							sendToAllClients(menu); // update to all clients
-						} else {
+						}
+						else{
 							System.out.println("empty menu");
 							client.sendToClient("No menu available");
 						}
-					} catch (Exception exception) {
+					} catch (Exception exception){
 						exception.printStackTrace();
 					}
 					System.out.println("Description has updated successfully");
@@ -217,14 +403,18 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 		}
-		else if (msgString.equals("REQUEST_MONTHLY_REPORTS")) {
-			List<MonthlyReport> reports = DataManager.getAllReports();  // Make sure this method exists
+		else if (msg instanceof String) {
+			msgString = (String) msg;
 
-			// Send back the list directly (Java serialization)
-			try {
-				client.sendToClient(reports);
-			} catch (IOException e) {
-				e.printStackTrace();
+			if (msgString.equals("REQUEST_MONTHLY_REPORTS")) {
+				List<MonthlyReport> reports = DataManager.getAllReports();  // Make sure this method exists
+
+				// Send back the list directly (Java serialization)
+				try {
+					client.sendToClient(reports);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		else if (msgString.startsWith("Update preferences")) {
@@ -237,20 +427,22 @@ public class SimpleServer extends AbstractServer {
 
 			try {
 
-				if (DataManager.updateMealPref(mealName, mealIngredient) != 1) {
+				if(DataManager.updateMealPref(mealName, mealIngredient) != 1){
 					System.out.println("Update meal failed");
 					client.sendToClient(mealName + " preferences update has failed");
-				} else {
+				}
+				else {
 					client.sendToClient(mealName + " preferences has updated successfully");
 					try {
 						List<Meal> menu = DataManager.requestMenu();
-						if (menu != null && !menu.isEmpty()) {
+						if(menu != null && !menu.isEmpty()) {
 							sendToAllClients(menu); //
-						} else {
+						}
+						else{
 							System.out.println("empty menu");
 							client.sendToClient("No menu available");
 						}
-					} catch (Exception exception) {
+					} catch (Exception exception){
 						exception.printStackTrace();
 					}
 					System.out.println("preferences has updated successfully");
@@ -264,27 +456,51 @@ public class SimpleServer extends AbstractServer {
 					ioException.printStackTrace();
 				}
 			}
-		} else if (msgString.startsWith("RequestMealCategory")) {
+		}
+
+		else if (msgString.startsWith("RequestMealCategory")) {
 			String name = msgString.substring("RequestMealCategory".length()).trim().replace("\"", "");
 			String category = DataManager.getMealCategoryByName(name);
 			if (category != null) {
 				try {
-					client.sendToClient("MealCategory:" + category);
+					client.sendToClient( "MealCategory:" + category);
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
 			} else {
 				try {
-					client.sendToClient("MealCategory:NotFound");
+					client.sendToClient( "MealCategory:NotFound");
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
 			}
-		} else if (msgString.startsWith("payment-confirmed:")) {
+		}
+		else if (msgString.startsWith("payment-confirmed:")) {
 			String customerId = msgString.split(":")[1];
 			DataManager.markPaymentAsPaidInDatabase(customerId);
 		}
-		else if (msgString.startsWith("Add Meal")) {
+		else if (msgString.startsWith("remove client")) {
+			int index = msgString.indexOf(";");
+			String username = msgString.substring(index + 1).trim();
+			if(!(username.equals("Customer"))){
+				DataManager.disconnectUser(username);
+			}
+			if(!SubscribersList.isEmpty()){
+				for (SubscribedClient subscribedClient : SubscribersList) {
+					if (subscribedClient.getClient().equals(client)) {
+						SubscribersList.remove(subscribedClient);
+						break;
+					}
+				}
+			}
+
+		}else if(msgString.startsWith("log out")){
+			int index = msgString.indexOf(";");
+			String username = msgString.substring(index + 1).trim();
+			DataManager.disconnectUser(username);
+
+
+		} else if (msgString.startsWith("Add Meal")) {
 
 			String details = msgString.substring("Add meal".length()).trim();
 
@@ -301,7 +517,8 @@ public class SimpleServer extends AbstractServer {
 
 				if (DataManager.mealExist(Name)) {
 					client.sendToClient("MealExists");
-				} else {
+				}
+				else {
 
 					if (DataManager.addMeal(Name, Description, Preferences, Price, Image, Category) != 1) {
 						client.sendToClient(Name + " add failed");
@@ -331,7 +548,8 @@ public class SimpleServer extends AbstractServer {
 					ioException.printStackTrace();
 				}
 			}
-		} else if (msgString.startsWith("Remove Meal")) {
+		}
+		else if (msgString.startsWith("Remove Meal")) {
 			String details = msgString.substring("Remove Meal".length()).trim();
 			String mealName = details.replace("\"", ""); // Remove quotes
 
@@ -359,17 +577,17 @@ public class SimpleServer extends AbstractServer {
 				e.printStackTrace();
 			}
 		} else if (msg instanceof List<?>) {
-			List<?> incoming = (List<?>) msg;
-			if (!incoming.isEmpty() && incoming.get(0) instanceof MealOrder) {
-				List<MealOrder> orders = (List<MealOrder>) incoming;
-				DataManager.saveMealOrders(orders);
-				try {
-					client.sendToClient("Reservation saved successfully");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+		List<?> incoming = (List<?>) msg;
+		if (!incoming.isEmpty() && incoming.get(0) instanceof MealOrder) {
+			List<MealOrder> orders = (List<MealOrder>) incoming;
+			DataManager.saveMealOrders(orders);
+			try {
+				client.sendToClient("Reservation saved successfully");
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
+	}
 		/*else if (msg instanceof ReservationRequest) {
 			ReservationRequest request = (ReservationRequest) msg;
 			Reservation reservation = request.getReservation();
@@ -436,16 +654,17 @@ public class SimpleServer extends AbstractServer {
 					throw new RuntimeException(e);
 				}
 			}
-		} else if (msg instanceof Reservation) {
+		}
+		else if (msg instanceof Reservation) {
 			System.out.println("Received raw Reservation (availability check assumed)");
 			List<HostingTable> availability = DataManager.getAvailableTables((Reservation) msg);
 			System.out.println("Available tables: " + availability.size());
-			try {
-				client.sendToClient(availability);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		} else if (msgString.equals("Get Price Confirmations")) {
+            try {
+                client.sendToClient(availability);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (msgString.equals("Get Price Confirmations")) {
 			try {
 				List<PriceConfirmation> list = DataManager.getPriceConfirmations();
 				if (list != null && !list.isEmpty()) {
@@ -456,7 +675,9 @@ public class SimpleServer extends AbstractServer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} else if (msgString.equals("Get Discount Confirmations")) {
+		}
+
+		else if (msgString.equals("Get Discount Confirmations")) {
 			try {
 				List<Discounts> list = DataManager.getDiscountConfirmations();
 				if (list != null && !list.isEmpty()) {
@@ -467,7 +688,8 @@ public class SimpleServer extends AbstractServer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} else if (msgString.equals("get_all_restaurants")) {
+		}
+		else if (msgString.equals("get_all_restaurants")) {
 			try {
 				List<Restaurant> restaurants = DataManager.getAllRestaurants();
 				if (restaurants != null && !restaurants.isEmpty()) {
@@ -485,7 +707,9 @@ public class SimpleServer extends AbstractServer {
 					ex.printStackTrace();
 				}
 			}
-		} else if (msgString.startsWith("Confirm Price")) {
+		}
+
+		else if (msgString.startsWith("Confirm Price")) {
 			String details = msgString.substring("Confirm Price".length()).trim();
 			String[] parts = details.split("\"");
 			String mealName = parts[1];
@@ -499,7 +723,9 @@ public class SimpleServer extends AbstractServer {
 				List<PriceConfirmation> updatePriceConfirmation = DataManager.getPriceConfirmations();
 				sendToAllClients(updatePriceConfirmation);
 			}
-		} else if (msgString.startsWith("Reject Price")) {
+		}
+
+		else if (msgString.startsWith("Reject Price")) {
 			String details = msgString.substring("Reject Price".length()).trim();
 			String[] parts = details.split("\"");
 
@@ -512,7 +738,10 @@ public class SimpleServer extends AbstractServer {
 				List<PriceConfirmation> updatePriceConfirmation = DataManager.getPriceConfirmations();
 				sendToAllClients(updatePriceConfirmation);
 			}
-		} else if (msgString.startsWith("Confirm Discount")) {
+		}
+
+
+		else if (msgString.startsWith("Confirm Discount")) {
 			String details = msgString.substring("Confirm Discount".length()).trim();
 			String[] parts = details.split("\"");
 
@@ -520,7 +749,7 @@ public class SimpleServer extends AbstractServer {
 			int id = Integer.parseInt(parts[3].trim());
 			String category = parts[5].trim();
 
-			int updated = DataManager.makediscount(discount, category);
+			int updated = DataManager.makediscount(discount,category);
 			boolean x = DataManager.removeDiscountConfirmation(id);
 			if (updated == 1 && x) {
 				List<Meal> updatedMenu = DataManager.requestMenu();
@@ -528,7 +757,9 @@ public class SimpleServer extends AbstractServer {
 				List<Discounts> updateDiscountConfirmation = DataManager.getDiscountConfirmations();
 				sendToAllClients(updateDiscountConfirmation);
 			}
-		} else if (msgString.startsWith("Reject Discount")) {
+		}
+
+		else if (msgString.startsWith("Reject Discount")) {
 			String details = msgString.substring("Reject Discount".length()).trim();
 			String[] parts = details.split("\"");
 
@@ -541,7 +772,9 @@ public class SimpleServer extends AbstractServer {
 				List<Discounts> updateDiscountConfirmation = DataManager.getDiscountConfirmations();
 				sendToAllClients(updateDiscountConfirmation);
 			}
-		} else if (msgString.startsWith("Change Category Meal")) {
+		}
+
+		else if (msgString.startsWith("Change Category Meal")){
 			String details = msgString.substring("Change Category Meal".length()).trim();
 			String[] parts = details.split("\"");
 
@@ -586,7 +819,8 @@ public class SimpleServer extends AbstractServer {
 					ioException.printStackTrace();
 				}
 			}
-		} else {
+		}
+		else {
 			System.out.println("The server didn't recognize this " + msgString + " signal");
 		}
 	}
