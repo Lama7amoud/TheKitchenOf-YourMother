@@ -415,15 +415,18 @@ public class TablesViewController {
         EventBus.getDefault().register(this);
         Platform.runLater(() -> {
             int employee_permission = userAtt.getPermissionLevel();
+            ObservableList<String> restaurantList = FXCollections.observableArrayList(
+                    "Haifa Branch", "Tel-Aviv Branch", "Nahariya Branch"
+            );
             // For manager and service
+            int restaurantId;
             if (!(employee_permission == 4 || employee_permission == 2)) {
+                RestaurantCombo.setValue(restaurantList.get(userAtt.getRestaurantId()-1));
                 RestaurantCombo.setDisable(true);
+                restaurantId = userAtt.getRestaurantId();
             } else {
                 RestaurantCombo.setDisable(false);
-                ObservableList<String> restaurantList = FXCollections.observableArrayList(
-                        "Haifa Branch", "Tel-Aviv Branch", "Nahariya Branch"
-                );
-
+                restaurantId = userAtt.getRestaurantInterest();
                 RestaurantCombo.setItems(restaurantList);
                 RestaurantCombo.setValue(restaurantList.get(userAtt.getRestaurantInterest()-1));
             }
@@ -445,7 +448,6 @@ public class TablesViewController {
             tableButtons[12] = TableButton13;
             tableButtons[13] = TableButton14;
 
-            int restaurantId = userAtt.getRestaurantInterest();
             positionTables(restaurantId); // Set the appropriate tables positions
 
             switch (restaurantId) {

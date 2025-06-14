@@ -208,6 +208,11 @@ public class PrimaryController {
             );
 
             ChooseRestaurantBox.setItems(restaurantList);
+            int employee_permission = userAtt.getPermissionLevel();
+            if(!(employee_permission == 4 || employee_permission == 2 || employee_permission == 0)){
+                ChooseRestaurantBox.setValue(restaurantList.get(userAtt.getRestaurantId()-1));
+                ChooseRestaurantBox.setDisable(true);
+            }
 
             if (userAtt.getPermissionLevel() == 0) {
                 logOutButton.setVisible(true);

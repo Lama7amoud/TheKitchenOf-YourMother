@@ -8,12 +8,10 @@ import il.cshaifasweng.OCSFMediatorExample.server.ocsf.ConnectionToClient;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import java.util.Timer;
-import java.util.TimerTask;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -30,7 +28,13 @@ public class SimpleServer extends AbstractServer {
 
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
-		String msgString = msg.toString();
+		String msgString;
+		if(msg instanceof String){
+			msgString = msg.toString();
+		}
+		else{
+			msgString = "";
+		}
 		System.out.println(msgString);
 		if (msgString.startsWith("#warning")) {
 			Warning warning = new Warning("Warning from server!");
@@ -100,8 +104,16 @@ public class SimpleServer extends AbstractServer {
 				exception.printStackTrace();
 			}
 		}
-
-		else if (msgString.startsWith("cancel_order;")) {
+		else if (msgString.startsWith("CheckTablesAvailability")) {
+			try {
+				String[] parts = msgString.split(";");
+				String[] details = Arrays.copyOfRange(parts, 1, parts.length);
+				List<String[]> reservedTables = DataManager.findOverlappingReservations(details);
+				client.sendToClient(reservedTables);
+			} catch (Exception exception) {
+				exception.printStackTrace();
+			}
+		}else if (msgString.startsWith("cancel_order;")) {
 			System.out.println("[SimpleServer] → Entered cancel_order branch");
 			String idNumber = msgString.split(";")[1].trim();
 
@@ -403,18 +415,14 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 		}
-		else if (msg instanceof String) {
-			msgString = (String) msg;
+		else if (msgString.equals("REQUEST_MONTHLY_REPORTS")) {
+			List<MonthlyReport> reports = DataManager.getAllReports();  // Make sure this method exists
 
-			if (msgString.equals("REQUEST_MONTHLY_REPORTS")) {
-				List<MonthlyReport> reports = DataManager.getAllReports();  // Make sure this method exists
-
-				// Send back the list directly (Java serialization)
-				try {
-					client.sendToClient(reports);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			// Send back the list directly (Java serialization)
+			try {
+				client.sendToClient(reports);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		else if (msgString.startsWith("Update preferences")) {

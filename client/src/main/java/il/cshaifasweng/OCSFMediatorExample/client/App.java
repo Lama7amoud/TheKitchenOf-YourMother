@@ -42,6 +42,7 @@ public class App extends Application {
         Parent root = loadFXML(pageName);
         scene = new Scene(root);
         appStage.setScene(scene);
+        appStage.setResizable(false);
         appStage.show();
     }
 
@@ -112,6 +113,7 @@ public class App extends Application {
         // 3) Load your mainPage.fxml (or "mainPage") as before
         scene = new Scene(loadFXML("mainPage"), 790, 480);
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
     }
 
