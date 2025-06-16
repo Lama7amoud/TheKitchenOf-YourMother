@@ -831,13 +831,11 @@ public class DataManager {
             Meal meal = session.createQuery(query).uniqueResult();
 
             if (meal != null) {
-                // Step 1: update category
+
                 meal.setMealCategory(to);
 
-                // Step 2: clear existing restaurant links
                 meal.getRestaurants().clear();
 
-                // Step 3: reassign based on new category
                 if (to.equals("special1")) {
                     meal.getRestaurants().add(session.get(Restaurant.class, 1));
                 } else if (to.equals("special2")) {

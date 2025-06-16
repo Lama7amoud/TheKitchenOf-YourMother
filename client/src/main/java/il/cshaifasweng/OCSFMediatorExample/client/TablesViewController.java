@@ -420,7 +420,7 @@ public class TablesViewController {
             );
             // For manager and service
             int restaurantId;
-            if (!(employee_permission == 4 || employee_permission == 2)) {
+            if ((employee_permission == 1 || employee_permission == 3)) {
                 RestaurantCombo.setValue(restaurantList.get(userAtt.getRestaurantId()-1));
                 RestaurantCombo.setDisable(true);
                 restaurantId = userAtt.getRestaurantId();

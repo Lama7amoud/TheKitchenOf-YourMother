@@ -230,7 +230,20 @@ protected void handleMessageFromServer(Object msg) {
                 App.switchScreen("Main Page");
             });
             return;
-       }
+        }
+
+        if (strMsg.startsWith("MealCategory:")) {
+            String category = strMsg.substring("MealCategory:".length()).trim();
+
+            if (updateMenuController != null) {
+                if (category.equals("NotFound")) {
+                    updateMenuController.handleMealNotFound();
+                } else {
+                    updateMenuController.handleMealCategoryResponse(category);
+                }
+            }
+            return;
+        }
 
         if (strMsg.equals("Reservation failed: ID already used.")) {
             Platform.runLater(() -> {

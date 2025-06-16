@@ -103,7 +103,7 @@ public class PrimaryController {
                 page = "TakeAwayOrReservation Page";
             }
 
-            // Handle customer or manager restaurant selection
+
             if (userAtt.getUsername().equals("Customer") || userAtt.getPermissionLevel() == 4) {
                 if (selectedRestaurant != null) {
                     int restaurantId = switch (selectedRestaurant) {
@@ -186,7 +186,7 @@ public class PrimaryController {
     void initialize() {
         Platform.runLater(() -> {
             int user_permission = userAtt.getPermissionLevel();
-            feedbackButton.setVisible((user_permission == 0) || (user_permission == 4));
+            feedbackButton.setVisible((user_permission == 0));
 
             RestaurantDetailsInstructionLabel.setVisible(false);
             orderButton.setDisable(true);
@@ -209,7 +209,7 @@ public class PrimaryController {
 
             ChooseRestaurantBox.setItems(restaurantList);
             int employee_permission = userAtt.getPermissionLevel();
-            if(!(employee_permission == 4 || employee_permission == 2 || employee_permission == 0)){
+            if((employee_permission == 1 || employee_permission == 3)){
                 ChooseRestaurantBox.setValue(restaurantList.get(userAtt.getRestaurantId()-1));
                 ChooseRestaurantBox.setDisable(true);
             }

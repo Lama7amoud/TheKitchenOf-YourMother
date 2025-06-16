@@ -247,37 +247,30 @@
             });
 
             // Handle image display
-            imageColumn.setCellFactory(column -> new TableCell<>() {
+// Real-time image display from file:// URI
+            imageColumn.setCellFactory(column -> new TableCell<Meal, String>() {
                 private final ImageView imageView = new ImageView();
                 @Override
                 protected void updateItem(String imagePath, boolean empty) {
                     super.updateItem(imagePath, empty);
                     if (empty || imagePath == null || imagePath.isEmpty()) {
                         setGraphic(null);
-                    } else {
-                        imageView.setFitHeight(50);
-                        imageView.setFitWidth(50);
-
-                        Image image = null;
-
-                        try {
-                            // Try loading from file system (real-time image after adding)
-                            File diskImage = new File(System.getProperty("user.dir") + "/src/main/resources" + imagePath);
-                            if (diskImage.exists()) {
-                                image = new Image(diskImage.toURI().toString());
-                            } else {
-                                // Fallback to resource if not found on disk (for built-in meals)
-                                image = new Image(String.valueOf(PrimaryController.class.getResource(imagePath)));
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Failed to load image for: " + imagePath);
-                        }
-
-                        imageView.setImage(image);
+                        return;
+                    }
+                    imageView.setFitWidth(50);
+                    imageView.setFitHeight(50);
+                    try {
+                        Image img = new Image(imagePath, true);   // direct load of file:///… URI
+                        imageView.setImage(img);
                         setGraphic(imageView);
+                    } catch (Exception ex) {
+                        System.out.println("Failed to load image: " + imagePath);
+                        setGraphic(null);
                     }
                 }
             });
+
+
 
             menuTable.setEditable(true); // Allow editing
             menuTable.setPlaceholder(new Label("No meals available"));
@@ -354,8 +347,8 @@
 
                         editButton.setStyle("-fx-background-color: #ffcc00; -fx-text-fill: black;");
                         editButton.setPrefWidth(60);
-                        priceField.setPromptText("New price");
-                        priceField.setMaxWidth(80);
+                        priceField.setPromptText("new price");
+                        priceField.setMaxWidth(100);
                     }
 
                     @Override

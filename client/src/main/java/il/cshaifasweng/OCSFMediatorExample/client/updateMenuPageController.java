@@ -18,6 +18,7 @@ import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import javafx.scene.control.Button;
@@ -25,6 +26,8 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
 import java.util.stream.Collectors;
+
+import static il.cshaifasweng.OCSFMediatorExample.client.Client.userAtt;
 
 
 public class updateMenuPageController {
@@ -110,6 +113,16 @@ public class updateMenuPageController {
     @FXML
     private ComboBox<String> mealCategoryCombo;
 
+    @FXML
+    private Label addLabel;
+    @FXML
+    private Label catdisLabel;
+    @FXML
+    private Label toLabel;
+
+
+
+
 
 
 
@@ -123,14 +136,17 @@ public class updateMenuPageController {
         EventBus.getDefault().register(this);
 
         Platform.runLater(() -> {
-            comboDiscount.getItems().addAll(
-                    "shared meals",
-                    "specials of Haifa",
-                    "specials of Tel-Aviv",
-                    "specials of Nahariya"
-            );
-
+            comboDiscount.getItems().addAll("shared meals", "specials of Haifa", "specials of Tel-Aviv", "specials of Nahariya");
             mealCategoryCombo.getItems().addAll("Haifa", "Tel-Aviv", "Nahariya", "All");
+
+            /*mealCategoryCombo.setOnAction(e -> {
+                addLabel.setVisible(false);
+            });
+
+            comboDiscount.setOnAction(e -> {
+                catdisLabel.setVisible(false);
+            });*/
+
 
             AuthorizedUser user = Client.getClientAttributes();
             helloTitleLabel.setText("Hello " + user.getFirstname());
@@ -150,26 +166,25 @@ public class updateMenuPageController {
 
     @FXML
     void get_haifa_menu_func(ActionEvent event) {
-        MenuController.setRestaurantInterest(1);
         String page = "Menu Page";
-
-        //String page = "Personal Area Page";
+        userAtt.setRestaurantInterest((short) 1);
+        MenuController.setRestaurantInterest(1);
         App.switchScreen(page);
 
     }
     @FXML
     void get_telaviv_menu_func(ActionEvent event) {
-        MenuController.setRestaurantInterest(2);
         String page = "Menu Page";
-        //String page = "Personal Area Page";
+        userAtt.setRestaurantInterest((short) 2);
+        MenuController.setRestaurantInterest(2);
         App.switchScreen(page);
 
     }
     @FXML
     void get_nahariya_menu_func(ActionEvent event) {
-        MenuController.setRestaurantInterest(3);
         String page = "Menu Page";
-        //String page = "Personal Area Page";
+        userAtt.setRestaurantInterest((short) 3);
+        MenuController.setRestaurantInterest(3);
         App.switchScreen(page);
     }
 
@@ -215,8 +230,9 @@ public class updateMenuPageController {
             case "All" -> "shared meal";
             default -> "";
         };
-// Path to meals folder inside your project
-        File destinationDir = new File("C:\\Users\\97254\\IdeaProjects\\TheKitchenOf-YourMother-m3lama\\client\\src\\main\\resources\\il\\cshaifasweng\\OCSFMediatorExample\\client\\meals");
+
+        File destinationDir = new File(System.getProperty("user.dir") + "/client/added meals");
+
         if (!destinationDir.exists()) {
             destinationDir.mkdirs();
         }
@@ -230,13 +246,19 @@ public class updateMenuPageController {
         // Only use the file name, not full path
         String imageFileName = sourceFile.getName();
         File destinationFile = new File(destinationDir, imageFileName);
+        try {
+            Files.copy(sourceFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
+        String imageURL = destinationFile.toURI().toString();
 
         try {
             // Copy the image to your project meals folder
-            Files.copy(sourceFile.toPath(), destinationFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(sourceFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             System.out.println("Image copied to: " + destinationFile.getAbsolutePath());
-            imageFileName = "/il/cshaifasweng/OCSFMediatorExample/client/meals/" + imageFileName;
+            imageFileName = destinationFile.toURI().toString();
             String messageToSend = String.format("Add Meal \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",
                     Name, Description, Preferences, Price, imageFileName, Category);
             Client.getClient().sendToServer(messageToSend);
@@ -245,6 +267,7 @@ public class updateMenuPageController {
         }
 
         // Clear fields
+        resetComboBoxWithPrompt(mealCategoryCombo, "Choose Category");
         addMealName.clear();
         mealDescription.clear();
         mealPreferences.clear();
@@ -253,6 +276,18 @@ public class updateMenuPageController {
         mealCategoryCombo.getSelectionModel().clearSelection();
     }
 
+
+    private void resetComboBoxWithPrompt(ComboBox<String> comboBox, String promptText) {
+        comboBox.getSelectionModel().clearSelection();
+        comboBox.setValue(null);
+        comboBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? promptText : item);
+            }
+        });
+    }
     @FXML
     void change_category_func(ActionEvent event) {
         String name = changeCategoryMealName.getText().trim();
@@ -299,9 +334,10 @@ public class updateMenuPageController {
             e.printStackTrace();
             showAlert("Failed to send category change request.");
         }
+        changeCategoryMealName.clear();
+        fromCategoryField.clear();
+        resetComboBoxWithPrompt(toCategoryCombo, "Select new category");
     }
-
-
 
     @Subscribe
     public void handleCategoryString(Object msg) {
@@ -358,7 +394,6 @@ public class updateMenuPageController {
         }
     }
 
-
     @FXML
     void discount_func(ActionEvent event) {
         String discountText = discountValue.getText().trim();
@@ -395,8 +430,8 @@ public class updateMenuPageController {
         }
 
         // Clear fields
+        resetComboBoxWithPrompt(comboDiscount, "Choose Category");
         discountValue.clear();
-        comboDiscount.getSelectionModel().clearSelection();
     }
 
     private void showAlert(String message) {
@@ -406,7 +441,6 @@ public class updateMenuPageController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
 
     public void handleMealCategoryResponse(String category) {
         Platform.runLater(() -> {
@@ -425,7 +459,9 @@ public class updateMenuPageController {
                             .filter(cat -> !cat.equals(displayCategory))
                             .collect(Collectors.toList())
             );
+
         });
+
     }
 
     public void handleMealNotFound() {
@@ -453,7 +489,5 @@ public class updateMenuPageController {
         }
         return true;
     }
-
-
 
 }

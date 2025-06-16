@@ -798,13 +798,11 @@ public class SimpleServer extends AbstractServer {
 
 					// Refresh relevant menus
 					if (fromCategory.equals("shared meal") || toCategory.equals("shared meal")) {
-						// If going to or from shared → update all
-
 
 						sendToAllClients(DataManager.requestMenu());
 
 					} else {
-						// Just between specials
+
 						if (fromCategory.equals("special1") || toCategory.equals("special1")) {
 							sendToAllClients(DataManager.requestMenu());
 						}

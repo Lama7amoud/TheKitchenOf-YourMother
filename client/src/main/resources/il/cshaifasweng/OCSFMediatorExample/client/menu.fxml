@@ -21,7 +21,7 @@
                 <TableColumn fx:id="preferencesColumn" prefWidth="140" text="Preferences" />
                 <TableColumn fx:id="priceColumn" prefWidth="80" text="Price" />
                 <TableColumn fx:id="imageColumn" prefWidth="120" text="Image" />
-                <TableColumn fx:id="editColumn" prefWidth="125.9999" text="Edit Price" />
+                <TableColumn fx:id="editColumn" prefWidth="150" text="Edit Price" />
             </columns>
         </TableView>
 

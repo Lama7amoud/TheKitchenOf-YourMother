@@ -27,10 +27,10 @@
                   <Insets left="10.0" right="10.0" />
                </padding>
             </Label>
-            <Button fx:id="managerConfirmButton" alignment="CENTER" layoutX="92.0" layoutY="138.33333333333331" mnemonicParsing="false" onAction="#manager_confirm_price_func" prefHeight="51.0" prefWidth="93.0" text="Price Change Confirmation" textOverrun="CLIP" visible="false" wrapText="true" AnchorPane.bottomAnchor="210.33333333333334" AnchorPane.leftAnchor="92.0" AnchorPane.rightAnchor="50.0" />
-            <Button fx:id="managerFeedbackButton" alignment="CENTER" layoutX="92.0" layoutY="273.0" mnemonicParsing="false" onAction="#manager_feedback_func" prefHeight="25.0" prefWidth="92.0" text="view feedback" />
-            <Button layoutX="40.0" layoutY="349.0" mnemonicParsing="false" onAction="#backFunc" text="back" />
-            <Button fx:id="managerDiscountButton" alignment="CENTER" layoutX="92.0" layoutY="210.0" mnemonicParsing="false" onAction="#manager_confirm_discount_func" prefHeight="44.0" prefWidth="93.0" text="Discount Confirmation" textOverrun="CLIP" visible="false" wrapText="true" />
+            <Button fx:id="managerConfirmButton" alignment="CENTER" layoutX="92.0" layoutY="138.33333333333331" mnemonicParsing="false" onAction="#manager_confirm_price_func" prefHeight="60.0" prefWidth="97.0" style="-fx-background-radius: 5em;" text="Price Change Confirmation" textOverrun="CLIP" wrapText="true" AnchorPane.bottomAnchor="211.0" AnchorPane.leftAnchor="92.0" AnchorPane.rightAnchor="46.0" />
+            <Button fx:id="managerFeedbackButton" alignment="CENTER" layoutX="88.0" layoutY="269.0" mnemonicParsing="false" onAction="#manager_feedback_func" prefHeight="29.0" prefWidth="97.0" style="-fx-background-radius: 5em;" text="view feedback" />
+            <Button layoutX="40.0" layoutY="343.0" mnemonicParsing="false" onAction="#backFunc" prefHeight="31.0" prefWidth="43.0" style="-fx-background-radius: 5em;" text="back" />
+            <Button fx:id="managerDiscountButton" alignment="CENTER" layoutX="92.0" layoutY="201.0" mnemonicParsing="false" onAction="#manager_confirm_discount_func" prefHeight="53.0" prefWidth="94.0" style="-fx-background-radius: 5em;" text="Discount Confirmation" textOverrun="CLIP" wrapText="true" />
          </children>
       </AnchorPane>
    </left>
