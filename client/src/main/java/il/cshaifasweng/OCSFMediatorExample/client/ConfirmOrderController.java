@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.client.events.MessageEvent;
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -8,6 +9,7 @@ import javafx.scene.control.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -23,6 +25,8 @@ public class ConfirmOrderController {
     private static final int RESERVATION_DURATION_MINUTES = 60;
     private boolean idAlreadyUsed = false;
     private String[] currentFormData;
+    private boolean isActive = false;
+
     @FXML
     private ComboBox<String> AvailableTimeBox;
 
@@ -48,6 +52,9 @@ public class ConfirmOrderController {
     @FXML private Label cvvLabel;
     @FXML private Label emailLabel;
 
+
+
+
     private List<HostingTable> lastReceivedTables = new ArrayList<>();
     private boolean reservationAlreadySent = false;
 
@@ -55,6 +62,7 @@ public class ConfirmOrderController {
     private void handleBackToMainPage(ActionEvent event) {
         Platform.runLater(() -> {
             EventBus.getDefault().unregister(this);
+            isActive = false;
             App.switchScreen("Main Page");
         });
     }
@@ -63,6 +71,7 @@ public class ConfirmOrderController {
     private void handleBackToOrderTables(ActionEvent event) {
         Platform.runLater(() -> {
             EventBus.getDefault().unregister(this);
+            isActive = false;
             App.switchScreen("Order Tables Page");
         });
     }
@@ -83,7 +92,10 @@ public class ConfirmOrderController {
 
     @FXML
     void initialize() {
-        EventBus.getDefault().register(this);
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+        isActive = true;
         branchDetailsButton.setVisible(false);
         viewMapButton.setVisible(false);
 
@@ -135,6 +147,46 @@ public class ConfirmOrderController {
                 OrderData.getInstance().setPreferredTime(parts[1].trim());
             }
         });
+
+        cvvField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal.matches("^\\d{3}$")) {
+                cvvLabel.setVisible(false);
+            }
+        });
+
+        emailField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal.matches("^[\\w-.]+@[\\w-]+\\.[a-zA-Z]{2,}$")) {
+                emailLabel.setVisible(false);
+            }
+        });
+
+        expirationMonthCombo.valueProperty().addListener((obs, oldVal, newVal) -> {
+            hideExpirationLabelIfValid();
+        });
+
+        expirationYearCombo.valueProperty().addListener((obs, oldVal, newVal) -> {
+            hideExpirationLabelIfValid();
+        });
+
+    }
+
+    private void hideExpirationLabelIfValid() {
+        String month = expirationMonthCombo.getValue();
+        String year = expirationYearCombo.getValue();
+
+        if (month != null && year != null) {
+            try {
+                int expMonth = Integer.parseInt(month);
+                int expYear = Integer.parseInt(year);
+
+                LocalDate now = LocalDate.now();
+                LocalDate expDate = LocalDate.of(expYear, expMonth, 1).withDayOfMonth(1);
+
+                if (!expDate.isBefore(now.withDayOfMonth(1))) {
+                    expirationLabel.setVisible(false);
+                }
+            } catch (Exception ignored) {}
+        }
     }
 
 
@@ -183,8 +235,21 @@ public class ConfirmOrderController {
 
 
         if (expirationMonth == null || expirationYear == null) {
+            expirationLabel.setText("Expiration date is required.");
             expirationLabel.setVisible(true);
             isValid = false;
+        } else {
+            int expMonth = Integer.parseInt(expirationMonth);
+            int expYear = Integer.parseInt(expirationYear);
+
+            LocalDate now = LocalDate.now();
+            LocalDate expirationDate = LocalDate.of(expYear, expMonth, 1).withDayOfMonth(1);
+
+            if (expirationDate.isBefore(now.withDayOfMonth(1))) {
+                expirationLabel.setText("Card is expired.");
+                expirationLabel.setVisible(true);
+                isValid = false;
+            }
         }
         if (!cvv.matches("^\\d{3}$")) {
             cvvLabel.setVisible(true);
@@ -226,8 +291,28 @@ public class ConfirmOrderController {
 
     }
 
+
+    @Subscribe
+    public void handleReservationSuccess(MessageEvent evt) {
+        if (!isActive || !evt.getMessage().equals("Reservation saved successfully")) return;
+
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Reservation Confirmed");
+            alert.setHeaderText(null);
+            alert.setContentText("Your reservation has been saved successfully.");
+            alert.showAndWait();
+            EventBus.getDefault().unregister(this);
+            isActive = false;
+            App.switchScreen("Main Page");
+
+        });
+    }
+
+
     @Subscribe
     public void onIdCheckResponse(IdCheckEvent event) {
+        if (!isActive) return;
         Platform.runLater(() -> {
             System.out.println("ID check result: " + event.doesExist());
             if (reservationAlreadySent) return;
@@ -294,12 +379,15 @@ public class ConfirmOrderController {
         List<HostingTable> chosenTables = findTablesForTime(order.getPreferredTime());
         reservation.setReservedTables(chosenTables);
 
+        reservation.setSenderId(Client.getClientId());
         ReservationRequest request = new ReservationRequest(reservation, true);
         Client.getClient().sendToServer(request);
     }
 
     @Subscribe
     public void checkingList(List<HostingTable> availableTables) {
+        if (!isActive) return;
+        if (!EventBus.getDefault().isRegistered(this)) return;
         List<?> list = (List<?>) availableTables;
         if (!list.isEmpty()) {
             Object first = list.get(0);
@@ -419,6 +507,35 @@ public class ConfirmOrderController {
         }
         return slots;
     }
+
+    @Subscribe
+    public void onExternalReservation(Reservation updated) {
+        if (!isActive) return;
+        OrderData order = OrderData.getInstance();
+
+        // Only interfere if the update is for the same restaurant and date
+        if (updated.getRestaurant().getId() == order.getSelectedRestaurant().getId()) {
+            LocalTime time = LocalTime.parse(order.getPreferredTime());
+            LocalDateTime currentClientTime = LocalDateTime.of(order.getDate(), time);
+            LocalDateTime otherTime = updated.getReservationTime();
+
+            // Conflict if within same 90-minute window
+            long minutes = Math.abs(Duration.between(currentClientTime, otherTime).toMinutes());
+            if (minutes < 90) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Time Unavailable");
+                    alert.setHeaderText(null);
+                    alert.setContentText("The time you selected is no longer available. Please try another slot.");
+                    alert.showAndWait();
+                    EventBus.getDefault().unregister(this);
+                    isActive = false;
+                    App.switchScreen("Main Page");
+                });
+            }
+        }
+    }
+
 
 
 }

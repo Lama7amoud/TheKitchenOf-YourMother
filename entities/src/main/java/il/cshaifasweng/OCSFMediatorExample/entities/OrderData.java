@@ -20,7 +20,7 @@ public class OrderData {
     private String phoneNumber;
     private String idNumber;
     private String address;
-    private String email;  // ✅ New field added
+    private String email;
     private String visa;
     private List<MealOrder> mealOrders = new ArrayList<>();
 

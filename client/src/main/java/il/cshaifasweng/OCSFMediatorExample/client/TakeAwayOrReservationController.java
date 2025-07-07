@@ -18,6 +18,11 @@ import java.util.Optional;
 
 public class TakeAwayOrReservationController {
 
+
+
+
+    @FXML private Button cancelButton;   // Cancel Reservation
+    @FXML private Button cancelButton1;  // Cancel Order
     @FXML
     private TextField IDtextField;
 
@@ -28,14 +33,30 @@ public class TakeAwayOrReservationController {
     private Scene scene;
     private Parent root;
 
+    private boolean isActive = false;
+
     @FXML
     void initialize() {
-        // Hide branch details if you wish
+        cancelButton.setDisable(true);
+        cancelButton1.setDisable(true);
+
+        IDtextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.matches("\\d{9}")) {
+                Client.getClient().sendToServer("check_id_type:" + newValue); // changed ; to :
+            } else {
+                cancelButton.setDisable(true);
+                cancelButton1.setDisable(true);
+            }
+        });
+
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+
         branchDetailsButton.setVisible(false);
-        System.out.println("[TakeAwayOrReservationController] registered with EventBus");
-        // Register this controller to listen for MessageEvent on EventBus
-        EventBus.getDefault().register(this);
+        isActive = true;
     }
+
 
     // Convenience method to show a simple information alert
     private void showAlert(String message) {
@@ -45,6 +66,31 @@ public class TakeAwayOrReservationController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    @Subscribe
+    public void handleIdTypeResponse(MessageEvent evt) {
+        String msg = evt.getMessage();
+        if (!msg.startsWith("id_type:")) return;
+
+        String type = msg.split(":")[1].trim();
+
+        Platform.runLater(() -> {
+            switch (type) {
+                case "reservation":
+                    cancelButton.setDisable(false);     // enable Cancel Reservation
+                    cancelButton1.setDisable(true);
+                    break;
+                case "takeaway":
+                    cancelButton1.setDisable(false);    // enable Cancel Order
+                    cancelButton.setDisable(true);
+                    break;
+                default: // not_found or unrecognized
+                    cancelButton.setDisable(true);
+                    cancelButton1.setDisable(true);
+            }
+        });
+    }
+
 
     // Convenience method to show an error alert
     private void showError(String message) {
@@ -99,6 +145,7 @@ public class TakeAwayOrReservationController {
     // ─────────(2) Listen for “confirm_order_cancellation;<fee>;<idNumber>” ─────────
     @Subscribe
     public void handleOrderCancellationPrompt(MessageEvent evt) {
+        if (!isActive) return;
         String payload = evt.getMessage();
         // e.g. payload = "confirm_order_cancellation;50;123456789"
         if (!payload.startsWith("confirm_order_cancellation;")) {
@@ -128,6 +175,7 @@ public class TakeAwayOrReservationController {
     // ─────────(3) Listen for final “order” responses (Visa path) ─────────
     @Subscribe
     public void handleOrderFinalResponse(MessageEvent evt) {
+        if (!isActive) return;
         String payload = evt.getMessage();
 
         if (payload.startsWith("order_cancellation_success;")) {
@@ -155,6 +203,7 @@ public class TakeAwayOrReservationController {
     // ─────────(4) Listen for “confirm_cancellation;<fee>;<idNumber>” (reservation flow) ─────────
     @Subscribe
     public void handleCancellationPrompt(MessageEvent evt) {
+        if (!isActive) return;
         String payload = evt.getMessage();
         System.out.println("[TakeAwayOrReservationController] handleCancellationPrompt got: " + payload);
         if (!payload.startsWith("confirm_cancellation;")) {
@@ -184,6 +233,7 @@ public class TakeAwayOrReservationController {
     // ─────────(5) Listen for final “reservation” responses (Visa path) ─────────
     @Subscribe
     public void handleReservationFinalResponse(MessageEvent evt) {
+        if (!isActive) return;
         String payload = evt.getMessage();
         System.out.println("[TakeAwayOrReservationController] handleReservationFinalResponse got: " + payload);
 
@@ -211,6 +261,7 @@ public class TakeAwayOrReservationController {
     // ─── (6) Listen for the “take‐away order saved” message ─────────
    @Subscribe
     public void handleOrderSaved(MessageEvent evt) {
+       if (!isActive) return;
         String payload = evt.getMessage();
        if (!payload.equals("order_saved_successfully")) {
            return;
@@ -224,6 +275,7 @@ public class TakeAwayOrReservationController {
 
     @Subscribe
     public void handleOrderCancellationDebt(MessageEvent evt) {
+        if (!isActive) return;
         String payload = evt.getMessage();
         if (!payload.startsWith("order_cancellation_debt;")) {
             return;
@@ -247,6 +299,8 @@ public class TakeAwayOrReservationController {
 
     @FXML
     public void goToOrderTables(ActionEvent event) throws IOException {
+        isActive = false;
+        EventBus.getDefault().unregister(this);
         root = FXMLLoader.load(getClass().getResource("OrderTablesPage.fxml"));
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         scene = new Scene(root);
@@ -256,6 +310,8 @@ public class TakeAwayOrReservationController {
 
     @FXML
     public void goToMenu(ActionEvent event) throws IOException {
+        isActive = false;
+        EventBus.getDefault().unregister(this);
         root = FXMLLoader.load(getClass().getResource("MenuPage.fxml"));
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         scene = new Scene(root);
@@ -293,11 +349,16 @@ public class TakeAwayOrReservationController {
 
     @FXML
     public void goToTakeAwayPage(ActionEvent event) {
+        isActive = false;
+        EventBus.getDefault().unregister(this);
         App.switchScreen("TakeAway Page");
+
     }
 
     // Unregister from EventBus when this controller is destroyed (optional)
-    public void shutdown() {
+    public void shutdown()
+    {
+        isActive = false;
         EventBus.getDefault().unregister(this);
     }
 }

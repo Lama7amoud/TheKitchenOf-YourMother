@@ -30,6 +30,10 @@ public class Reservation implements Serializable {
     private String email;
     private double amountDue = 0.0;   //addedddd
 
+    @Transient  // If using JPA
+    private String senderId;
+
+
 
     @ManyToOne
     private Restaurant restaurant;
@@ -49,6 +53,13 @@ public class Reservation implements Serializable {
         this.isTakeAway = true; // since it's from the TakeAway page
     }
 
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
+    }
+
+    public String getSenderId() {
+        return senderId;
+    }
     public String getStatus() {
         return status;
     }

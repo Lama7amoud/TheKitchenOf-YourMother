@@ -8,7 +8,10 @@ import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
 
 import java.io.IOException;
-import java.util.List;import il.cshaifasweng.OCSFMediatorExample.client.events.MessageEvent;
+import java.util.List;
+import java.util.UUID;
+
+import il.cshaifasweng.OCSFMediatorExample.client.events.MessageEvent;
 
 public class Client extends AbstractClient {
 
@@ -16,7 +19,10 @@ public class Client extends AbstractClient {
     public static String host;
     public static int port;
     static AuthorizedUser userAtt;
-
+    private static final String CLIENT_ID = UUID.randomUUID().toString();
+    public static String getClientId() {
+        return CLIENT_ID;
+    }
 
     private static List<Meal> menu;
 
@@ -204,23 +210,23 @@ public class Client extends AbstractClient {
 @Override
 protected void handleMessageFromServer(Object msg) {
 
+    if (msg instanceof Message) {
+        Message message = (Message) msg;
+        if ("reservation_update".equals(message.getType())) {
+            Reservation updated = (Reservation) message.getData();
+            EventBus.getDefault().post(updated);  // post to EventBus for UI use
+            return;
+        }
+    }
     if (msg instanceof String) {
         String strMsg = (String) msg;
         System.out.println("[Client] <handleMessageFromServer> got raw server message: " + strMsg);
         EventBus.getDefault().post(new MessageEvent(strMsg));
         if (strMsg.equals("Reservation cancelled successfully")) {
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Cancelled");
-                alert.setHeaderText(null);
-                alert.setContentText("Your reservation has been cancelled.");
-                alert.showAndWait();
-                App.switchScreen("Main Page");
-            });
             return;
         }
 
-        if (strMsg.equals("Reservation saved successfully")) {
+        /*if (strMsg.equals("Reservation saved successfully")) {
              Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success");
@@ -230,7 +236,7 @@ protected void handleMessageFromServer(Object msg) {
                 App.switchScreen("Main Page");
             });
             return;
-        }
+        }*/
 
         if (strMsg.startsWith("MealCategory:")) {
             String category = strMsg.substring("MealCategory:".length()).trim();
@@ -331,6 +337,11 @@ protected void handleMessageFromServer(Object msg) {
 
     // Handle single Reservation object
     if (msg instanceof Reservation) {
+        Reservation reservation = (Reservation) msg;
+        if (reservation.getSenderId() != null && reservation.getSenderId().equals(Client.getClientId())) {
+            return; // Ignore own reservation
+        }
+
         System.out.println("Reservation saved, ID: " + ((Reservation) msg).getId());
         EventBus.getDefault().post(msg);
     }

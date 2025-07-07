@@ -58,7 +58,7 @@
                         if (selectedRestaurant != null) {
                             userAtt.setRestaurantInterest((short) selectedRestaurant.getId());
                         }
-                        yield "Tables Page"; // ✅ Match the name in App.java switchScreen map
+                        yield "Tables Page";
                     }
                     case "branchDetailsButton" -> "Branch Page";
                     default -> "";
@@ -77,6 +77,7 @@
                 // Disable confirm button at start
                 ConfirmOrderButton.setDisable(true);
 
+                datePicker.setDisable(true);  // Disable until restaurant arrives
                 // Add listeners to check input
                 guestCountField.textProperty().addListener((obs, oldVal, newVal) -> checkFormCompletion());
                 PrefferedTimeBox.valueProperty().addListener((obs, oldVal, newVal) -> checkFormCompletion());
@@ -173,6 +174,8 @@
                 Client.getClientAttributes().setRestaurant(restaurant);
 
                 setUpHolidayFilter(restaurant.getHolidays());
+                datePicker.setDisable(false);  // Enable once branch is received
+
             });
         }
 

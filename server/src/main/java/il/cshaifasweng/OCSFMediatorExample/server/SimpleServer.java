@@ -28,10 +28,12 @@ public class SimpleServer extends AbstractServer {
 
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
+
 		String msgString;
 		if(msg instanceof String){
 			msgString = msg.toString();
 		}
+
 		else{
 			msgString = "";
 		}
@@ -590,7 +592,8 @@ public class SimpleServer extends AbstractServer {
 			List<MealOrder> orders = (List<MealOrder>) incoming;
 			DataManager.saveMealOrders(orders);
 			try {
-				client.sendToClient("Reservation saved successfully");
+				/*client.sendToClient("Reservation saved successfully");*/
+				client.sendToClient("Meal orders saved");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -646,8 +649,18 @@ public class SimpleServer extends AbstractServer {
 				} else {
 					DataManager.saveReservation(reservation);
 					try {
+						// Notify only this client
 						client.sendToClient("Reservation saved successfully");
+
+						// Send reservation to this client only, for client-side processing if needed
 						client.sendToClient(reservation);
+
+						// Notify all other clients about reservation update
+						sendToAllClientsExceptSender(new Message("reservation_update", reservation), client);
+
+						//sent to all clients for update
+						List<HostingTable> updatedAvailability = DataManager.getAvailableTables(reservation);
+						sendToAllClients(updatedAvailability);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -747,8 +760,22 @@ public class SimpleServer extends AbstractServer {
 				sendToAllClients(updatePriceConfirmation);
 			}
 		}
+		else if (msgString.startsWith("check_id_type:")) {
+			String idNumber = msgString.split(":")[1].trim();
+			Reservation reservation = DataManager.getActiveReservationById(idNumber);
 
-
+			try {
+				if (reservation == null) {
+					client.sendToClient("id_type:not_found");
+				} else if (reservation.isTakeAway()) {
+					client.sendToClient("id_type:takeaway");
+				} else {
+					client.sendToClient("id_type:reservation");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		else if (msgString.startsWith("Confirm Discount")) {
 			String details = msgString.substring("Confirm Discount".length()).trim();
 			String[] parts = details.split("\"");
@@ -830,6 +857,23 @@ public class SimpleServer extends AbstractServer {
 			System.out.println("The server didn't recognize this " + msgString + " signal");
 		}
 	}
+	public void sendToAllClientsExceptSender(Object msg, ConnectionToClient sender) {
+		for (Thread clientThread : getClientConnections()) {
+			if (clientThread instanceof ConnectionToClient) {
+				ConnectionToClient client = (ConnectionToClient) clientThread;
+				if (client != sender) {
+					try {
+						client.sendToClient(msg);
+					} catch (IOException e) {
+						System.err.println("Failed to send to client: " + client);
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+
+
 
 	public void sendToAllClients(Object message) {
 		try {

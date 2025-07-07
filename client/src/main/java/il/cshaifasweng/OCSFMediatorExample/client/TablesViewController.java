@@ -21,6 +21,7 @@ import java.awt.Point;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -35,6 +36,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 public class TablesViewController {
+
+    private boolean isActive = false;
 
     int numOfImages = 3;
     Image[] images;
@@ -157,6 +160,7 @@ public class TablesViewController {
 
     @FXML
     void backButton(ActionEvent event){
+        isActive = false;
         EventBus.getDefault().unregister(this);
         App.switchScreen("Order Tables Page");
     }
@@ -412,7 +416,10 @@ public class TablesViewController {
 
     @FXML
     void initialize() {
-        EventBus.getDefault().register(this);
+        isActive = true;
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
         Platform.runLater(() -> {
             int employee_permission = userAtt.getPermissionLevel();
             ObservableList<String> restaurantList = FXCollections.observableArrayList(
@@ -492,5 +499,45 @@ public class TablesViewController {
             Client.getClient().sendToServer("Get branch details;" + userAtt.getRestaurantInterest());
         });
     }
+
+
+    //added
+    @Subscribe
+    public void onExternalReservationUpdate(Reservation updatedReservation) {
+        Platform.runLater(() -> {
+            Restaurant currentRestaurant = restaurantToMap != null
+                    ? restaurantToMap
+                    : Client.getClientAttributes().getRestaurant();
+
+            if (currentRestaurant == null) return;
+
+            // 1. Match restaurant
+            if (updatedReservation.getRestaurant().getId() != currentRestaurant.getId()) return;
+
+            // 2. Match selected time/date
+            String selectedTimeStr = timePicker.getValue();
+            LocalDate selectedDate = datePicker.getValue();
+
+            if (selectedTimeStr == null || selectedDate == null) return;
+
+            LocalTime selectedTime = LocalTime.parse(selectedTimeStr);
+            LocalDateTime selectedDateTime = LocalDateTime.of(selectedDate, selectedTime);
+
+            // 3. Check if within conflict range (±90 minutes)
+            LocalDateTime updatedTime = updatedReservation.getReservationTime();
+            long minutesBetween = Math.abs(java.time.Duration.between(selectedDateTime, updatedTime).toMinutes());
+
+            if (minutesBetween < 90) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Reservation Conflict");
+                alert.setHeaderText("The selected time is no longer fully available.");
+                alert.setContentText("A new reservation was just made. The map will refresh.");
+                alert.showAndWait();
+
+                checkTimeAvailability(null);  // Re-check availability
+            }
+        });
+    }
+
 
 }

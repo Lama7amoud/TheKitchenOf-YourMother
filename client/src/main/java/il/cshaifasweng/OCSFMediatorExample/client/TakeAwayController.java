@@ -50,18 +50,15 @@ public class TakeAwayController implements Initializable {
         EventBus.getDefault().register(this);
         LocalTime now = LocalTime.now().withSecond(0).withNano(0);
 
-        // Add current time
-        favTimeComboBox.getItems().add(now.toString());
+// Round up to the next 30-minute mark
+        int minute = now.getMinute();
+        int minutesToAdd = (minute < 30) ? (30 - minute) : (60 - minute);
+        LocalTime firstSlot = now.plusMinutes(minutesToAdd);
 
-        // Add after 30 minutes
-        favTimeComboBox.getItems().add(now.plusMinutes(30).toString());
-
-        // Add after 1 hour
-        favTimeComboBox.getItems().add(now.plusHours(1).toString());
-
-        // Add 5 more options spaced 1 hour apart (starting from +2 hours)
-        for (int i = 2; i <= 6; i++) {
-            favTimeComboBox.getItems().add(now.plusHours(i).toString());
+// Add 7 half-hour spaced options
+        for (int i = 0; i < 7; i++) {
+            LocalTime slot = firstSlot.plusMinutes(i * 30);
+            favTimeComboBox.getItems().add(slot.toString());
         }
 
         // Initially hide all error labels
