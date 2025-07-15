@@ -88,6 +88,7 @@
 
             private ObservableList<Meal> menuData = FXCollections.observableArrayList();
             private List<Meal> fullMealList = new ArrayList<>();
+            private Map<String, Integer> mealQuantities = new HashMap<>();
 
 
 
@@ -284,6 +285,21 @@
                 menuTable.setPlaceholder(new Label("No meals available"));
                 menuTable.setItems(menuData);
                 menuTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+                menuTable.setRowFactory(tv -> new TableRow<Meal>() {
+                    @Override
+                    protected void updateItem(Meal item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setVisible(item != null && !empty);
+                        setManaged(item != null && !empty);
+                        if (item == null || empty) {
+                            setPrefHeight(0);
+                        } else {
+                            setPrefHeight(Region.USE_COMPUTED_SIZE);
+                        }
+                    }
+                });
+
+
 
                 if (user != null && user.getPermissionLevel() == 5) {
 
@@ -423,14 +439,24 @@
                             qtyField.setEditable(false);
 
                             addButton.setOnAction(e -> {
-                                int current = Integer.parseInt(qtyField.getText());
-                                qtyField.setText(String.valueOf(current + 1));
+                                Meal meal = getTableView().getItems().get(getIndex());
+                                String mealName = meal.getMealName();
+                                int current = mealQuantities.getOrDefault(mealName, 0);
+                                mealQuantities.put(mealName, current + 1);
+                                menuData.setAll(buildExpandedMenuList(fullMealList));
+
+
+                                /*int current = Integer.parseInt(qtyField.getText());
+                                qtyField.setText(String.valueOf(current + 1));*/
                             });
 
                             subButton.setOnAction(e -> {
-                                int current = Integer.parseInt(qtyField.getText());
+                                Meal meal = getTableView().getItems().get(getIndex());
+                                String mealName = meal.getMealName();
+                                int current = mealQuantities.getOrDefault(mealName, 0);
                                 if (current > 0) {
-                                    qtyField.setText(String.valueOf(current - 1));
+                                    mealQuantities.put(mealName, current - 1);
+                                    menuData.setAll(buildExpandedMenuList(fullMealList));
                                 }
                             });
 
@@ -449,9 +475,31 @@
                                     setGraphic(null);
                                     return;
                                 }
+
+
+
+
+                                meal = getTableView().getItems().get(getIndex());
+                                String mealName = meal.getMealName();
+
+                                long countBefore = getTableView().getItems().subList(0, getIndex()).stream()
+                                        .filter(m -> m.getMealName().equals(mealName))
+                                        .count();
+
+                                if (meal.getMealCategory().equals("header") || countBefore > 0) {
+                                    setGraphic(null); // Show counter only for first row of each meal
+                                    return;
+                                }
+
+
+                                qtyField.setText(String.valueOf(mealQuantities.getOrDefault(mealName, 0)));
                                 HBox box = new HBox(5, subButton, qtyField, addButton);
-                                quantityMap.put(getTableView().getItems().get(getIndex()), box);//added
+                                quantityMap.put(meal, box);
                                 setGraphic(box);
+
+                                /*HBox box = new HBox(5, subButton, qtyField, addButton);
+                                quantityMap.put(getTableView().getItems().get(getIndex()), box);//added
+                                setGraphic(box);*/
                             }
                         }
                     });
@@ -480,7 +528,17 @@
                             List<Meal> allMeals = (List<Meal>) list;
                             List<Meal> filtered = filterByInterest(allMeals);
                             fullMealList = filtered; // Save original full list
-                            menuData.setAll(fullMealList); // Set data to TableView
+
+
+
+                            // Initialize quantities map if first time
+                            for (Meal meal : filtered) {
+                                if (!meal.getMealCategory().equals("header")) {
+                                    mealQuantities.putIfAbsent(meal.getMealName(), 0);
+                                }
+                            }
+                            menuData.setAll(buildExpandedMenuList(filtered));
+                            //menuData.setAll(fullMealList); // Set data to TableView
 
                             // Use dynamic row height adjustment instead of fixed cell size
                             menuTable.setRowFactory(tv -> new TableRow<>() {
@@ -552,6 +610,38 @@
 
                 return result;
             }
+            private Meal duplicateMealWithoutCounter(Meal original) {
+                return new Meal(
+                        original.getMealName(),
+                        original.getMealDescription(),
+                        original.getMealPreferences(),
+                        original.getMealPrice(),
+                        original.getImagePath(),
+                        original.getMealCategory()
+                );
+            }
+            private List<Meal> buildExpandedMenuList(List<Meal> fullList) {
+                List<Meal> expanded = new ArrayList<>();
+                for (Meal meal : fullList) {
+                    if (meal.getMealCategory().equals("header")) {
+                        expanded.add(meal);
+                        continue;
+                    }
+
+                    // Always add one base row, regardless of quantity (even if 0)
+                    expanded.add(meal);
+
+                    int qty = mealQuantities.getOrDefault(meal.getMealName(), 0);
+                    for (int i = 1; i < qty; i++) {
+                        expanded.add(duplicateMealWithoutCounter(meal)); // duplicates for qty > 1
+                    }
+                }
+                return expanded;
+            }
+
+
+
+
 
 
 
@@ -563,7 +653,6 @@
                 if (searchTerm.isEmpty()) {
                     // Show full table when search is empty
                     menuData.setAll(fullMealList);
-                    resizeTable(); // optional
                     return;
                 }
                 if (selectedCriterion == null) return;
@@ -593,16 +682,10 @@
                     }
                 }
                 menuData.setAll(filtered); // update content but keep cell logic
-                resizeTable(); // optional
+
             }
-            private void resizeTable() {
-                menuTable.setFixedCellSize(60);
-                menuTable.prefHeightProperty().bind(
-                        menuTable.fixedCellSizeProperty().multiply(Bindings.size(menuTable.getItems()).add(1.01))
-                );
-                menuTable.minHeightProperty().bind(menuTable.prefHeightProperty());
-                menuTable.maxHeightProperty().bind(menuTable.prefHeightProperty());
-            }
+
+
             @FXML
             void back_to_main_func() {
                 String page = "Main Page";
