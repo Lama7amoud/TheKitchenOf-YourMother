@@ -653,6 +653,7 @@
                 if (searchTerm.isEmpty()) {
                     // Show full table when search is empty
                     menuData.setAll(fullMealList);
+                    resizeTable();
                     return;
                 }
                 if (selectedCriterion == null) return;
@@ -682,9 +683,18 @@
                     }
                 }
                 menuData.setAll(filtered); // update content but keep cell logic
-
+                resizeTable();
             }
 
+            private void resizeTable() {
+                menuTable.setFixedCellSize(60);
+                menuTable.prefHeightProperty().bind(
+                        menuTable.fixedCellSizeProperty().multiply(Bindings.size(menuTable.getItems()).add(1.01))
+                );
+                menuTable.minHeightProperty().bind(menuTable.prefHeightProperty());
+                menuTable.maxHeightProperty().bind(menuTable.prefHeightProperty());
+
+            }
 
             @FXML
             void back_to_main_func() {
