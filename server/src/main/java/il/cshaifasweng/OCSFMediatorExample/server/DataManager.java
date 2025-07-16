@@ -1706,6 +1706,37 @@ public static void updateReservation(Reservation reservation) {
             }
         }
     }
+
+
+
+
+    public static List<MealOrder> mergeDuplicateOrders(List<MealOrder> orders) {
+        Map<String, MealOrder> mergedMap = new HashMap<>();
+
+        for (MealOrder order : orders) {
+            String key = order.getReservationId() + "||" + order.getMealName() + "||" + order.getPreferences();
+
+            if (!mergedMap.containsKey(key)) {
+                // Add a copy of the order to the map to avoid modifying the original list
+                MealOrder copy = new MealOrder(
+                        order.getReservationId(),
+                        order.getMealName(),
+                        order.getPreferences(),
+                        order.getQuantity(),
+                        order.getTotalPrice()
+                );
+                mergedMap.put(key, copy);
+            } else {
+                MealOrder existing = mergedMap.get(key);
+                existing.setQuantity(existing.getQuantity() + order.getQuantity());
+                existing.setTotalPrice(existing.getTotalPrice() + order.getTotalPrice());
+            }
+        }
+
+        return new ArrayList<>(mergedMap.values());
+    }
+
+
     public static void saveMealOrders(List<MealOrder> orders) {
         SessionFactory sessionFactory = getSessionFactory(password);
         Session session = null;

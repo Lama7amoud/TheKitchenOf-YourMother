@@ -590,7 +590,8 @@ public class SimpleServer extends AbstractServer {
 		List<?> incoming = (List<?>) msg;
 		if (!incoming.isEmpty() && incoming.get(0) instanceof MealOrder) {
 			List<MealOrder> orders = (List<MealOrder>) incoming;
-			DataManager.saveMealOrders(orders);
+			List<MealOrder> mergedorder = DataManager.mergeDuplicateOrders(orders);
+			DataManager.saveMealOrders(mergedorder);
 			try {
 				/*client.sendToClient("Reservation saved successfully");*/
 				client.sendToClient("Meal orders saved");
