@@ -88,6 +88,9 @@
 
             private ObservableList<Meal> menuData = FXCollections.observableArrayList();
             private List<Meal> fullMealList = new ArrayList<>();
+            private Map<String, Integer> mealQuantities = new HashMap<>();
+            private Map<String, List<String>> selectedPreferencesMap = new HashMap<>();
+
 
 
 
@@ -175,9 +178,29 @@
                                 if (user.getPermissionLevel() == 0) { // Customer - editable checkboxes
                                     String[] preferences = item.split(",");
                                     for (String pref : preferences) {
-                                        CheckBox checkBox = new CheckBox(pref.trim());
-                                        checkBox.setDisable(false); // Customer can edit
+                                        String trimmedPref = pref.trim();
+                                        CheckBox checkBox = new CheckBox(trimmedPref);
+                                        checkBox.setDisable(false);
+
+// Restore previous selection if exists
+                                        String mealKey = meal.getMealName() + "_" + getIndex();
+                                        List<String> selected = selectedPreferencesMap.getOrDefault(mealKey, new ArrayList<>());
+                                        checkBox.setSelected(selected.contains(trimmedPref));
+
+// Track checkbox selection changes
+                                        checkBox.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+                                            selectedPreferencesMap.putIfAbsent(mealKey, new ArrayList<>());
+                                            if (isNowSelected) {
+                                                if (!selectedPreferencesMap.get(mealKey).contains(trimmedPref)) {
+                                                    selectedPreferencesMap.get(mealKey).add(trimmedPref);
+                                                }
+                                            } else {
+                                                selectedPreferencesMap.get(mealKey).remove(trimmedPref);
+                                            }
+                                        });
+
                                         vbox.getChildren().add(checkBox);
+
                                     }
                                     preferencesMap.put(meal, vbox);
                                     setGraphic(vbox);
@@ -284,6 +307,21 @@
                 menuTable.setPlaceholder(new Label("No meals available"));
                 menuTable.setItems(menuData);
                 menuTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+                menuTable.setRowFactory(tv -> new TableRow<Meal>() {
+                    @Override
+                    protected void updateItem(Meal item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setVisible(item != null && !empty);
+                        setManaged(item != null && !empty);
+                        if (item == null || empty) {
+                            setPrefHeight(0);
+                        } else {
+                            setPrefHeight(Region.USE_COMPUTED_SIZE);
+                        }
+                    }
+                });
+
+
 
                 if (user != null && user.getPermissionLevel() == 5) {
 
@@ -423,16 +461,29 @@
                             qtyField.setEditable(false);
 
                             addButton.setOnAction(e -> {
-                                int current = Integer.parseInt(qtyField.getText());
-                                qtyField.setText(String.valueOf(current + 1));
+                                Meal meal = getTableView().getItems().get(getIndex());
+                                String mealName = meal.getMealName();
+                                int current = mealQuantities.getOrDefault(mealName, 0);
+                                mealQuantities.put(mealName, current + 1);
+                                menuData.setAll(buildExpandedMenuList(fullMealList));
+
                             });
 
                             subButton.setOnAction(e -> {
-                                int current = Integer.parseInt(qtyField.getText());
+                                Meal meal = getTableView().getItems().get(getIndex());
+                                String mealName = meal.getMealName();
+                                int current = mealQuantities.getOrDefault(mealName, 0);
+
                                 if (current > 0) {
-                                    qtyField.setText(String.valueOf(current - 1));
+                                    mealQuantities.put(mealName, current -1);
+                                    menuData.setAll(buildExpandedMenuList(fullMealList));
                                 }
                             });
+
+
+
+
+
 
                             addButton.setStyle("-fx-background-color: lightgreen;");
                             subButton.setStyle("-fx-background-color: lightcoral;");
@@ -449,9 +500,31 @@
                                     setGraphic(null);
                                     return;
                                 }
+
+
+
+
+                                meal = getTableView().getItems().get(getIndex());
+                                String mealName = meal.getMealName();
+
+                                long countBefore = getTableView().getItems().subList(0, getIndex()).stream()
+                                        .filter(m -> m.getMealName().equals(mealName))
+                                        .count();
+
+                                if (meal.getMealCategory().equals("header") || countBefore > 0) {
+                                    setGraphic(null); // Show counter only for first row of each meal
+                                    return;
+                                }
+
+
+                                qtyField.setText(String.valueOf(mealQuantities.getOrDefault(mealName, 0)));
                                 HBox box = new HBox(5, subButton, qtyField, addButton);
-                                quantityMap.put(getTableView().getItems().get(getIndex()), box);//added
+                                quantityMap.put(meal, box);
                                 setGraphic(box);
+
+                                /*HBox box = new HBox(5, subButton, qtyField, addButton);
+                                quantityMap.put(getTableView().getItems().get(getIndex()), box);//added
+                                setGraphic(box);*/
                             }
                         }
                     });
@@ -480,7 +553,17 @@
                             List<Meal> allMeals = (List<Meal>) list;
                             List<Meal> filtered = filterByInterest(allMeals);
                             fullMealList = filtered; // Save original full list
-                            menuData.setAll(fullMealList); // Set data to TableView
+
+
+
+                            // Initialize quantities map if first time
+                            for (Meal meal : filtered) {
+                                if (!meal.getMealCategory().equals("header")) {
+                                    mealQuantities.putIfAbsent(meal.getMealName(), 0);
+                                }
+                            }
+                            menuData.setAll(buildExpandedMenuList(filtered));
+                            //menuData.setAll(fullMealList); // Set data to TableView
 
                             // Use dynamic row height adjustment instead of fixed cell size
                             menuTable.setRowFactory(tv -> new TableRow<>() {
@@ -552,6 +635,38 @@
 
                 return result;
             }
+            private Meal duplicateMealWithoutCounter(Meal original) {
+                return new Meal(
+                        original.getMealName(),
+                        original.getMealDescription(),
+                        original.getMealPreferences(),
+                        original.getMealPrice(),
+                        original.getImagePath(),
+                        original.getMealCategory()
+                );
+            }
+            private List<Meal> buildExpandedMenuList(List<Meal> fullList) {
+                List<Meal> expanded = new ArrayList<>();
+                for (Meal meal : fullList) {
+                    if (meal.getMealCategory().equals("header")) {
+                        expanded.add(meal);
+                        continue;
+                    }
+
+                    // Always add one base row, regardless of quantity (even if 0)
+                    expanded.add(meal);
+
+                    int qty = mealQuantities.getOrDefault(meal.getMealName(), 0);
+                    for (int i = 1; i < qty; i++) {
+                        expanded.add(duplicateMealWithoutCounter(meal)); // duplicates for qty > 1
+                    }
+                }
+                return expanded;
+            }
+
+
+
+
 
 
 
@@ -563,7 +678,7 @@
                 if (searchTerm.isEmpty()) {
                     // Show full table when search is empty
                     menuData.setAll(fullMealList);
-                    resizeTable(); // optional
+                    resizeTable();
                     return;
                 }
                 if (selectedCriterion == null) return;
@@ -593,8 +708,9 @@
                     }
                 }
                 menuData.setAll(filtered); // update content but keep cell logic
-                resizeTable(); // optional
+                resizeTable();
             }
+
             private void resizeTable() {
                 menuTable.setFixedCellSize(60);
                 menuTable.prefHeightProperty().bind(
@@ -602,7 +718,9 @@
                 );
                 menuTable.minHeightProperty().bind(menuTable.prefHeightProperty());
                 menuTable.maxHeightProperty().bind(menuTable.prefHeightProperty());
+
             }
+
             @FXML
             void back_to_main_func() {
                 String page = "Main Page";
@@ -839,38 +957,56 @@
                 if (!isActive || !reservation.isTakeAway()) return;
 
                 List<MealOrder> ordersToSave = new ArrayList<>();
-                for (Meal meal : menuTable.getItems()) {
-                    if (!"header".equals(meal.getMealCategory())) {
-                        HBox box = quantityMap.get(meal);
-                        if (box == null) continue;
+                List<Meal> items = menuTable.getItems();
+                int i = 0;
 
-                        TextField qtyField = (TextField) box.getChildren().get(1);
-                        int quantity = Integer.parseInt(qtyField.getText());
-                        if (quantity <= 0) continue;
+                while (i < items.size()) {
+                    Meal current = items.get(i);
 
-                        VBox prefsBox = getPreferencesVBoxForMeal(meal);
-                        StringBuilder selectedPrefs = new StringBuilder();
-                        if (prefsBox != null) {
-                            for (javafx.scene.Node node : prefsBox.getChildren()) {
-                                if (node instanceof CheckBox) {
-                                    CheckBox cb = (CheckBox) node;
-                                    if (cb.isSelected()) {
-                                        if (!selectedPrefs.isEmpty()) selectedPrefs.append(", ");
-                                        selectedPrefs.append(cb.getText());
-                                    }
-                                }
-                            }
+                    // Skip headers
+                    if ("header".equals(current.getMealCategory())) {
+                        i++;
+                        continue;
+                    }
+
+                    String mealName = current.getMealName();
+                    int quantity = mealQuantities.getOrDefault(mealName, 0);
+                    if (quantity <= 0) {
+                        // Skip this group entirely
+                        // Move to next different meal
+                        while (i < items.size() && items.get(i).getMealName().equals(mealName)) {
+                            i++;
                         }
+                        continue;
+                    }
+
+                    // Count group size (number of rows for this meal)
+                    int groupStart = i;
+                    int groupEnd = i;
+                    while (groupEnd < items.size() &&
+                            items.get(groupEnd).getMealName().equals(mealName) &&
+                            !"header".equals(items.get(groupEnd).getMealCategory())) {
+                        groupEnd++;
+                    }
+
+                    // Add one MealOrder per row (quantity 1 each)
+                    for (int j = groupStart; j < groupEnd; j++) {
+                        Meal meal = items.get(j);
+                        String key = meal.getMealName() + "_" + j;
+                        List<String> selectedPrefs = selectedPreferencesMap.getOrDefault(key, new ArrayList<>());
+                        String joinedPrefs = String.join(", ", selectedPrefs);
 
                         MealOrder mo = new MealOrder(
-                                reservation.getId(), // Now this is valid!
+                                reservation.getId(),
                                 meal.getMealName(),
-                                selectedPrefs.toString(),
-                                quantity,
-                                quantity * meal.getMealPrice()
+                                joinedPrefs,
+                                1,
+                                meal.getMealPrice()
                         );
                         ordersToSave.add(mo);
                     }
+
+                    i = groupEnd; // Skip to next group
                 }
 
                 // Send to server
