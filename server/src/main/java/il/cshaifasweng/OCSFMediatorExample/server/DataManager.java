@@ -103,7 +103,7 @@ public class DataManager {
         return histogram;
     }
 
-
+    // called by a function that already opened the session
     private static List<Meal> getMenu() throws Exception {
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Meal> query = builder.createQuery(Meal.class);
@@ -1222,6 +1222,7 @@ public class DataManager {
     }
 
     public static void saveReservation(Reservation reservation) {
+
         SessionFactory sessionFactory = getSessionFactory(password);
         session = sessionFactory.openSession();
         session.beginTransaction();
@@ -1464,6 +1465,7 @@ public class DataManager {
                     session.getTransaction().commit();
                     return true;
                 }
+
             }
 
             // No "on" reservation found
@@ -1538,20 +1540,33 @@ public class DataManager {
 
     //addedddd
 // **NEW** Hibernate-based:
-public static Reservation getActiveReservationById(String idNumber) {
+public static Reservation getActiveReservationById(String idNumber, int restaurantId) {
     // Use the same SessionFactory you already have
     SessionFactory sessionFactory = getSessionFactory(password);
-    try (Session session = sessionFactory.openSession()) {
+    Session session = sessionFactory.openSession();
+    try{
         // Start a transaction if you want, although here read-only is fine
         session.beginTransaction();
 
         // Equivalent HQL: select a reservation whose idNumber matches and status = 'on'
-        Reservation res = session.createQuery(
-                        "FROM Reservation r WHERE r.idNumber = :idNum AND lower(r.status) = 'on'",
-                        Reservation.class
-                )
-                .setParameter("idNum", idNumber)
-                .uniqueResult();
+        Reservation res;
+
+        if (restaurantId == -1) {
+            res = session.createQuery(
+                            "FROM Reservation r WHERE r.idNumber = :idNum AND lower(r.status) = 'on'",
+                            Reservation.class
+                    )
+                    .setParameter("idNum", idNumber)
+                    .uniqueResult();
+        } else {
+            res = session.createQuery(
+                            "FROM Reservation r WHERE r.idNumber = :idNum AND r.restaurant.id = :resId AND lower(r.status) = 'on'",
+                            Reservation.class
+                    )
+                    .setParameter("idNum", idNumber)
+                    .setParameter("resId", restaurantId)
+                    .uniqueResult();
+        }
 
         session.getTransaction().commit();
         return res;  // either a Reservation or null
@@ -1559,23 +1574,37 @@ public static Reservation getActiveReservationById(String idNumber) {
         e.printStackTrace();
         return null;
     }
+    finally {
+        if (session != null) {
+            session.close();
+            System.out.println("Session closed");
+        }
+    }
 }
 
 //addedddd
 public static void updateReservation(Reservation reservation) {
     SessionFactory sessionFactory = getSessionFactory(password);
-    try (Session session = sessionFactory.openSession()) {
+    Session session = sessionFactory.openSession();
+    try{
         Transaction tx = session.beginTransaction();
         session.update(reservation);   // or session.merge(reservation) if detached
         tx.commit();
     } catch (Exception e) {
         e.printStackTrace();
     }
+    finally {
+        if (session != null) {
+            session.close();
+            System.out.println("Session closed");
+        }
+    }
 }
 
 
     public static MonthlyReport generateReportForRestaurant(Restaurant restaurant) {
-        try (Session session = sessionFactory.openSession()) {
+        Session session = sessionFactory.openSession();
+        try{
             session.beginTransaction();
 
             LocalDate today = LocalDate.now();
@@ -1633,6 +1662,12 @@ public static void updateReservation(Reservation reservation) {
             session.getTransaction().commit();
             return report;
         }
+        finally {
+            if (session != null) {
+                session.close();
+                System.out.println("Session closed");
+            }
+        }
     }
 
     public static List<MonthlyReport> getAllReports() {
@@ -1643,13 +1678,13 @@ public static void updateReservation(Reservation reservation) {
 
     //    visa payment
     public static void markPaymentAsPaidInDatabase(String customerId) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("your-persistence-unit");
-        EntityManager em = emf.createEntityManager();
+        SessionFactory sessionFactory = getSessionFactory(password);
+        session = sessionFactory.openSession();
+        session.beginTransaction();
 
         try {
-            em.getTransaction().begin();
 
-            TypedQuery<Reservation> query = em.createQuery(
+            TypedQuery<Reservation> query = session.createQuery(
                     "SELECT r FROM Reservation r WHERE r.idNumber = :customerId AND r.isPayed = false",
                     Reservation.class
             );
@@ -1660,21 +1695,23 @@ public static void updateReservation(Reservation reservation) {
             if (!results.isEmpty()) {
                 Reservation reservation = results.get(0);
                 reservation.setPayed(true);
-                em.merge(reservation);
+                session.merge(reservation);
                 System.out.println("Reservation marked as paid for customer ID: " + customerId);
             } else {
                 System.out.println("No unpaid reservation found for customer ID: " + customerId);
             }
 
-            em.getTransaction().commit();
+            session.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
+            if (session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
             }
         } finally {
-            em.close();
-            emf.close();
+            if (session != null) {
+                session.close();
+                System.out.println("session closed");
+            }
         }
     }
 
@@ -1761,8 +1798,6 @@ public static void updateReservation(Reservation reservation) {
             }
         }
     }
-
-
 
 
 }

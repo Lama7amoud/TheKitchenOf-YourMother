@@ -120,7 +120,7 @@ public class SimpleServer extends AbstractServer {
 			String idNumber = msgString.split(";")[1].trim();
 
 			// 1) Fetch the active “on” take‐away reservation
-			Reservation reservation = DataManager.getActiveReservationById(idNumber);
+			Reservation reservation = DataManager.getActiveReservationById(idNumber, -1);
 			if (reservation == null) {
 				try {
 					client.sendToClient("no_order_found");
@@ -203,7 +203,7 @@ public class SimpleServer extends AbstractServer {
 			int fee = Integer.parseInt(parts[2]);
 
 			// Re‐fetch the active reservation (just to be safe):
-			Reservation reservation = DataManager.getActiveReservationById(idNumber);
+			Reservation reservation = DataManager.getActiveReservationById(idNumber, -1);
 			String visa = reservation.getVisa();
 			boolean paidByVisa = visa != null && !visa.trim().isEmpty();
 			if (reservation != null) {
@@ -257,7 +257,7 @@ public class SimpleServer extends AbstractServer {
 		else if (msgString.startsWith("cancel_reservation;")) {
 			System.out.println("[SimpleServer]   → Entered cancel_reservation branch");
 			String idNumber = msgString.split(";")[1].trim();
-			Reservation reservation = DataManager.getActiveReservationById(idNumber);
+			Reservation reservation = DataManager.getActiveReservationById(idNumber, -1);
 			if (reservation == null) {
 				try {
 					client.sendToClient("no_reservation_found");
@@ -293,7 +293,7 @@ public class SimpleServer extends AbstractServer {
 			String idNumber = parts[1];
 			int fee = Integer.parseInt(parts[2]);
 
-			Reservation reservation = DataManager.getActiveReservationById(idNumber);
+			Reservation reservation = DataManager.getActiveReservationById(idNumber, -1);
 
 			try {
 				if (reservation == null) {
@@ -648,8 +648,9 @@ public class SimpleServer extends AbstractServer {
 						throw new RuntimeException(e);
 					}
 				} else {
-					DataManager.saveReservation(reservation);
 					try {
+						DataManager.saveReservation(reservation);
+
 						// Notify only this client
 						client.sendToClient("Reservation saved successfully");
 
@@ -762,8 +763,13 @@ public class SimpleServer extends AbstractServer {
 			}
 		}
 		else if (msgString.startsWith("check_id_type:")) {
-			String idNumber = msgString.split(":")[1].trim();
-			Reservation reservation = DataManager.getActiveReservationById(idNumber);
+			System.out.println("Inside check_id_type: " + msgString);
+
+			String[] parts = msgString.split(":");
+			String idNumber = parts[1].trim();
+			int restaurantId = Integer.parseInt(parts[2].trim());
+
+			Reservation reservation = DataManager.getActiveReservationById(idNumber, restaurantId);
 
 			try {
 				if (reservation == null) {

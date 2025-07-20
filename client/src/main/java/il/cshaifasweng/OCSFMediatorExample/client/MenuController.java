@@ -1009,8 +1009,6 @@
                     i = groupEnd; // Skip to next group
                 }
 
-
-
                 // Send to server
                 Client.getClient().sendToServer(ordersToSave);
 

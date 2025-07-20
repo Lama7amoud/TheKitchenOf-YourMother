@@ -211,7 +211,7 @@ public class TakeAwayController implements Initializable {
 
         int restaurantId = userAtt.getRestaurantInterest();
         Client.getClient().sendToServer("Get branch details;" + restaurantId);
-
+        EventBus.getDefault().unregister(this);
         App.switchScreen("Menu Page");
     }
 
@@ -219,9 +219,9 @@ public class TakeAwayController implements Initializable {
     public void handleRestaurantResponse(Object msg) {
         if (msg instanceof Restaurant restaurant) {
             Platform.runLater(() -> {
-                userAtt.setRestaurant(restaurant);  // ✅ Set it in userAtt
-                System.out.println("✅ Restaurant set in userAtt: " + restaurant.getId());
-                App.switchScreen("Menu Page");      // 🔁 Now switch to menu
+                userAtt.setRestaurant(restaurant);  //  Set it in userAtt
+                System.out.println("Restaurant set in userAtt: " + restaurant.getId());
+                App.switchScreen("Menu Page");      //  Now switch to menu
             });
         }
     }*/
@@ -264,6 +264,7 @@ public class TakeAwayController implements Initializable {
             default -> "";
         };
         if (!page.isEmpty()) {
+            EventBus.getDefault().unregister(this);
             App.switchScreen(page);
         }
     }

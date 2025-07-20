@@ -42,7 +42,7 @@ public class TakeAwayOrReservationController {
 
         IDtextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.matches("\\d{9}")) {
-                Client.getClient().sendToServer("check_id_type:" + newValue); // changed ; to :
+                Client.getClient().sendToServer("check_id_type:" + newValue + ":" + Client.getClientAttributes().getRestaurantInterest()); // changed ; to :
             } else {
                 cancelButton.setDisable(true);
                 cancelButton1.setDisable(true);
@@ -142,7 +142,7 @@ public class TakeAwayOrReservationController {
         }
     }
 
-    // ─────────(2) Listen for “confirm_order_cancellation;<fee>;<idNumber>” ─────────
+    // ─────────(2) Listen for "confirm_order_cancellation;<fee>;<idNumber>"
     @Subscribe
     public void handleOrderCancellationPrompt(MessageEvent evt) {
         if (!isActive) return;
@@ -185,6 +185,7 @@ public class TakeAwayOrReservationController {
 
             Platform.runLater(() -> {
                 showAlert("Your order was cancelled successfully.\nYou have been charged " + fee + "₪.");
+                cancelButton1.setDisable(true);
             });
 
         } else if (payload.equals("order_cancellation_failed;visa_error")) {
@@ -337,6 +338,7 @@ public class TakeAwayOrReservationController {
                 break;
         }
         if (fxmlToLoad != null) {
+            EventBus.getDefault().unregister(this);
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlToLoad));
             Parent root2 = loader.load();
             Stage stage2 = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -355,10 +357,4 @@ public class TakeAwayOrReservationController {
 
     }
 
-    // Unregister from EventBus when this controller is destroyed (optional)
-    public void shutdown()
-    {
-        isActive = false;
-        EventBus.getDefault().unregister(this);
-    }
 }
