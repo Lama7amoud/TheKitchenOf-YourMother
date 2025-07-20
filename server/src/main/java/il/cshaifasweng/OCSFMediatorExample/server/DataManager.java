@@ -16,7 +16,6 @@ import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
-import javafx.fxml.FXML;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.HostingTable;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
@@ -28,9 +27,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.Transaction;
-import java.time.LocalDateTime;
+
 import java.util.stream.Collectors;
 
 
@@ -428,7 +428,7 @@ public class DataManager {
             e.printStackTrace();
         }
     }
-    public static void saveComplaint(String password, Complaint complaint) {
+    public static void saveComplaint(Complaint complaint) {
         Transaction tx = null;
         try (Session session = getSessionFactory(password).openSession()) {
             tx = session.beginTransaction();
@@ -1731,7 +1731,19 @@ public static void updateReservation(Reservation reservation) {
         }
     }
 
-
-
-
+    public static Reservation getReservationByUserId(int userId) {
+        Session session = getSessionFactory(password).openSession();
+        Reservation reservation = null;
+        try {
+            Query<?> query = session.createQuery(
+                    "FROM Reservation r WHERE r.idNumber = :userId", Reservation.class);
+            query.setParameter("userId", String.valueOf(userId));
+            reservation = (Reservation) query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return reservation;
+    }
 }

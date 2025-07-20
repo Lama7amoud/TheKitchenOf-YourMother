@@ -79,6 +79,43 @@ public class SimpleServer extends AbstractServer {
 			sendToAllClients(updatedFeedback);
 		}
 
+		else if (msgString.startsWith("complaint;")) {
+			String[] parts = msgString.split(";", 4);
+			int userId = Integer.parseInt(parts[1]);
+			String complaintMessage = parts[2];
+			String status = parts[3];
+
+			// Fetch reservation to get the client's email
+			Reservation reservation = DataManager.getReservationByUserId(userId);
+			if (reservation == null) {
+				System.out.println(" Reservation not found for userId: " + userId);
+				return;
+			}
+
+			String clientEmail = reservation.getEmail();
+
+			// Create complaint entity
+			Complaint complaint = new Complaint(userId, complaintMessage, status, LocalDateTime.now(), reservation.getRestaurant());
+			DataManager.saveComplaint(complaint);
+
+			// Send email
+			String subject = "We've received your complaint";
+			String content = "Hi " + reservation.getName() + ",\n\nWe have received your complaint. Our team will look into it and get back to you shortly.\n\nThank you!";
+			EmailSender.sendEmail(clientEmail, subject, content);
+
+			// Start a 3-minute timer
+			new java.util.Timer().schedule(
+					new java.util.TimerTask() {
+						@Override
+						public void run() {
+							System.out.println("3-minute timer completed for userId: " + userId);
+						}
+					},
+					180_000 // 3 minutes
+			);
+
+			System.out.println("Complaint saved and email sent.");
+		}
 
 		else if(msgString.startsWith("logIn:")){
 			AuthorizedUser currentUser = DataManager.checkPermission(msgString);
