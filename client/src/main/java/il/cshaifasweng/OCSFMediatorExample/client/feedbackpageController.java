@@ -91,7 +91,7 @@ public class feedbackpageController implements Initializable {
 
     @FXML
     void sendComplaintToServer() throws IOException {
-        int userId = 1; // Replace with actual logged-in user ID
+        int userId = getUserId(); // Replace with actual logged-in user ID
         String status = "Pending"; // Default status
         String message = complaintText;
 
@@ -102,7 +102,7 @@ public class feedbackpageController implements Initializable {
 
     @FXML
     void sendFeedbackToServer() throws IOException {
-        int userId = 1; // Replace with actual logged-in user ID
+        int userId = getUserId(); // Replace with actual logged-in user ID
         int rating = 5; // Or let the user choose this from a dropdown/spinner
         String message = feedbackText;
 

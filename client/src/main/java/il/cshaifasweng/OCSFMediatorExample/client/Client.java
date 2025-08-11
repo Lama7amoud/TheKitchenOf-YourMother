@@ -6,6 +6,7 @@ import javafx.scene.control.Alert;
 import net.bytebuddy.asm.Advice;
 import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
+import il.cshaifasweng.OCSFMediatorExample.client.MonthlyReport;
 
 import java.io.IOException;
 import java.util.List;
@@ -303,9 +304,6 @@ protected void handleMessageFromServer(Object msg) {
             } else if (first instanceof HostingTable) {
                 System.out.println("Received list of hosting tables from server.");
                 EventBus.getDefault().post((List<HostingTable>) list);
-            } else if (first instanceof MonthlyReport) {
-                System.out.println("Received list of monthly reports from server.");
-                EventBus.getDefault().post(new MonthlyReportsEvent((List<MonthlyReport>) list));
             } else if (first instanceof Restaurant) {
                 List<Restaurant> restaurantList = (List<Restaurant>) list;
                 System.out.println("Received list of restaurants from server: " + restaurantList.size());
@@ -351,6 +349,24 @@ protected void handleMessageFromServer(Object msg) {
         userAtt.copyUser((AuthorizedUser) msg);
         String response = "Authorized user request: " + userAtt.getMessageToServer();
         EventBus.getDefault().post(response);
+    }
+
+    if (msg instanceof il.cshaifasweng.OCSFMediatorExample.client.MonthlyReport) {
+        EventBus.getDefault().post((il.cshaifasweng.OCSFMediatorExample.client.MonthlyReport) msg);
+        return;
+    }
+
+    if (msg instanceof List<?>) {
+        List<?> list = (List<?>) msg;
+
+        // Check if the list contains MonthlyReport objects
+        if (!list.isEmpty() && list.get(0) instanceof MonthlyReport) {
+            @SuppressWarnings("unchecked")
+            List<MonthlyReport> reports = (List<MonthlyReport>) list;
+
+            // Post the reports to EventBus so controllers can handle them
+            EventBus.getDefault().post(reports);
+        }
     }
 }
 

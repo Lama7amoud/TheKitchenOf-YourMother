@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
+import il.cshaifasweng.OCSFMediatorExample.client.MonthlyReport;
 import il.cshaifasweng.OCSFMediatorExample.entities.Reservation;
 
 import java.util.*;
@@ -1649,14 +1650,20 @@ public static void updateReservation(Reservation reservation) {
                 }
             }
 
-            // Create and save the report
+            // Prepare complaint data map
+            Map<String, Integer> complaintsData = new LinkedHashMap<>();
+            complaintsData.put("Total Complaints", complaintCount);  // if you only have total count, just use a dummy category
+
+
+
             MonthlyReport report = new MonthlyReport(
-                    now,
-                    takeawayOrdersCount,  // replaced deliveryOrdersCount
-                    customersServed,
-                    complaintCount,
-                    restaurant
+                    restaurant,          // restaurantName (String)
+                    now,                 // generatedTime (LocalDateTime)
+                    customersServed,     // totalCustomers (int)
+                    takeawayOrdersCount, // deliveryOrders (int)
+                    complaintsData       // complaintsData (Map<String, Integer>)
             );
+
 
             session.save(report);
             session.getTransaction().commit();
@@ -1672,7 +1679,11 @@ public static void updateReservation(Reservation reservation) {
 
     public static List<MonthlyReport> getAllReports() {
         try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("FROM MonthlyReport", MonthlyReport.class).getResultList();
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<MonthlyReport> cq = cb.createQuery(MonthlyReport.class);
+            Root<MonthlyReport> root = cq.from(MonthlyReport.class);
+            cq.select(root);
+            return session.createQuery(cq).getResultList();
         }
     }
 
@@ -1800,4 +1811,81 @@ public static void updateReservation(Reservation reservation) {
     }
 
 
+    public static MonthlyReport getLatestMonthlyReport() {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction tx = session.beginTransaction();
+
+            // 1. Find the latest generatedTime (max date) from your report data or orders table
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+
+            // Assuming you track generatedTime in an entity ReportEntity:
+            CriteriaQuery<LocalDateTime> maxDateQuery = cb.createQuery(LocalDateTime.class);
+            Root<?> reportRoot = maxDateQuery.from(MonthlyReport.class);
+            maxDateQuery.select(cb.greatest(reportRoot.get("generatedTime")));
+            LocalDateTime latestGeneratedTime = session.createQuery(maxDateQuery).uniqueResult();
+
+            if (latestGeneratedTime == null) {
+                tx.commit();
+                // no data, return empty
+                return new MonthlyReport("Unknown", LocalDateTime.now(), 0, 0, new LinkedHashMap<>());
+            }
+
+            // Define start and end datetime of the latest month
+            LocalDateTime startOfMonth = latestGeneratedTime.withDayOfMonth(1).toLocalDate().atStartOfDay();
+            LocalDateTime endOfMonth = latestGeneratedTime.withDayOfMonth(latestGeneratedTime.toLocalDate().lengthOfMonth())
+                    .toLocalDate().atTime(LocalTime.MAX);
+
+            // 2. Total customers (distinct customerId) in orders during that month
+            CriteriaQuery<Long> totalCustomersQuery = cb.createQuery(Long.class);
+            Root<OrderData> orderRoot = totalCustomersQuery.from(OrderData.class);
+            totalCustomersQuery.select(cb.countDistinct(orderRoot.get("customerId")));
+            Predicate betweenDates = cb.between(orderRoot.get("orderDate"), startOfMonth, endOfMonth);
+            totalCustomersQuery.where(betweenDates);
+            Long totalCustomers = session.createQuery(totalCustomersQuery).uniqueResult();
+            if (totalCustomers == null) totalCustomers = 0L;
+
+            // 3. Total delivery orders during that month
+            CriteriaQuery<Long> deliveryOrdersQuery = cb.createQuery(Long.class);
+            Root<OrderData> deliveryRoot = deliveryOrdersQuery.from(OrderData.class);
+            deliveryOrdersQuery.select(cb.count(deliveryRoot));
+            Predicate deliveryTrue = cb.isTrue(deliveryRoot.get("delivery"));
+            Predicate betweenDates2 = cb.between(deliveryRoot.get("orderDate"), startOfMonth, endOfMonth);
+            deliveryOrdersQuery.where(cb.and(deliveryTrue, betweenDates2));
+            Long deliveryOrders = session.createQuery(deliveryOrdersQuery).uniqueResult();
+            if (deliveryOrders == null) deliveryOrders = 0L;
+
+            // 4. Complaints count grouped by category during that month
+            CriteriaQuery<Object[]> complaintsQuery = cb.createQuery(Object[].class);
+            Root<Complaint> complaintRoot = complaintsQuery.from(Complaint.class);
+            complaintsQuery.multiselect(complaintRoot.get("category"), cb.count(complaintRoot));
+            Predicate betweenDates3 = cb.between(complaintRoot.get("complaintDate"), startOfMonth, endOfMonth);
+            complaintsQuery.where(betweenDates3);
+            complaintsQuery.groupBy(complaintRoot.get("category"));
+
+            List<Object[]> complaintsList = session.createQuery(complaintsQuery).getResultList();
+
+            Map<String, Integer> complaintsData = new LinkedHashMap<>();
+            for (Object[] row : complaintsList) {
+                String category = (String) row[0];
+                Long count = (Long) row[1];
+                complaintsData.put(category, count.intValue());
+            }
+
+            tx.commit();
+
+            String restaurantName = "Your Restaurant"; // Change if needed
+
+            return new MonthlyReport(
+                    restaurantName,
+                    latestGeneratedTime,
+                    totalCustomers.intValue(),
+                    deliveryOrders.intValue(),
+                    complaintsData
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new MonthlyReport("Unknown", LocalDateTime.now(), 0, 0, new LinkedHashMap<>());
+        }
+    }
 }

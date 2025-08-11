@@ -27,6 +27,9 @@ public class ManagerController {
     private Button managerFeedbackButton;
 
     @FXML
+    private Button viewMonthlyReportButton;
+
+    @FXML
     private Button managerDiscountButton;
     String[] restaurantTitles = {"Haifa", "Tel-Aviv", "Nahariya"};
 
@@ -74,5 +77,11 @@ public class ManagerController {
         String page = "Discount Confirmation Page";
         App.switchScreen(page);
 
+    }
+
+    @FXML
+    void viewMonthlyReport(ActionEvent event) {
+        String page = "Monthly Report Page";
+        App.switchScreen(page);
     }
 }

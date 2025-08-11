@@ -1,54 +1,68 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.MonthlyReport;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.CategoryAxis;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 public class MonthlyReportViewController {
 
-    @FXML
-    private Label restaurantNameLabel;
+    @FXML private Label restaurantNameLabel;
+    @FXML private Label generatedTimeLabel;
+    @FXML private Label totalCustomersLabel;
+    @FXML private Label deliveryOrdersLabel;
+    @FXML private BarChart<String, Number> complaintsHistogram;
 
     @FXML
-    private Label generatedTimeLabel;
-
-    @FXML
-    private Label totalCustomersLabel;
-
-    @FXML
-    private Label deliveryOrdersLabel;
-
-    @FXML
-    private BarChart<String, Number> complaintsHistogram;
-
-    private MonthlyReport report;
-
-    public void setReport(MonthlyReport report) {
-        this.report = report;
-        updateUI();
+    private void initialize() {
+        EventBus.getDefault().register(this);
     }
 
-    private void updateUI() {
-        if (report == null) return;
+    /**
+     * Trigger fetching the monthly report from the server
+     */
+    @FXML
+    void viewReport(ActionEvent event) {
+        try {
+            Client.getClient().sendToServer("REQUEST_MONTHLY_REPORTS");
+        } catch (Exception e) {
+            showError("Error sending request: " + e.getMessage());
+        }
+    }
 
-        restaurantNameLabel.setText(report.getRestaurant().getName());
-        generatedTimeLabel.setText(report.getTimestamp().toString());
+    /**
+     * Handle incoming MonthlyReport object from the server
+     */
+    @Subscribe
+    public void onMonthlyReportReceived(MonthlyReport report) {
+        Platform.runLater(() -> {
+            restaurantNameLabel.setText(report.getRestaurantName());
+            generatedTimeLabel.setText(report.getGeneratedTime().toString());
+            totalCustomersLabel.setText(String.valueOf(report.getTotalCustomers()));
+            deliveryOrdersLabel.setText(String.valueOf(report.getDeliveryOrders()));
 
-        totalCustomersLabel.setText(String.valueOf(report.getCustomersServed()));
-        deliveryOrdersLabel.setText(String.valueOf(report.getTakeawayOrders()));  // assuming takeaway = delivery
+            // Fill bar chart with complaint data
+            complaintsHistogram.getData().clear();
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName("Complaints");
+            report.getComplaintsData().forEach((category, count) ->
+                    series.getData().add(new XYChart.Data<>(category, count))
+            );
+            complaintsHistogram.getData().add(series);
+        });
+    }
 
-        // Complaints bar chart
-        complaintsHistogram.getData().clear();
-
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Complaints");
-
-        series.getData().add(new XYChart.Data<>("Total Complaints", report.getComplaintCount()));
-
-        complaintsHistogram.getData().add(series);
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

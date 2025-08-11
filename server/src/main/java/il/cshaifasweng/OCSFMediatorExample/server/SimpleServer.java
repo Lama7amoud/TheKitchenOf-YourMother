@@ -1,6 +1,7 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
 import il.cshaifasweng.OCSFMediatorExample.client.Client;
+import il.cshaifasweng.OCSFMediatorExample.client.MonthlyReport;
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
 
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
@@ -418,11 +419,9 @@ public class SimpleServer extends AbstractServer {
 			}
 		}
 		else if (msgString.equals("REQUEST_MONTHLY_REPORTS")) {
-			List<MonthlyReport> reports = DataManager.getAllReports();  // Make sure this method exists
-
-			// Send back the list directly (Java serialization)
+			MonthlyReport report = DataManager.getLatestMonthlyReport();
 			try {
-				client.sendToClient(reports);
+				client.sendToClient(report);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
