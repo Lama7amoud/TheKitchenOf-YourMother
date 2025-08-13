@@ -31,6 +31,10 @@ public class DailyReport implements Serializable {
     @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Reservation> reservationsList;
 
+    public int getId() {
+        return id;
+    }
+
     // Getters and setters
     public List<Reservation> getReservationsList() {
         return reservationsList;

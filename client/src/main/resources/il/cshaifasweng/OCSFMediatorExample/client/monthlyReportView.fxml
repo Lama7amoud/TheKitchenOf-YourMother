@@ -50,7 +50,7 @@
     </HBox>
    <AnchorPane prefHeight="72.0" prefWidth="866.0">
       <children>
-         <ComboBox fx:id="graphOrTableBox" layoutX="596.0" layoutY="21.0" prefWidth="150.0" promptText="Show List" style="-fx-background-color: #ffa500; -fx-background-radius: 5em;" />
+         <ComboBox fx:id="graphOrTableBox" layoutX="596.0" layoutY="21.0" onAction="#listChoice" prefWidth="150.0" promptText="Show List" style="-fx-background-color: #ffa500; -fx-background-radius: 5em;" />
       
                 <Label layoutX="112.0" layoutY="16.0" style="-fx-font-size: 16px; -fx-padding: 10 0 0 0; -fx-font-weight: bold;" text="Number Of Complaints Submitted " textFill="#ffa100" />
       </children>

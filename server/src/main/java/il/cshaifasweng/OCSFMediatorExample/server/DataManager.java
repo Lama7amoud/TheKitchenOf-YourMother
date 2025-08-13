@@ -610,7 +610,7 @@ public class DataManager {
             // Check if the user is already connected
             if (user.isConnected()) {
                 AuthorizedUser errorUser = new AuthorizedUser();
-                errorUser.setMessageToServer("You are already connected with this user on another device. Multiple connections are not allowed.");
+                errorUser.setMessageToServer("You are already connected with this user.");
                 return errorUser;
             }
 
@@ -1723,13 +1723,14 @@ public static Reservation getActiveReservationById(String idNumber, int restaura
         }
     }
 
-
     static List<DailyReport> getReportsByMonth(String message) {
         List<DailyReport> reports = new ArrayList<>();
         String[] parts = message.split(";");
         String restaurantName = parts[1];
         int month = Integer.parseInt(parts[2]);
         int year = Integer.parseInt(parts[3]);
+
+        Session session = null;
 
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
@@ -1740,23 +1741,27 @@ public static Reservation getActiveReservationById(String idNumber, int restaura
             CriteriaQuery<DailyReport> query = builder.createQuery(DailyReport.class);
             Root<DailyReport> root = query.from(DailyReport.class);
 
-            // Fetch deliveries and reservations lists eagerly
+            // Eager fetch reservations list
             root.fetch("reservationsList", JoinType.LEFT);
-
-            Expression<Integer> reportMonth = builder.function("MONTH", Integer.class, root.get("generatedTime"));
-            Expression<Integer> reportYear = builder.function("YEAR", Integer.class, root.get("generatedTime"));
 
             List<Predicate> predicates = new ArrayList<>();
 
-            predicates.add(builder.equal(reportMonth, month));
-            predicates.add(builder.equal(reportYear, year));
+            // Filter by date range
+            LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0);
+            LocalDateTime endDate = startDate.withDayOfMonth(startDate.toLocalDate().lengthOfMonth())
+                    .plusDays(1).minusSeconds(1);
+            predicates.add(builder.between(root.get("generatedTime"), startDate, endDate));
 
+            // Filter by restaurant name if not "All"
             if (!restaurantName.equalsIgnoreCase("All")) {
                 Join<DailyReport, Restaurant> restaurantJoin = root.join("restaurant");
-                predicates.add(builder.equal(restaurantJoin.get("name"), restaurantName));
+                predicates.add(builder.like(
+                        builder.lower(restaurantJoin.get("name")),
+                        "%" + restaurantName.toLowerCase() + "%"
+                ));
             }
 
-            query.select(root).where(predicates.toArray(new Predicate[0]));
+            query.select(root).distinct(true).where(predicates.toArray(new Predicate[0]));
 
             reports = session.createQuery(query).getResultList();
 

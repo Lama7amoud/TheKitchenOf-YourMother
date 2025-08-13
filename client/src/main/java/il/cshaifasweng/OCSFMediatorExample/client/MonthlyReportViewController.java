@@ -56,6 +56,17 @@ public class MonthlyReportViewController {
     @FXML
     private TableView<Reservation> TableView;
 
+    private List<DailyReport> currentReportList;
+    private TableColumn<Reservation, String> nameCol;
+    private TableColumn<Reservation, String> phoneCol;
+    private TableColumn<Reservation, LocalDateTime> timeCol;
+    private TableColumn<Reservation, Integer> guestsCol;
+    private TableColumn<Reservation, String> restaurantCol;
+    private TableColumn<Reservation, String> sittingTypeCol;
+    private TableColumn<Reservation, String> addressCol;
+    private TableColumn<Reservation, String> payedMethodCol;
+
+
     @FXML
     void back(ActionEvent event){
         EventBus.getDefault().unregister(this);
@@ -71,6 +82,8 @@ public class MonthlyReportViewController {
         String restaurant = restaurantNameBox.getValue();
 
         Platform.runLater(() -> {
+
+            errorLabel.setStyle("-fx-text-fill: red;");
             // Check restaurant selection
             if (restaurant == null || restaurant.trim().isEmpty()) {
                 errorLabel.setText("Choose a restaurant");
@@ -124,10 +137,12 @@ public class MonthlyReportViewController {
                 default: wantedRestaurant = "";
             }
             errorLabel.setText("");
+            graphOrTableBox.setValue("None");
             totalCustomersLabel.setText("0");
             deliveryOrdersLabel.setText("0");
             TableView.getColumns().clear();
             complaintsHistogram.getData().clear();
+            currentReportList = null;
             String message = wantedRestaurant + ";" + monthLabel.getText() + ";" + yearLabel.getText();
             Client client = Client.getClient();
             client.sendToServer("request_reports;" + message);
@@ -137,11 +152,13 @@ public class MonthlyReportViewController {
 
     @Subscribe
     public void reportsReceived(List<DailyReport> reportsList) {
+        currentReportList = reportsList;
 
         Platform.runLater(() -> {
             complaintsHistogram.getData().clear(); // reset chart
 
             if (reportsList == null || reportsList.isEmpty()) {
+                errorLabel.setStyle("-fx-text-fill: red;");
                 errorLabel.setText("No reports found for the selected filters.");
                 totalCustomersLabel.setText("0");
                 deliveryOrdersLabel.setText("0");
@@ -149,7 +166,8 @@ public class MonthlyReportViewController {
                 return;
             }
 
-            errorLabel.setText("");
+            errorLabel.setStyle("-fx-text-fill: green;");
+            errorLabel.setText("Data has received");
 
             // Show totals from all reports
             long totalCustomers = reportsList.stream().mapToLong(DailyReport::getTotalCustomers).sum();
@@ -175,33 +193,52 @@ public class MonthlyReportViewController {
                 series1.getData().add(new XYChart.Data<>(String.valueOf(day), complaints));
             }
             complaintsHistogram.getData().add(series1);
+        });
+    }
 
-            // Gather all reservations
-            List<Reservation> allReservations = reportsList.stream()
+
+    @FXML
+    void listChoice(ActionEvent event) {
+        if (currentReportList == null || currentReportList.isEmpty()) return;
+
+        String choice = graphOrTableBox.getValue(); // get selected value
+        if (choice == null || choice.equals("None")) {
+            TableView.getItems().clear();
+            return;
+        }
+
+        Platform.runLater(() -> {
+
+            // Gather reservations filtered by isTakeAway
+            List<Reservation> filteredReservations = currentReportList.stream()
                     .flatMap(report -> report.getReservationsList().stream())
+                    .filter(res -> {
+                        if (choice.equals("Reservations")) return !res.isTakeAway();
+                        else if (choice.equals("deliveries")) return res.isTakeAway();
+                        else return true;
+                    })
                     .collect(Collectors.toList());
 
-            // Only create columns once
+            // Create columns once
             if (TableView.getColumns().isEmpty()) {
-
                 // Name
-                TableColumn<Reservation, String> nameCol = new TableColumn<>("Name");
+                nameCol = new TableColumn<>("Name");
                 nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 
                 // Phone
-                TableColumn<Reservation, String> phoneCol = new TableColumn<>("Phone");
+                phoneCol = new TableColumn<>("Phone");
                 phoneCol.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
 
                 // Reservation Time
-                TableColumn<Reservation, LocalDateTime> timeCol = new TableColumn<>("Reservation Time");
+                timeCol = new TableColumn<>("Reservation Time");
                 timeCol.setCellValueFactory(new PropertyValueFactory<>("reservationTime"));
 
                 // Guests
-                TableColumn<Reservation, Integer> guestsCol = new TableColumn<>("Guests");
+                guestsCol = new TableColumn<>("Guests");
                 guestsCol.setCellValueFactory(new PropertyValueFactory<>("totalGuests"));
 
                 // Restaurant Name
-                TableColumn<Reservation, String> restaurantCol = new TableColumn<>("Restaurant");
+                restaurantCol = new TableColumn<>("Restaurant");
                 restaurantCol.setCellValueFactory(cellData -> {
                     Reservation res = cellData.getValue();
                     if (res.getRestaurant() != null) {
@@ -219,15 +256,15 @@ public class MonthlyReportViewController {
                 });
 
                 // Sitting Type
-                TableColumn<Reservation, String> sittingTypeCol = new TableColumn<>("Sitting Type");
+                sittingTypeCol = new TableColumn<>("Sitting Type");
                 sittingTypeCol.setCellValueFactory(new PropertyValueFactory<>("sittingType"));
 
                 // Address
-                TableColumn<Reservation, String> addressCol = new TableColumn<>("Address");
+                addressCol = new TableColumn<>("Address");
                 addressCol.setCellValueFactory(new PropertyValueFactory<>("address"));
 
-                // Payed Method (Visa or Cash)
-                TableColumn<Reservation, String> payedMethodCol = new TableColumn<>("Payed Method");
+                // Payed Method
+                payedMethodCol = new TableColumn<>("Payed Method");
                 payedMethodCol.setCellValueFactory(cellData -> {
                     Reservation res = cellData.getValue();
                     String method = (res.getVisa() == null || res.getVisa().isEmpty()) ? "Cash" : "Visa";
@@ -240,12 +277,16 @@ public class MonthlyReportViewController {
                 );
             }
 
-            // Clear items first to prevent duplicates
+            // Show/hide columns depending on selection
+            boolean isDeliveries = choice.equals("deliveries");
+            guestsCol.setVisible(!isDeliveries);
+            sittingTypeCol.setVisible(!isDeliveries);
+
+            // Update table items
             TableView.getItems().clear();
-            TableView.getItems().setAll(allReservations);
+            TableView.getItems().setAll(filteredReservations);
         });
     }
-
 
 
 
@@ -259,7 +300,7 @@ public class MonthlyReportViewController {
             );
             restaurantNameBox.setItems(restaurantList);
             ObservableList<String> graphOrTableList = FXCollections.observableArrayList(
-                    "Complaints Histogram", "Reservations", "deliveries"
+                    "None" , "Reservations", "deliveries"
             );
             graphOrTableBox.setItems(graphOrTableList);
             int employee_permission = userAtt.getPermissionLevel();

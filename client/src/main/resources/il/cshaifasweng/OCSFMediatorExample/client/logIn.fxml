@@ -64,7 +64,7 @@
                         <Font name="System Bold" size="20.0" />
                      </font>
                   </Button>
-                  <Label fx:id="connectingMessageLabel" alignment="CENTER" layoutX="115.0" layoutY="91.0" prefHeight="43.0" prefWidth="182.0" style="-fx-font-style: italic;" textAlignment="CENTER" />
+                  <Label fx:id="connectingMessageLabel" alignment="CENTER" layoutX="12.0" layoutY="91.0" prefHeight="43.0" prefWidth="285.0" style="-fx-font-style: italic;" textAlignment="CENTER" />
                </children>
             </AnchorPane>
          </children>
