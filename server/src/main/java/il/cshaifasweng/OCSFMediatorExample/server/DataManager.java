@@ -1726,7 +1726,6 @@ public static Reservation getActiveReservationById(String idNumber, int restaura
 
     static List<DailyReport> getReportsByMonth(String message) {
         List<DailyReport> reports = new ArrayList<>();
-        System.out.println(message);
         String[] parts = message.split(";");
         String restaurantName = parts[1];
         int month = Integer.parseInt(parts[2]);

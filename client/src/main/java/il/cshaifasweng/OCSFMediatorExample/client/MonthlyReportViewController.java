@@ -1,21 +1,26 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.DailyReport;
+import il.cshaifasweng.OCSFMediatorExample.entities.Reservation;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static il.cshaifasweng.OCSFMediatorExample.client.Client.userAtt;
 
@@ -25,7 +30,7 @@ public class MonthlyReportViewController {
     private Button backButtun;
 
     @FXML
-    private BarChart<String, String> complaintsHistogram;
+    private BarChart<String, Number> complaintsHistogram;
 
     @FXML
     private Label deliveryOrdersLabel;
@@ -47,6 +52,9 @@ public class MonthlyReportViewController {
 
     @FXML
     private ComboBox<String> graphOrTableBox;
+
+    @FXML
+    private TableView<Reservation> TableView;
 
     @FXML
     void back(ActionEvent event){
@@ -118,6 +126,7 @@ public class MonthlyReportViewController {
             errorLabel.setText("");
             totalCustomersLabel.setText("0");
             deliveryOrdersLabel.setText("0");
+            TableView.getColumns().clear();
             complaintsHistogram.getData().clear();
             String message = wantedRestaurant + ";" + monthLabel.getText() + ";" + yearLabel.getText();
             Client client = Client.getClient();
@@ -128,27 +137,115 @@ public class MonthlyReportViewController {
 
     @Subscribe
     public void reportsReceived(List<DailyReport> reportsList) {
-        System.out.println("reports received");
 
         Platform.runLater(() -> {
+            complaintsHistogram.getData().clear(); // reset chart
+
             if (reportsList == null || reportsList.isEmpty()) {
                 errorLabel.setText("No reports found for the selected filters.");
                 totalCustomersLabel.setText("0");
                 deliveryOrdersLabel.setText("0");
-                complaintsHistogram.getData().clear();
+                TableView.getItems().clear(); // clear table items
                 return;
             }
 
             errorLabel.setText("");
 
-            // Take the first report (or aggregated one)
-            DailyReport report = reportsList.get(0);
+            // Show totals from all reports
+            long totalCustomers = reportsList.stream().mapToLong(DailyReport::getTotalCustomers).sum();
+            long totalDeliveries = reportsList.stream().mapToLong(DailyReport::getDeliveryOrders).sum();
 
-            totalCustomersLabel.setText(String.valueOf(report.getTotalCustomers()));
-            deliveryOrdersLabel.setText(String.valueOf(report.getDeliveryOrders()));
+            totalCustomersLabel.setText(String.valueOf(totalCustomers));
+            deliveryOrdersLabel.setText(String.valueOf(totalDeliveries));
 
+            // Complaints histogram
+            XYChart.Series<String, Number> series1 = new XYChart.Series<>();
+            series1.setName("Complaints Histogram");
+
+            Map<Integer, Integer> complaintsMap = new HashMap<>();
+            for (DailyReport report : reportsList) {
+                int day = report.getGeneratedTime().getDayOfMonth();
+                complaintsMap.put(day, report.getComplaintsCount());
+            }
+
+            LocalDate firstDate = reportsList.get(0).getGeneratedTime().toLocalDate();
+            int daysInMonth = firstDate.lengthOfMonth();
+            for (int day = 1; day <= daysInMonth; day++) {
+                int complaints = complaintsMap.getOrDefault(day, 0);
+                series1.getData().add(new XYChart.Data<>(String.valueOf(day), complaints));
+            }
+            complaintsHistogram.getData().add(series1);
+
+            // Gather all reservations
+            List<Reservation> allReservations = reportsList.stream()
+                    .flatMap(report -> report.getReservationsList().stream())
+                    .collect(Collectors.toList());
+
+            // Only create columns once
+            if (TableView.getColumns().isEmpty()) {
+
+                // Name
+                TableColumn<Reservation, String> nameCol = new TableColumn<>("Name");
+                nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+                // Phone
+                TableColumn<Reservation, String> phoneCol = new TableColumn<>("Phone");
+                phoneCol.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
+
+                // Reservation Time
+                TableColumn<Reservation, LocalDateTime> timeCol = new TableColumn<>("Reservation Time");
+                timeCol.setCellValueFactory(new PropertyValueFactory<>("reservationTime"));
+
+                // Guests
+                TableColumn<Reservation, Integer> guestsCol = new TableColumn<>("Guests");
+                guestsCol.setCellValueFactory(new PropertyValueFactory<>("totalGuests"));
+
+                // Restaurant Name
+                TableColumn<Reservation, String> restaurantCol = new TableColumn<>("Restaurant");
+                restaurantCol.setCellValueFactory(cellData -> {
+                    Reservation res = cellData.getValue();
+                    if (res.getRestaurant() != null) {
+                        int id = res.getRestaurant().getId();
+                        String name;
+                        switch (id) {
+                            case 1: name = "Haifa-Mom Kitchen"; break;
+                            case 2: name = "Tel-Aviv-Mom Kitchen"; break;
+                            case 3: name = "Nahariya-Mom Kitchen"; break;
+                            default: name = "Unknown";
+                        }
+                        return new SimpleStringProperty(name);
+                    }
+                    return new SimpleStringProperty("Unknown");
+                });
+
+                // Sitting Type
+                TableColumn<Reservation, String> sittingTypeCol = new TableColumn<>("Sitting Type");
+                sittingTypeCol.setCellValueFactory(new PropertyValueFactory<>("sittingType"));
+
+                // Address
+                TableColumn<Reservation, String> addressCol = new TableColumn<>("Address");
+                addressCol.setCellValueFactory(new PropertyValueFactory<>("address"));
+
+                // Payed Method (Visa or Cash)
+                TableColumn<Reservation, String> payedMethodCol = new TableColumn<>("Payed Method");
+                payedMethodCol.setCellValueFactory(cellData -> {
+                    Reservation res = cellData.getValue();
+                    String method = (res.getVisa() == null || res.getVisa().isEmpty()) ? "Cash" : "Visa";
+                    return new SimpleStringProperty(method);
+                });
+
+                TableView.getColumns().addAll(
+                        nameCol, phoneCol, timeCol, guestsCol,
+                        restaurantCol, sittingTypeCol, addressCol, payedMethodCol
+                );
+            }
+
+            // Clear items first to prevent duplicates
+            TableView.getItems().clear();
+            TableView.getItems().setAll(allReservations);
         });
     }
+
 
 
 

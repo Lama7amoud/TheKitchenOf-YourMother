@@ -6,55 +6,73 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="10" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MonthlyReportViewController">
-   <Pane prefHeight="166.0" prefWidth="600.0">
+<VBox alignment="CENTER" prefHeight="753.0" prefWidth="900.0" spacing="10" style="-fx-padding: 20; -fx-background-color: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MonthlyReportViewController">
+   <Pane prefHeight="170.0" prefWidth="871.0">
       <children>
       
-          <Label layoutX="201.0" layoutY="19.0" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Monthly Report" textFill="#ffa915" />
-         <ComboBox fx:id="restaurantNameBox" layoutX="329.0" layoutY="88.0" prefWidth="150.0" promptText="Choose Restaurant" style="-fx-background-color: #ffa500; -fx-background-radius: 5em;" />
-         <TextField fx:id="monthLabel" layoutX="87.0" layoutY="88.0" prefHeight="25.0" prefWidth="75.0" />
-         <TextField fx:id="yearLabel" layoutX="225.0" layoutY="88.0" prefHeight="25.0" prefWidth="75.0" />
-         <Label layoutX="22.0" layoutY="87.0" style="-fx-font-size: 18px;" text="Month" textFill="#ffa100" />
-         <Label layoutX="177.0" layoutY="87.0" style="-fx-font-size: 18px;" text="Year" textFill="#ffa100" />
+          <Label layoutX="323.0" layoutY="15.0" style="-fx-font-size: 30px; -fx-font-weight: bold;" text="Monthly Report" textFill="#ffa915" />
+         <ComboBox fx:id="restaurantNameBox" layoutX="458.0" layoutY="89.0" prefWidth="150.0" promptText="Choose Restaurant" style="-fx-background-color: #ffa500; -fx-background-radius: 5em;" />
+         <TextField fx:id="monthLabel" layoutX="174.0" layoutY="89.0" prefHeight="25.0" prefWidth="75.0" />
+         <TextField fx:id="yearLabel" layoutX="340.0" layoutY="89.0" prefHeight="25.0" prefWidth="75.0" />
+         <Label layoutX="107.0" layoutY="88.0" style="-fx-font-size: 18px;" text="Month" textFill="#ffa100" />
+         <Label layoutX="291.0" layoutY="87.0" style="-fx-font-size: 18px;" text="Year" textFill="#ffa100" />
          <Button fx:id="backButtun" alignment="CENTER" layoutX="21.0" layoutY="24.0" mnemonicParsing="false" onAction="#back" prefHeight="26.0" prefWidth="55.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Back" textFill="WHITE" />
-         <Button fx:id="Confirm" alignment="CENTER" layoutX="511.0" layoutY="88.0" mnemonicParsing="false" onAction="#checkInputs" prefHeight="26.0" prefWidth="75.0" style="-fx-background-color: Green; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Confirm" textFill="WHITE" />
-         <Label fx:id="errorLabel" alignment="CENTER" layoutX="134.0" layoutY="135.0" prefHeight="17.0" prefWidth="313.0" text="Error Label" textFill="RED" />
+         <Button fx:id="Confirm" alignment="CENTER" layoutX="736.0" layoutY="88.0" mnemonicParsing="false" onAction="#checkInputs" prefHeight="26.0" prefWidth="75.0" style="-fx-background-color: Green; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Confirm" textFill="WHITE" />
+         <Label fx:id="errorLabel" alignment="CENTER" layoutX="279.0" layoutY="119.0" prefHeight="17.0" prefWidth="313.0" text="Error Label" textFill="RED" />
       </children>
    </Pane>
 
-    <HBox spacing="20">
+    <HBox prefHeight="75.0" prefWidth="871.0" spacing="20">
         <VBox>
-            <Label text="Total Customers Served:" textFill="#ffa100">
+            <Label style="-fx-font-weight: bold;" text="Total Customers Served:" textFill="#ffa100">
             <font>
                <Font size="16.0" />
             </font></Label>
             <Label fx:id="totalCustomersLabel" text="0" />
         </VBox>
         <VBox>
-            <Label text="Delivery Orders:" textFill="#ffa100">
+            <Label style="-fx-font-weight: bold;" text="Delivery Orders:" textFill="#ffa100">
             <font>
                <Font size="16.0" />
-            </font></Label>
+            </font>
+         </Label>
             <Label fx:id="deliveryOrdersLabel" text="0" />
         </VBox>
     </HBox>
-
-    <Label style="-fx-font-size: 16px; -fx-padding: 10 0 0 0;" text="Number Of Complaints Submitted " textFill="#ffa100" />
-   <ComboBox fx:id="graphOrTableBox" prefWidth="150.0" promptText="Show Histogram" style="-fx-background-color: #ffa500; -fx-background-radius: 5em;" />
-
-    <BarChart fx:id="complaintsHistogram" barGap="10" categoryGap="20" prefHeight="400.0" prefWidth="600" title="Total Complaints">
-        <xAxis>
-            <CategoryAxis />
-        </xAxis>
-        <yAxis>
-            <NumberAxis label="Count" prefHeight="362.0" prefWidth="49.0" />
-        </yAxis>
-    </BarChart>
+   <AnchorPane prefHeight="72.0" prefWidth="866.0">
+      <children>
+         <ComboBox fx:id="graphOrTableBox" layoutX="596.0" layoutY="21.0" prefWidth="150.0" promptText="Show List" style="-fx-background-color: #ffa500; -fx-background-radius: 5em;" />
+      
+                <Label layoutX="112.0" layoutY="16.0" style="-fx-font-size: 16px; -fx-padding: 10 0 0 0; -fx-font-weight: bold;" text="Number Of Complaints Submitted " textFill="#ffa100" />
+      </children>
+   </AnchorPane>
+   <AnchorPane prefHeight="410.0" prefWidth="867.0">
+      <children>
+      
+          <BarChart fx:id="complaintsHistogram" barGap="10" categoryGap="20" layoutX="7.0" layoutY="4.0" prefHeight="400.0" prefWidth="431.0" title="Total Complaints">
+              <xAxis>
+                  <CategoryAxis />
+              </xAxis>
+              <yAxis>
+                  <NumberAxis label="Count" prefHeight="362.0" prefWidth="49.0" />
+              </yAxis>
+          </BarChart>
+         <TableView fx:id="TableView" layoutX="440.0" prefHeight="407.0" prefWidth="431.0">
+           <columns>
+             <TableColumn prefWidth="75.0" text="C1" />
+             <TableColumn prefWidth="75.0" text="C2" />
+           </columns>
+         </TableView>
+      </children>
+   </AnchorPane>
 
 </VBox>
