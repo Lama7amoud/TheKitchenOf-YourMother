@@ -41,6 +41,10 @@ public class Reservation implements Serializable {
     @ManyToMany
     private List<HostingTable> reservedTables;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "daily_report_id")
+    private DailyReport dailyReport;
+
     public Reservation() {}
 
     public Reservation(String name, String phoneNumber, String idNumber, String address, LocalDateTime reservationTime) {
@@ -52,6 +56,9 @@ public class Reservation implements Serializable {
         this.status = "on"; // default status
         this.isTakeAway = true; // since it's from the TakeAway page
     }
+
+    public DailyReport getDailyReport() {return dailyReport;}
+    public void setDailyReport(DailyReport dailyReport) {this.dailyReport = dailyReport;}
 
     public void setSenderId(String senderId) {
         this.senderId = senderId;

@@ -62,7 +62,6 @@ public class logInController {
             App.switchScreen("Main Page");
             connectButton.setDisable(false);
             customerButton.setDisable(false);
-
         });
     }
 

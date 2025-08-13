@@ -27,7 +27,7 @@ public class ManagerController {
     private Button managerFeedbackButton;
 
     @FXML
-    private Button viewMonthlyReportButton;
+    private Button monthlyReportsButton;
 
     @FXML
     private Button managerDiscountButton;
@@ -80,8 +80,8 @@ public class ManagerController {
     }
 
     @FXML
-    void viewMonthlyReport(ActionEvent event) {
-        String page = "Monthly Report Page";
+    void monthlyReportsPage(ActionEvent event) {
+        String page = "monthly Reports Page";
         App.switchScreen(page);
     }
 }

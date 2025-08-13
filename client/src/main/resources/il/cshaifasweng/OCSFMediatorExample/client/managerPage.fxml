@@ -27,11 +27,11 @@
                   <Insets left="10.0" right="10.0" />
                </padding>
             </Label>
-            <Button fx:id="managerConfirmButton" alignment="CENTER" layoutX="92.0" layoutY="138.33333333333331" mnemonicParsing="false" onAction="#manager_confirm_price_func" prefHeight="60.0" prefWidth="97.0" style="-fx-background-radius: 5em;" text="Price Change Confirmation" textOverrun="CLIP" wrapText="true" AnchorPane.bottomAnchor="211.0" AnchorPane.leftAnchor="92.0" AnchorPane.rightAnchor="46.0" />
-            <Button fx:id="managerFeedbackButton" alignment="CENTER" layoutX="88.0" layoutY="269.0" mnemonicParsing="false" onAction="#manager_feedback_func" prefHeight="29.0" prefWidth="97.0" style="-fx-background-radius: 5em;" text="view feedback" />
+            <Button fx:id="managerConfirmButton" alignment="CENTER" layoutX="36.0" layoutY="128.0" mnemonicParsing="false" onAction="#manager_confirm_price_func" prefHeight="35.0" prefWidth="164.0" style="-fx-background-radius: 5em;" text="Price Change Confirmation" textOverrun="CLIP" wrapText="true" AnchorPane.bottomAnchor="238.0" AnchorPane.leftAnchor="36.0" AnchorPane.rightAnchor="35.0" />
+            <Button fx:id="managerFeedbackButton" alignment="CENTER" layoutX="36.0" layoutY="220.0" mnemonicParsing="false" onAction="#manager_feedback_func" prefHeight="35.0" prefWidth="164.0" style="-fx-background-radius: 5em;" text="view feedback" />
             <Button layoutX="40.0" layoutY="343.0" mnemonicParsing="false" onAction="#backFunc" prefHeight="31.0" prefWidth="43.0" style="-fx-background-radius: 5em;" text="back" />
-            <Button fx:id="managerDiscountButton" alignment="CENTER" layoutX="92.0" layoutY="201.0" mnemonicParsing="false" onAction="#manager_confirm_discount_func" prefHeight="53.0" prefWidth="94.0" style="-fx-background-radius: 5em;" text="Discount Confirmation" textOverrun="CLIP" wrapText="true" />
-            <Button fx:id="viewMonthlyReportButton" alignment="CENTER" layoutX="77.0" layoutY="311.0" mnemonicParsing="false" onAction="#viewMonthlyReport" style="-fx-background-radius: 5em;" text="view monthly report" wrapText="true" />
+            <Button fx:id="managerDiscountButton" alignment="CENTER" layoutX="34.0" layoutY="173.0" mnemonicParsing="false" onAction="#manager_confirm_discount_func" prefHeight="35.0" prefWidth="166.0" style="-fx-background-radius: 5em;" text="Discount Confirmation" textOverrun="CLIP" wrapText="true" />
+            <Button fx:id="monthlyReportsButton" alignment="CENTER" layoutX="36.0" layoutY="267.0" mnemonicParsing="false" onAction="#monthlyReportsPage" prefHeight="35.0" prefWidth="164.0" style="-fx-background-radius: 5em;" text="View Monthly Reports" />
          </children>
       </AnchorPane>
    </left>

@@ -1,7 +1,7 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
-import il.cshaifasweng.OCSFMediatorExample.client.MonthlyReport;
 import il.cshaifasweng.OCSFMediatorExample.entities.Reservation;
+
 
 import java.util.*;
 import javax.persistence.*;
@@ -55,8 +55,7 @@ public class DataManager {
         configuration.addAnnotatedClass(Discounts.class);
         configuration.addAnnotatedClass(Feedback.class);
         configuration.addAnnotatedClass(Complaint.class);
-        configuration.addAnnotatedClass(MonthlyReport.class);
-
+        configuration.addAnnotatedClass(DailyReport.class);
         configuration.addAnnotatedClass(AuthorizedUser.class);
         configuration.addAnnotatedClass(Restaurant.class);
         configuration.addAnnotatedClass(HostingTable.class);
@@ -69,23 +68,6 @@ public class DataManager {
         return configuration.buildSessionFactory(serviceRegistry);
     }
 
-    // Save a generated report
-    /*
-    public static void saveMonthlyReport(MonthlyReport report) {
-        Transaction transaction = null;
-        SessionFactory sessionFactory = getSessionFactory(password);
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.save(report);
-            transaction.commit();
-            System.out.println("Monthly report saved to the database.");
-        } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
-        } finally {
-            if (sessionFactory != null) sessionFactory.close();
-        }
-    }*/
 
     public static Map<String, Integer> getComplaintHistogram(String password, LocalDate start, LocalDate end) {
         Map<String, Integer> histogram = new HashMap<>();
@@ -436,6 +418,10 @@ public class DataManager {
             session.save(complaint);
             tx.commit();
             System.out.println("Complaint saved successfully.");
+
+
+            DataManager.updateDailyReportComplaints(complaint);
+
         } catch (Exception e) {
             if (tx != null) {
                 tx.rollback();
@@ -443,6 +429,142 @@ public class DataManager {
             e.printStackTrace();
         }
     }
+
+
+    public static void updateDailyReportComplaints(Complaint complaint) {
+        Restaurant restaurant = complaint.getRestaurant();
+        LocalDate complaintDate = complaint.getSubmittedAt().toLocalDate();
+
+        LocalDateTime startOfDay = complaintDate.atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        try {
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            DailyReport report = session.createQuery(
+                            "FROM DailyReport WHERE restaurant = :restaurant AND generatedTime = :startOfDay",
+                            DailyReport.class)
+                    .setParameter("restaurant", restaurant)
+                    .setParameter("startOfDay", startOfDay)
+                    .uniqueResult();
+
+            Long complaintCount = session.createQuery(
+                            "SELECT COUNT(c) FROM Complaint c WHERE c.restaurant = :restaurant " +
+                                    "AND c.submittedAt >= :startOfDay AND c.submittedAt < :endOfDay", Long.class)
+                    .setParameter("restaurant", restaurant)
+                    .setParameter("startOfDay", startOfDay)
+                    .setParameter("endOfDay", endOfDay)
+                    .uniqueResult();
+
+            if (report == null) {
+                report = new DailyReport();
+                report.setRestaurant(restaurant);
+                report.setGeneratedTime(startOfDay);
+                report.setComplaintsCount(complaintCount != null ? complaintCount.intValue() : 1);
+                report.setTotalCustomers(0);
+                report.setDeliveryOrders(0);
+                report.setReservations(0);
+                session.save(report);
+            } else {
+                report.setComplaintsCount(complaintCount != null ? complaintCount.intValue() : 0);
+                session.update(report);
+            }
+
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+
+
+    public static void updateDailyReport(Reservation reservation) {
+        Restaurant restaurant = reservation.getRestaurant();
+        LocalDate reservationDate = reservation.getReservationTime().toLocalDate();
+
+        LocalDateTime startOfDay = reservationDate.atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        try {
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            DailyReport report = session.createQuery(
+                            "FROM DailyReport WHERE restaurant = :restaurant AND generatedTime = :startOfDay",
+                            DailyReport.class)
+                    .setParameter("restaurant", restaurant)
+                    .setParameter("startOfDay", startOfDay)
+                    .uniqueResult();
+
+
+            if (report == null) {
+                report = new DailyReport();
+                report.setRestaurant(restaurant);
+                report.setGeneratedTime(startOfDay);
+
+                report.setTotalCustomers(reservation.isTakeAway()? 0 : reservation.getTotalGuests());
+                report.setReservations(reservation.isTakeAway() ? 0 : 1);
+                report.setDeliveryOrders(reservation.isTakeAway() ? 1 : 0);
+                report.setComplaintsCount(0);  // complaints not updated here
+            } else {
+                Long totalCustomers = session.createQuery(
+                                "SELECT COALESCE(SUM(r.totalGuests), 0) FROM Reservation r WHERE r.restaurant = :restaurant " +
+                                        "AND r.isTakeAway = false " +
+                                        "AND r.reservationTime >= :startOfDay AND r.reservationTime < :endOfDay", Long.class)
+                        .setParameter("restaurant", restaurant)
+                        .setParameter("startOfDay", startOfDay)
+                        .setParameter("endOfDay", endOfDay)
+                        .uniqueResult();
+
+                Long deliveryOrders = session.createQuery(
+                                "SELECT COUNT(r) FROM Reservation r WHERE r.restaurant = :restaurant " +
+                                        "AND r.isTakeAway = true AND r.reservationTime >= :startOfDay AND r.reservationTime < :endOfDay", Long.class)
+                        .setParameter("restaurant", restaurant)
+                        .setParameter("startOfDay", startOfDay)
+                        .setParameter("endOfDay", endOfDay)
+                        .uniqueResult();
+
+                Long reservations = session.createQuery(
+                                "SELECT COUNT(r) FROM Reservation r WHERE r.restaurant = :restaurant " +
+                                        "AND r.isTakeAway = false AND r.reservationTime >= :startOfDay AND r.reservationTime < :endOfDay", Long.class)
+                        .setParameter("restaurant", restaurant)
+                        .setParameter("startOfDay", startOfDay)
+                        .setParameter("endOfDay", endOfDay)
+                        .uniqueResult();
+
+                report.setTotalCustomers(totalCustomers.intValue());
+                report.setDeliveryOrders(deliveryOrders.intValue());
+                report.setReservations(reservations.intValue());
+            }
+
+            // Link reservation to report
+            reservation.setDailyReport(report);
+            session.saveOrUpdate(reservation);
+            session.saveOrUpdate(report);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+
 
     static AuthorizedUser checkPermission(String details) {
         try {
@@ -1583,91 +1705,16 @@ public static Reservation getActiveReservationById(String idNumber, int restaura
     }
 }
 
-//addedddd
-public static void updateReservation(Reservation reservation) {
-    SessionFactory sessionFactory = getSessionFactory(password);
-    Session session = sessionFactory.openSession();
-    try{
-        Transaction tx = session.beginTransaction();
-        session.update(reservation);   // or session.merge(reservation) if detached
-        tx.commit();
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-    finally {
-        if (session != null) {
-            session.close();
-            System.out.println("Session closed");
-        }
-    }
-}
-
-
-    public static MonthlyReport generateReportForRestaurant(Restaurant restaurant) {
+    //addedddd
+    public static void updateReservation(Reservation reservation) {
+        SessionFactory sessionFactory = getSessionFactory(password);
         Session session = sessionFactory.openSession();
         try{
-            session.beginTransaction();
-
-            LocalDate today = LocalDate.now();
-            LocalDateTime todayStart = today.atStartOfDay();
-            LocalDateTime now = LocalDateTime.now();
-
-            // Fetch all reservations and complaints for manual filtering
-            List<Reservation> allReservations = session.createQuery("FROM Reservation", Reservation.class).getResultList();
-            List<Complaint> allComplaints = session.createQuery("FROM Complaint", Complaint.class).getResultList();
-
-            // Count takeaway orders
-            int takeawayOrdersCount = 0;
-            for (Reservation reservation : allReservations) {
-                if (reservation.getRestaurant().equals(restaurant)
-                        && reservation.getReservationTime().isAfter(todayStart)
-                        && reservation.getReservationTime().isBefore(now)
-                        && reservation.getStatus().equalsIgnoreCase("on")
-                        && reservation.isPayed()
-                        && reservation.isTakeAway()) {
-                    takeawayOrdersCount++;
-                }
-            }
-
-            // Count customers served inside the restaurant
-            int customersServed = 0;
-            for (Reservation reservation : allReservations) {
-                if (reservation.getRestaurant().equals(restaurant)
-                        && reservation.getReservationTime().isAfter(todayStart)
-                        && reservation.getReservationTime().isBefore(now)
-                        && !reservation.isTakeAway()) {
-                    customersServed += reservation.getTotalGuests();
-                }
-            }
-
-            // Count complaint subjects for histogram
-            int complaintCount = 0;
-            for (Complaint complaint : allComplaints) {
-                if (complaint.getRestaurant().equals(restaurant)
-                        && complaint.getSubmittedAt().isAfter(todayStart)
-                        && complaint.getSubmittedAt().isBefore(now)) {
-                    complaintCount++;
-                }
-            }
-
-            // Prepare complaint data map
-            Map<String, Integer> complaintsData = new LinkedHashMap<>();
-            complaintsData.put("Total Complaints", complaintCount);  // if you only have total count, just use a dummy category
-
-
-
-            MonthlyReport report = new MonthlyReport(
-                    restaurant,          // restaurantName (String)
-                    now,                 // generatedTime (LocalDateTime)
-                    customersServed,     // totalCustomers (int)
-                    takeawayOrdersCount, // deliveryOrders (int)
-                    complaintsData       // complaintsData (Map<String, Integer>)
-            );
-
-
-            session.save(report);
-            session.getTransaction().commit();
-            return report;
+            Transaction tx = session.beginTransaction();
+            session.update(reservation);   // or session.merge(reservation) if detached
+            tx.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         finally {
             if (session != null) {
@@ -1677,15 +1724,60 @@ public static void updateReservation(Reservation reservation) {
         }
     }
 
-    public static List<MonthlyReport> getAllReports() {
-        try (Session session = sessionFactory.openSession()) {
-            CriteriaBuilder cb = session.getCriteriaBuilder();
-            CriteriaQuery<MonthlyReport> cq = cb.createQuery(MonthlyReport.class);
-            Root<MonthlyReport> root = cq.from(MonthlyReport.class);
-            cq.select(root);
-            return session.createQuery(cq).getResultList();
+
+    static List<DailyReport> getReportsByMonth(String message) {
+        List<DailyReport> reports = new ArrayList<>();
+        System.out.println(message);
+        String[] parts = message.split(";");
+        String restaurantName = parts[1];
+        int month = Integer.parseInt(parts[2]);
+        int year = Integer.parseInt(parts[3]);
+
+        try {
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<DailyReport> query = builder.createQuery(DailyReport.class);
+            Root<DailyReport> root = query.from(DailyReport.class);
+
+            // Fetch deliveries and reservations lists eagerly
+            root.fetch("reservationsList", JoinType.LEFT);
+
+            Expression<Integer> reportMonth = builder.function("MONTH", Integer.class, root.get("generatedTime"));
+            Expression<Integer> reportYear = builder.function("YEAR", Integer.class, root.get("generatedTime"));
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(builder.equal(reportMonth, month));
+            predicates.add(builder.equal(reportYear, year));
+
+            if (!restaurantName.equalsIgnoreCase("All")) {
+                Join<DailyReport, Restaurant> restaurantJoin = root.join("restaurant");
+                predicates.add(builder.equal(restaurantJoin.get("name"), restaurantName));
+            }
+
+            query.select(root).where(predicates.toArray(new Predicate[0]));
+
+            reports = session.createQuery(query).getResultList();
+
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+        } finally {
+            if (session != null) {
+                session.close();
+                System.out.println("session closed");
+            }
         }
+
+        return reports;
     }
+
 
     //    visa payment
     public static void markPaymentAsPaidInDatabase(String customerId) {
@@ -1811,81 +1903,4 @@ public static void updateReservation(Reservation reservation) {
     }
 
 
-    public static MonthlyReport getLatestMonthlyReport() {
-        try (Session session = sessionFactory.openSession()) {
-            Transaction tx = session.beginTransaction();
-
-            // 1. Find the latest generatedTime (max date) from your report data or orders table
-
-            CriteriaBuilder cb = session.getCriteriaBuilder();
-
-            // Assuming you track generatedTime in an entity ReportEntity:
-            CriteriaQuery<LocalDateTime> maxDateQuery = cb.createQuery(LocalDateTime.class);
-            Root<?> reportRoot = maxDateQuery.from(MonthlyReport.class);
-            maxDateQuery.select(cb.greatest(reportRoot.get("generatedTime")));
-            LocalDateTime latestGeneratedTime = session.createQuery(maxDateQuery).uniqueResult();
-
-            if (latestGeneratedTime == null) {
-                tx.commit();
-                // no data, return empty
-                return new MonthlyReport("Unknown", LocalDateTime.now(), 0, 0, new LinkedHashMap<>());
-            }
-
-            // Define start and end datetime of the latest month
-            LocalDateTime startOfMonth = latestGeneratedTime.withDayOfMonth(1).toLocalDate().atStartOfDay();
-            LocalDateTime endOfMonth = latestGeneratedTime.withDayOfMonth(latestGeneratedTime.toLocalDate().lengthOfMonth())
-                    .toLocalDate().atTime(LocalTime.MAX);
-
-            // 2. Total customers (distinct customerId) in orders during that month
-            CriteriaQuery<Long> totalCustomersQuery = cb.createQuery(Long.class);
-            Root<OrderData> orderRoot = totalCustomersQuery.from(OrderData.class);
-            totalCustomersQuery.select(cb.countDistinct(orderRoot.get("customerId")));
-            Predicate betweenDates = cb.between(orderRoot.get("orderDate"), startOfMonth, endOfMonth);
-            totalCustomersQuery.where(betweenDates);
-            Long totalCustomers = session.createQuery(totalCustomersQuery).uniqueResult();
-            if (totalCustomers == null) totalCustomers = 0L;
-
-            // 3. Total delivery orders during that month
-            CriteriaQuery<Long> deliveryOrdersQuery = cb.createQuery(Long.class);
-            Root<OrderData> deliveryRoot = deliveryOrdersQuery.from(OrderData.class);
-            deliveryOrdersQuery.select(cb.count(deliveryRoot));
-            Predicate deliveryTrue = cb.isTrue(deliveryRoot.get("delivery"));
-            Predicate betweenDates2 = cb.between(deliveryRoot.get("orderDate"), startOfMonth, endOfMonth);
-            deliveryOrdersQuery.where(cb.and(deliveryTrue, betweenDates2));
-            Long deliveryOrders = session.createQuery(deliveryOrdersQuery).uniqueResult();
-            if (deliveryOrders == null) deliveryOrders = 0L;
-
-            // 4. Complaints count grouped by category during that month
-            CriteriaQuery<Object[]> complaintsQuery = cb.createQuery(Object[].class);
-            Root<Complaint> complaintRoot = complaintsQuery.from(Complaint.class);
-            complaintsQuery.multiselect(complaintRoot.get("category"), cb.count(complaintRoot));
-            Predicate betweenDates3 = cb.between(complaintRoot.get("complaintDate"), startOfMonth, endOfMonth);
-            complaintsQuery.where(betweenDates3);
-            complaintsQuery.groupBy(complaintRoot.get("category"));
-
-            List<Object[]> complaintsList = session.createQuery(complaintsQuery).getResultList();
-
-            Map<String, Integer> complaintsData = new LinkedHashMap<>();
-            for (Object[] row : complaintsList) {
-                String category = (String) row[0];
-                Long count = (Long) row[1];
-                complaintsData.put(category, count.intValue());
-            }
-
-            tx.commit();
-
-            String restaurantName = "Your Restaurant"; // Change if needed
-
-            return new MonthlyReport(
-                    restaurantName,
-                    latestGeneratedTime,
-                    totalCustomers.intValue(),
-                    deliveryOrders.intValue(),
-                    complaintsData
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new MonthlyReport("Unknown", LocalDateTime.now(), 0, 0, new LinkedHashMap<>());
-        }
-    }
 }

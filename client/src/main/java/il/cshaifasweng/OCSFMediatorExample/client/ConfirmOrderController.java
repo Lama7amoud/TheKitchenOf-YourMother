@@ -86,7 +86,10 @@ public class ConfirmOrderController {
                 case "branchDetailsButton" -> "Branch Page";
                 default -> null;
             };
-            if (page != null) App.switchScreen(page);
+            if (page != null){
+                EventBus.getDefault().unregister(this);
+                App.switchScreen(page);
+            }
         });
     }
 

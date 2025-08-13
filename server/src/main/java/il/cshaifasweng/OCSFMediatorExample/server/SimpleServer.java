@@ -1,7 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
 import il.cshaifasweng.OCSFMediatorExample.client.Client;
-import il.cshaifasweng.OCSFMediatorExample.client.MonthlyReport;
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
 
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
@@ -10,6 +9,7 @@ import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -418,13 +418,16 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 		}
-		else if (msgString.equals("REQUEST_MONTHLY_REPORTS")) {
-			MonthlyReport report = DataManager.getLatestMonthlyReport();
-			try {
-				client.sendToClient(report);
-			} catch (IOException e) {
-				e.printStackTrace();
+		else if (msgString.startsWith("request_reports")) {
+			List<DailyReport> reports = DataManager.getReportsByMonth(msgString);  // Make sure this method exists
+			if (reports != null){
+				try {
+					client.sendToClient(reports);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
+
 		}
 		else if (msgString.startsWith("Update preferences")) {
 			String details = msgString.substring("Update preferences".length()).trim();
@@ -652,6 +655,8 @@ public class SimpleServer extends AbstractServer {
 
 						// Notify only this client
 						client.sendToClient("Reservation saved successfully");
+
+						DataManager.updateDailyReport(reservation);
 
 						// Send reservation to this client only, for client-side processing if needed
 						client.sendToClient(reservation);
@@ -889,29 +894,6 @@ public class SimpleServer extends AbstractServer {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-	}
-
-	private void scheduleReportGeneration() {
-		reportTimer = new Timer();
-
-		// Immediate first generation
-		generateAllReports();
-
-		// Every 5 minutes after that
-		reportTimer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				generateAllReports();
-			}
-		}, 5 * 60 * 1000, 5 * 60 * 1000); // 5 minutes
-	}
-
-	private void generateAllReports() {
-		List<Restaurant> restaurants = DataManager.getAllRestaurants();
-		for (Restaurant restaurant : restaurants) {
-			DataManager.generateReportForRestaurant(restaurant);
-		}
-		System.out.println("[REPORT SYSTEM] Reports generated at: " + LocalTime.now());
 	}
 
 }
