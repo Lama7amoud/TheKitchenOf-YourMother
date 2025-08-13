@@ -1289,7 +1289,6 @@ public class DataManager {
 
 
 
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter database password: ");
