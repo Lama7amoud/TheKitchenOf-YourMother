@@ -423,7 +423,7 @@ public class DataManager {
     }
 
 
-    static boolean saveComplaint(String complainttxt, int restaurantId) {
+    static boolean saveComplaint(String complainttxt, int restaurantId,String id,String name,String email) {
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
             session = sessionFactory.openSession();
@@ -443,6 +443,10 @@ public class DataManager {
             complaint.setStatus(false); // Not responded yet
             complaint.setSubmittedAt(LocalDateTime.now());
             complaint.setRestaurant(restaurant);
+            complaint.setUserId(id);
+            complaint.setName(name);
+            complaint.setEmail(email);
+
 
             // Save to DB
             session.save(complaint);
@@ -469,6 +473,28 @@ public class DataManager {
     }
 
 
+    public static void updateComplaint(int id, String response, double refund) {
+        Session session = getSessionFactory(password).openSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+
+            Complaint complaint = session.get(Complaint.class, id);
+            if (complaint != null) {
+                complaint.setResponse(response);
+                complaint.setRefund(refund);
+                complaint.setStatus(true); // mark as resolved
+                session.update(complaint);
+            }
+
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
 
 
     public static void updateDailyReportComplaints(Complaint complaint) {
@@ -1327,6 +1353,29 @@ public class DataManager {
         }
     }
 
+    public static List<Complaint> getComplaint() {
+        try {
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Complaint> query = builder.createQuery(Complaint.class);
+            Root<Complaint> root = query.from(Complaint.class);
+            query.select(root);
+
+            List<Complaint> results = session.createQuery(query).getResultList();
+            session.getTransaction().commit();
+            return results;
+        } catch (Exception e) {
+            if (session != null) session.getTransaction().rollback();
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (session != null) session.close();
+        }
+    }
+
 
 
     public static void main(String[] args) {
@@ -1382,6 +1431,55 @@ public class DataManager {
             session.close();
         }
     }
+
+    public static boolean hasActiveReservationForUser(String idNumber, String name, String email) {
+        SessionFactory sf = getSessionFactory(password);
+        Session session = null;
+        try {
+            session = sf.openSession();
+            session.beginTransaction();
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+            Root<Reservation> root = cq.from(Reservation.class);
+
+            List<Predicate> preds = new ArrayList<>();
+
+            // Required: idNumber (you can relax this if you want)
+            if (idNumber != null && !idNumber.isBlank()) {
+                preds.add(cb.equal(root.get("idNumber"), idNumber.trim()));
+            }
+
+            // Optional: name and email, case-insensitive if provided
+            if (name != null && !name.isBlank()) {
+                preds.add(cb.equal(cb.lower(root.get("name")), name.trim().toLowerCase()));
+            }
+            if (email != null && !email.isBlank()) {
+                preds.add(cb.equal(cb.lower(root.get("email")), email.trim().toLowerCase()));
+            }
+
+            // Only consider active reservations (your code uses "on"/"off")
+            preds.add(cb.equal(cb.lower(root.get("status")), "on"));
+
+            cq.select(cb.count(root)).where(preds.toArray(new Predicate[0]));
+
+            Long count = session.createQuery(cq).getSingleResult();
+            session.getTransaction().commit();
+
+            return count != null && count > 0;
+        } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
 
     public static void saveReservation(Reservation reservation) {
 

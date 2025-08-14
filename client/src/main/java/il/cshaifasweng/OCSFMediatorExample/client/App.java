@@ -70,7 +70,9 @@ public class App extends Application {
                 entry("Manager Feedback Page" ,"managerfeedbackpage"),
                 entry("Tables View Page", "tablesViewPage"),
                 entry("VisaPayment Page","visaPayment"),
-                entry("monthly Reports Page", "monthlyReportView")
+                entry("monthly Reports Page", "monthlyReportView"),
+                entry("Complaint Page","complaintPage"),
+                entry("Customer Service Page","customersServicePage")
                 );
 
         String contentName = screenMappings.get(screenName);

@@ -116,7 +116,7 @@ public class PersonalAreaPageController {
                 page = "Main Page";
             } else if (event.getSource() == customerServiceButton) {
                 //page = "Service Page";
-                page = "Main Page";
+                page = "Customer Service Page";
             }
             else if (event.getSource() == updateMenuButton) {
                 page = "Update Menu Page";

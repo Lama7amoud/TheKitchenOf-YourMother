@@ -238,7 +238,7 @@ protected void handleMessageFromServer(Object msg) {
             return;
         }*/
 
-        if(strMsg.startsWith("complaint") || strMsg.startsWith("feedback")){
+        if(strMsg.startsWith("complaint") || strMsg.startsWith("feedback")|| strMsg.startsWith("user")){
             EventBus.getDefault().post(strMsg);
             return;
         }
@@ -305,6 +305,9 @@ protected void handleMessageFromServer(Object msg) {
             } else if (first instanceof Feedback) {
                 System.out.println("Received list of feedback from server.");
                 EventBus.getDefault().post((List<Feedback>) list);
+            } else if (first instanceof Complaint) {
+                System.out.println("Received list of complaint from server.");
+                EventBus.getDefault().post((List<Complaint>) list);
             } else if (first instanceof HostingTable) {
                 System.out.println("Received list of hosting tables from server.");
                 EventBus.getDefault().post((List<HostingTable>) list);

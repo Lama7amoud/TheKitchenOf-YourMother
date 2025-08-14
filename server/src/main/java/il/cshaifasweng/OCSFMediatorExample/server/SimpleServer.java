@@ -322,7 +322,6 @@ public class SimpleServer extends AbstractServer {
 
 
 
-		// ───────── (E) “Get Manager feedback” branch (unchanged) ─────────
 		else if (msgString.startsWith("Get Manager feedback")) {
 			try {
 				List<Feedback> list = DataManager.getManagerFeedback();
@@ -336,9 +335,24 @@ public class SimpleServer extends AbstractServer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+		else if (msgString.startsWith("Get complaints")) {
+			try {
+				List<Complaint> list = DataManager.getComplaint();
+				if (list != null && !list.isEmpty()) {
+					sendToAllClients(list);
+
+				} else {
+					sendToAllClients(new ArrayList<Complaint>());
+
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
 
-		} else if (msgString.equals("Request Menu")) {
+		else if (msgString.equals("Request Menu")) {
 			try {
 				List<Meal> menu = DataManager.requestMenu();
 				if(menu != null && !menu.isEmpty()) {
@@ -353,6 +367,17 @@ public class SimpleServer extends AbstractServer {
 			}
 
 		}
+		else if (msgString.startsWith("UpdateComplaint;")) {
+				String[] parts = msgString.split(";", 4);
+
+				int complaintId = Integer.parseInt(parts[1]);
+				String newResponse = parts[2];
+				double newRefund = Double.parseDouble(parts[3]);
+
+				DataManager.updateComplaint(complaintId, newResponse, newRefund);
+		}
+
+
 
 		else if (msgString.startsWith("Update price")) {
 			String details = msgString.substring("Update price".length()).trim();
@@ -425,13 +450,33 @@ public class SimpleServer extends AbstractServer {
 
 			String complainttxt = parts[1];
 			int restaurantId = Integer.parseInt(parts[2].trim());
-			boolean complaintConfirmed = DataManager.saveComplaint(complainttxt, restaurantId);
+			String id = parts[3].trim();
+			String name = parts[4].trim();
+			String email = parts[5].trim();
+
+			boolean complaintConfirmed=false;
+			boolean flag=false;
+			if(DataManager.hasActiveReservationForUser(id,name,email))
+			{
+				 complaintConfirmed = DataManager.saveComplaint(complainttxt, restaurantId,id,name,email);
+				flag=true;
+			}
+			else{
+				flag=false;
+			}
 
 			try {
 				if(complaintConfirmed) {
 					client.sendToClient("complaint inserted successfully");
 				} else{
-					client.sendToClient("complaint has not inserted");
+					if(!flag)
+					{
+						client.sendToClient("user not exist");
+					}
+					else {
+						client.sendToClient("complaint has not inserted");
+					}
+
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

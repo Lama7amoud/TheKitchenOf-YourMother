@@ -34,6 +34,9 @@ public class PrimaryController {
     private Button feedbackButton;
 
     @FXML
+    private Button complaintButton;
+
+    @FXML
     private ImageView imageView;
 
     @FXML
@@ -99,6 +102,18 @@ public class PrimaryController {
                     userAtt.setRestaurantInterest((short) restaurantId); // Save the restaurant in userAtt
                     page = "Feedback Page";
                 }
+            } else if (sourceButton == complaintButton) {
+                if (selectedRestaurant != null) {
+                    int restaurantId = switch (selectedRestaurant) {
+                        case "Haifa Branch" -> 1;
+                        case "Tel-Aviv Branch" -> 2;
+                        case "Nahariya Branch" -> 3;
+                        default -> throw new IllegalArgumentException("Unknown restaurant: " + selectedRestaurant);
+                    };
+                    userAtt.setRestaurantInterest((short) restaurantId);
+                    page = "Complaint Page";
+                }
+
             } else if (sourceButton == orderButton) {
                 page = "TakeAwayOrReservation Page";
             }
@@ -164,6 +179,7 @@ public class PrimaryController {
                 RestaurantDetailsInstructionLabel.setVisible(true);
                 orderButton.setDisable(false);
                 feedbackButton.setDisable(false);
+                complaintButton.setDisable(false);
                 menuButton.setDisable(false);
                 imageView.setVisible(true);
 
@@ -187,10 +203,13 @@ public class PrimaryController {
         Platform.runLater(() -> {
             int user_permission = userAtt.getPermissionLevel();
             feedbackButton.setVisible((user_permission == 0));
-
+            complaintButton.setVisible(true);
             RestaurantDetailsInstructionLabel.setVisible(false);
             orderButton.setDisable(true);
             feedbackButton.setDisable(true);
+
+            complaintButton.setDisable(true);
+
             menuButton.setDisable(true);
             imageView.setVisible(false);
 
