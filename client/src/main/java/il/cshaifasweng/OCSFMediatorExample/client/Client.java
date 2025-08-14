@@ -238,6 +238,11 @@ protected void handleMessageFromServer(Object msg) {
             return;
         }*/
 
+        if(strMsg.startsWith("complaint") || strMsg.startsWith("feedback")){
+            EventBus.getDefault().post(strMsg);
+            return;
+        }
+
         if (strMsg.startsWith("MealCategory:")) {
             String category = strMsg.substring("MealCategory:".length()).trim();
 

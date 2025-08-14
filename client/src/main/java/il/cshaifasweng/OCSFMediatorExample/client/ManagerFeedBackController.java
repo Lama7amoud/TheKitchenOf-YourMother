@@ -80,15 +80,15 @@ public class ManagerFeedBackController {
                     System.out.println(restaurantId);
                     if (restaurantId == 1) {
                         filtered = allFeedbacks.stream()
-                                .filter(f -> f.getRestaurant().equalsIgnoreCase("Haifa"))
+                                .filter(f -> f.getRestaurant().getName().equalsIgnoreCase("Haifa"))
                                 .collect(Collectors.toList());
                     } else if (restaurantId == 2) {
                         filtered = allFeedbacks.stream()
-                                .filter(f -> f.getRestaurant().equalsIgnoreCase("Tel-Aviv"))
+                                .filter(f -> f.getRestaurant().getName().equalsIgnoreCase("Tel-Aviv"))
                                 .collect(Collectors.toList());
                     } else if (restaurantId == 3) {
                         filtered = allFeedbacks.stream()
-                                .filter(f -> f.getRestaurant().equalsIgnoreCase("Nahariya"))
+                                .filter(f -> f.getRestaurant().getName().equalsIgnoreCase("Nahariya"))
                                 .collect(Collectors.toList());
                     } else {
                         filtered = allFeedbacks;

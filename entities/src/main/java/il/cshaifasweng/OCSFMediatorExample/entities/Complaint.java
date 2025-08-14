@@ -15,11 +15,9 @@ public class Complaint implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private int userId;
-
     private String complaint;
 
-    private String status;
+    private boolean status; // responded or not
 
     private LocalDateTime submittedAt;
 
@@ -29,8 +27,7 @@ public class Complaint implements Serializable {
 
     public Complaint() {}
 
-    public Complaint(int userId, String complaint, String status, LocalDateTime submittedAt, Restaurant restaurant) {
-        this.userId = userId;
+    public Complaint(String complaint, Boolean status, LocalDateTime submittedAt, Restaurant restaurant) {
         this.complaint = complaint;
         this.status = status;
         this.submittedAt = submittedAt;
@@ -56,14 +53,6 @@ public class Complaint implements Serializable {
         this.id = id;
     }
 
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
     public String getComplaint() {
         return complaint;
     }
@@ -72,11 +61,11 @@ public class Complaint implements Serializable {
         this.complaint = complaint;
     }
 
-    public String getStatus() {
+    public Boolean getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Boolean status) {
         this.status = status;
     }
 

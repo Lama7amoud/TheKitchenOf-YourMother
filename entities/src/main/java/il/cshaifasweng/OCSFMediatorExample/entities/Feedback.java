@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.persistence.*;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 @Entity
 @Table(name = "feedback")
 public class Feedback implements Serializable {
@@ -15,26 +12,24 @@ public class Feedback implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private int userId;
-
     private String message;
 
     private int rating;
 
     private LocalDateTime submittedAt;
 
-    private String restaurant;
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id") // Foreign key to Restaurant table
+    private Restaurant restaurant;
 
     public Feedback() {
     }
 
-    public Feedback(int userId, String message, int rating, LocalDateTime submittedAt, String restaurant) {
-        this.userId = userId;
+    public Feedback(String message, int rating, LocalDateTime submittedAt, Restaurant restaurant) {
         this.message = message;
         this.rating = rating;
         this.submittedAt = submittedAt;
         this.restaurant = restaurant;
-
     }
 
     // Getters and Setters
@@ -45,14 +40,6 @@ public class Feedback implements Serializable {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
     }
 
     public String getMessage() {
@@ -79,12 +66,11 @@ public class Feedback implements Serializable {
         this.submittedAt = submittedAt;
     }
 
-    public String getRestaurant() {
+    public Restaurant getRestaurant() {
         return restaurant;
     }
 
-    public void setRestaurant(String restaurant) {
+    public void setRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
     }
 }
-

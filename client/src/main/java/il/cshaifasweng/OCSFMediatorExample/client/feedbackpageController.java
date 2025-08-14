@@ -9,6 +9,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -35,95 +38,76 @@ public class feedbackpageController implements Initializable {
     private Button submitFeedbackButton;
 
     @FXML
-    private Label emtpyComplaintMessage;
-
-    @FXML
-    private Label emtpyFeedbackMessage;
-
-    @FXML
     private ComboBox<Integer> ratingComboBox;
 
     @FXML
+    private Label messsageLabel;
+
+
+    @FXML
     void submitComplaintOnAction(ActionEvent event) throws IOException {
-        complaintText = complaintTextArea.getText();
-        if(complaintText.isEmpty()) {
-            emtpyComplaintMessage.setVisible(true);
-        }
-        sendComplaintToServer();
-        complaintTextArea.clear();
-        emtpyComplaintMessage.setTextFill(Color.GREEN);
-        emtpyComplaintMessage.setText("Complaint sent successfully");
+        Platform.runLater(() -> {
+            messsageLabel.setText("");
+            complaintText = complaintTextArea.getText();
+            if (complaintText == null || complaintText.isEmpty()) {
+                messsageLabel.setStyle("-fx-text-fill: red;");
+                messsageLabel.setText("Complaint text field is empty");
+                return;
+            }
+            Client.getClient().sendToServer("complaint;" + complaintText + ";" + Client.getClientAttributes().getRestaurantInterest());
+            complaintTextArea.clear();
+        });
     }
 
+    @Subscribe
+    public void insertconfirmation(String msg){
+        if(!(msg.startsWith("complaint") || msg.startsWith("feedback"))){
+            return;
+        }
+        Platform.runLater(() -> {
+            if (msg.equals("complaint inserted successfully") || msg.equals("feedback inserted successfully")) {
+                messsageLabel.setStyle("-fx-text-fill: green;");
+            } else if (msg.equals("complaint has not inserted") || msg.equals("feedback has not inserted")) {
+                messsageLabel.setStyle("-fx-text-fill: red;");
 
+            }
+            messsageLabel.setText(msg);
+        });
+    }
 
 
     @FXML
     void submitFeedbackOnAction(ActionEvent event) throws IOException {
-        feedbackText = feedbackTextArea.getText();
-        if(feedbackText.isEmpty()) {
-            emtpyFeedbackMessage.setVisible(true);
-        }
-        else {
-            String restaurant ="";
-            if (MenuController.getRestaurantInterest() ==  1)
-            {
-                restaurant = "Haifa";
+        Platform.runLater(() -> {
+            messsageLabel.setText("");
+            feedbackText = feedbackTextArea.getText();
+            if (feedbackText == null || feedbackText.isEmpty()) {
+                messsageLabel.setStyle("-fx-text-fill: red;");
+                messsageLabel.setText("Feedback text field is empty");
+                return;
             }
-            else if (MenuController.getRestaurantInterest() ==  2)
-            {
-                restaurant = "Tel-Aviv";
-            }
-            else if (MenuController.getRestaurantInterest() ==  3)
-            {
-                restaurant = "Nahariya";
-            }
-            feedbackTextArea.clear();
-            emtpyFeedbackMessage.setTextFill(Color.GREEN);
-            emtpyFeedbackMessage.setText("Feedback sent successfully");
             int rating = ratingComboBox.getValue();
-            String msg = String.format("feedback;%d;%s;%d;%s", getUserId(), feedbackText, rating,restaurant);
-            Client.getClient().sendToServer(msg);
-        }
-
-
+            Client.getClient().sendToServer("feedback;" + feedbackText + ";" + rating + ";" + Client.getClientAttributes().getRestaurantInterest());
+            feedbackTextArea.clear();
+        });
     }
-
-    @FXML
-    void sendComplaintToServer() throws IOException {
-        int userId = getUserId(); // Replace with actual logged-in user ID
-        String status = "Pending"; // Default status
-        String message = complaintText;
-
-        String formattedMessage = String.format("complaint;%d;%s;%s", userId, message, status);
-        Client.getClient().sendToServer(formattedMessage);
-    }
-
-
-    @FXML
-    void sendFeedbackToServer() throws IOException {
-        int userId = getUserId(); // Replace with actual logged-in user ID
-        int rating = 5; // Or let the user choose this from a dropdown/spinner
-        String message = feedbackText;
-
-        String formattedMessage = String.format("feedback;%d;%s;%d", userId, message, rating);
-        Client.getClient().sendToServer(formattedMessage);
-    }
-
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        feedbackTextArea.setWrapText(true);
-        complaintTextArea.setWrapText(true);
-        ratingComboBox.getItems().addAll(1, 2, 3, 4, 5);
-        ratingComboBox.setValue(5); // Default value
+        EventBus.getDefault().register(this);
+        Platform.runLater(() -> {
+            ratingComboBox.getItems().addAll(1, 2, 3, 4, 5);
+            ratingComboBox.setValue(5); // Default value
+            messsageLabel.setText("");
+            messsageLabel.setVisible(true);
+        });
     }
 
 
     @FXML
     void back_func(ActionEvent event) throws IOException {
         Platform.runLater(() -> {
+            EventBus.getDefault().unregister(this);
             App.switchScreen("Main Page");
         });
     }

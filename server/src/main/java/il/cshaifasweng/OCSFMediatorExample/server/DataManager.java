@@ -69,23 +69,6 @@ public class DataManager {
     }
 
 
-    public static Map<String, Integer> getComplaintHistogram(String password, LocalDate start, LocalDate end) {
-        Map<String, Integer> histogram = new HashMap<>();
-        try (Session session = getSessionFactory(password).openSession()) {
-            List<Complaint> complaints = session.createQuery("FROM Complaint", Complaint.class).list();
-            for (Complaint complaint : complaints) {
-                LocalDate date = LocalDate.from(complaint.getSubmittedAt());
-                if ((date.isEqual(start) || date.isAfter(start)) && (date.isEqual(end) || date.isBefore(end))) {
-                    String key = date.getYear() + "-" + String.format("%02d", date.getMonthValue());
-                    histogram.put(key, histogram.getOrDefault(key, 0) + 1);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return histogram;
-    }
-
     // called by a function that already opened the session
     private static List<Meal> getMenu() throws Exception {
         CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -397,38 +380,95 @@ public class DataManager {
         }
     }
 
-    public static void saveFeedback(String password, Feedback feedback) {
-        Transaction tx = null;
-        try (Session session = getSessionFactory(password).openSession()) {
-            tx = session.beginTransaction();
-            session.save(feedback);
-            tx.commit();
-            System.out.println("Feedback saved successfully.");
-        } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
+    static boolean saveFeedback(String feedbackMsg, int rating, int restaurantId) {
+        try {
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            // Load the restaurant from DB
+            Restaurant restaurant = session.get(Restaurant.class, restaurantId);
+            if (restaurant == null) {
+                System.err.println("Restaurant not found with ID: " + restaurantId);
+                session.getTransaction().rollback();
+                return false;
             }
+
+            // Create and fill the feedback
+            Feedback feedback = new Feedback();
+            feedback.setMessage(feedbackMsg);
+            feedback.setRating(rating);
+            feedback.setSubmittedAt(LocalDateTime.now());
+            feedback.setRestaurant(restaurant);
+
+            // Save to DB
+            session.save(feedback);
+            session.getTransaction().commit();
+
+            return true;
+
+        } catch (Exception e) {
+            System.err.println("Error saving feedback:");
             e.printStackTrace();
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            return false;
+        } finally {
+            if (session != null) {
+                session.close();
+                System.out.println("Session closed");
+            }
         }
     }
-    public static void saveComplaint(String password, Complaint complaint) {
-        Transaction tx = null;
-        try (Session session = getSessionFactory(password).openSession()) {
-            tx = session.beginTransaction();
+
+
+    static boolean saveComplaint(String complainttxt, int restaurantId) {
+        try {
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            // Load the restaurant from DB
+            Restaurant restaurant = session.get(Restaurant.class, restaurantId);
+            if (restaurant == null) {
+                System.err.println("Restaurant not found with ID: " + restaurantId);
+                session.getTransaction().rollback();
+                return false;
+            }
+
+            // Create and fill the complaint
+            Complaint complaint = new Complaint();
+            complaint.setComplaint(complainttxt);
+            complaint.setStatus(false); // Not responded yet
+            complaint.setSubmittedAt(LocalDateTime.now());
+            complaint.setRestaurant(restaurant);
+
+            // Save to DB
             session.save(complaint);
-            tx.commit();
-            System.out.println("Complaint saved successfully.");
+            session.getTransaction().commit();
 
-
+            // Update the daily report
             DataManager.updateDailyReportComplaints(complaint);
 
+            return true;
+
         } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-            }
+            System.err.println("Error saving complaint:");
             e.printStackTrace();
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            return false;
+        } finally {
+            if (session != null) {
+                session.close();
+                System.out.println("Session closed");
+            }
         }
     }
+
+
 
 
     public static void updateDailyReportComplaints(Complaint complaint) {

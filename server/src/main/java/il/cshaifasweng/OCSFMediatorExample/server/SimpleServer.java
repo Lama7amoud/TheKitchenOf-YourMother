@@ -65,19 +65,22 @@ public class SimpleServer extends AbstractServer {
 			}
 		}
 		else if (msgString.startsWith("feedback;")) {
-			String[] parts = msgString.split(";", 5);
-			int userId = Integer.parseInt(parts[1]);
-			String message = parts[2];
-			int rating = Integer.parseInt(parts[3]);
-			String restaurant = parts[4];
-			System.out.println(restaurant);
+			String[] parts = msgString.split(";");
+			String feedbackMsg = parts[1];
+			int rating = Integer.parseInt(parts[2]);
+			int restaurantId = Integer.parseInt(parts[3]);
 
-			Feedback feedback = new Feedback(userId, message, rating, LocalDateTime.now(), restaurant);
-			DataManager.saveFeedback(DataManager.getPassword(), feedback);
-			System.out.println("Feedback saved successfully.");
+			boolean feedbackConfirm = DataManager.saveFeedback(feedbackMsg, rating, restaurantId);
 
-			List<Feedback> updatedFeedback = DataManager.getManagerFeedback();
-			sendToAllClients(updatedFeedback);
+			try {
+				if(feedbackConfirm) {
+					client.sendToClient("feedback inserted successfully");
+				} else{
+					client.sendToClient("feedback has not inserted");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 
@@ -417,8 +420,24 @@ public class SimpleServer extends AbstractServer {
 					ioException.printStackTrace();
 				}
 			}
-		}
-		else if (msgString.startsWith("request_reports")) {
+		} else if(msgString.startsWith("complaint")){
+			String[] parts = msgString.split(";");
+
+			String complainttxt = parts[1];
+			int restaurantId = Integer.parseInt(parts[2].trim());
+			boolean complaintConfirmed = DataManager.saveComplaint(complainttxt, restaurantId);
+
+			try {
+				if(complaintConfirmed) {
+					client.sendToClient("complaint inserted successfully");
+				} else{
+					client.sendToClient("complaint has not inserted");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}else if (msgString.startsWith("request_reports")) {
 			List<DailyReport> reports = DataManager.getReportsByMonth(msgString);  // Make sure this method exists
 			if (reports != null){
 				try {
