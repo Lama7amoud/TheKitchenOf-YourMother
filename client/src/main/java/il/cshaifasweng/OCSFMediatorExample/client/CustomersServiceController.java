@@ -1,4 +1,5 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
+import il.cshaifasweng.OCSFMediatorExample.entities.Discounts;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DoubleStringConverter;
 import il.cshaifasweng.OCSFMediatorExample.entities.Complaint;
@@ -124,27 +125,31 @@ public class CustomersServiceController {
             }
         });
 
-
-
-        // Request data
         Client.getClient().sendToServer("Get complaints");
     }
 
 
     @Subscribe
     public void handleComplaintList(Object msg) {
-        if (msg instanceof List<?>) {
-            List<?> list = (List<?>) msg;
-            if (!list.isEmpty() && list.get(0) instanceof Complaint) {
-                List<Complaint> allComplaints = (List<Complaint>) list;
+        Platform.runLater(() -> {
+            try {
+                if (msg instanceof List) {
+                    List<?> list = (List<?>) msg;
+                    if (!list.isEmpty() && list.get(0) instanceof Complaint) {
+                        List<Complaint> complaints = (List<Complaint>) list;
 
-                List<Complaint> filtered = allComplaints.stream()
-                        .filter(c -> !c.getStatus())
-                        .toList();
+                        // Filter: keep only complaints with status == false
+                        List<Complaint> filtered = complaints.stream()
+                                .filter(c -> !c.getStatus())
+                                .toList();
 
-                Platform.runLater(() -> complaintlist.setAll(filtered));
+                        complaintlist.setAll(filtered);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }
+        });
     }
 
 

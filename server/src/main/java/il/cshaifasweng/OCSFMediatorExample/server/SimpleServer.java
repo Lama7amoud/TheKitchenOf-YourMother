@@ -339,17 +339,21 @@ public class SimpleServer extends AbstractServer {
 		else if (msgString.startsWith("Get complaints")) {
 			try {
 				List<Complaint> list = DataManager.getComplaint();
-				if (list != null && !list.isEmpty()) {
-					sendToAllClients(list);
 
-				} else {
-					sendToAllClients(new ArrayList<Complaint>());
+				// Filter only those with status == false
+				List<Complaint> filtered = list == null
+						? new ArrayList<>()
+						: list.stream()
+						.filter(c -> !c.getStatus()) // keep only false
+						.toList();
 
-				}
+				sendToAllClients(filtered);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+
+
 
 
 		else if (msgString.equals("Request Menu")) {
@@ -375,6 +379,9 @@ public class SimpleServer extends AbstractServer {
 				double newRefund = Double.parseDouble(parts[3]);
 
 				DataManager.updateComplaint(complaintId, newResponse, newRefund);
+
+				List<Complaint> com =DataManager.getComplaint();
+				sendToAllClients(com);
 		}
 
 
@@ -445,44 +452,37 @@ public class SimpleServer extends AbstractServer {
 					ioException.printStackTrace();
 				}
 			}
-		} else if(msgString.startsWith("complaint")){
+		} else if (msgString.startsWith("complaint")) {
 			String[] parts = msgString.split(";");
 
 			String complainttxt = parts[1];
-			int restaurantId = Integer.parseInt(parts[2].trim());
-			String id = parts[3].trim();
-			String name = parts[4].trim();
-			String email = parts[5].trim();
+			int restaurantId    = Integer.parseInt(parts[2].trim());
+			String id           = parts[3].trim();
+			String name         = parts[4].trim();
+			String email        = parts[5].trim();
 
-			boolean complaintConfirmed=false;
-			boolean flag=false;
-			if(DataManager.hasActiveReservationForUser(id,name,email))
-			{
-				 complaintConfirmed = DataManager.saveComplaint(complainttxt, restaurantId,id,name,email);
-				flag=true;
-			}
-			else{
-				flag=false;
+			Complaint saved = null;
+			List<Complaint> s=null;
+			boolean exists = DataManager.hasActiveReservationForUser(id, name, email);
+
+			if (exists) {
+				// use the helper that returns the saved entity
+				saved = DataManager.saveComplaintReturn(complainttxt, restaurantId, id, name, email);
+				s=DataManager.getComplaint();
 			}
 
 			try {
-				if(complaintConfirmed) {
+				if (saved != null) {
 					client.sendToClient("complaint inserted successfully");
-				} else{
-					if(!flag)
-					{
-						client.sendToClient("user not exist");
-					}
-					else {
-						client.sendToClient("complaint has not inserted");
-					}
-
+					sendToAllClients(s);
+				} else {
+					client.sendToClient(exists ? "complaint has not inserted" : "user not exist");
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
-		}else if (msgString.startsWith("request_reports")) {
+		}
+		else if (msgString.startsWith("request_reports")) {
 			List<DailyReport> reports = DataManager.getReportsByMonth(msgString);  // Make sure this method exists
 			if (reports != null){
 				try {

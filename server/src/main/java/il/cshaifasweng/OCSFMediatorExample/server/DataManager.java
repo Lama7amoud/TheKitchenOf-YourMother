@@ -473,28 +473,60 @@ public class DataManager {
     }
 
 
-    public static void updateComplaint(int id, String response, double refund) {
+    public static Complaint saveComplaintReturn(String text, int restaurantId,String idNumber, String name, String email) {
         Session session = getSessionFactory(password).openSession();
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
 
-            Complaint complaint = session.get(Complaint.class, id);
-            if (complaint != null) {
-                complaint.setResponse(response);
-                complaint.setRefund(refund);
-                complaint.setStatus(true); // mark as resolved
-                session.update(complaint);
-            }
+            Restaurant res = session.get(Restaurant.class, restaurantId);
 
+            Complaint c = new Complaint();
+            c.setComplaint(text);
+            c.setRestaurant(res);
+            c.setUserId(idNumber);
+            c.setName(name);
+            c.setEmail(email);
+            c.setSubmittedAt(java.time.LocalDateTime.now());
+            c.setStatus(false); // unresolved by default
+
+            session.save(c);
             tx.commit();
+            return c;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             e.printStackTrace();
+            return null;
         } finally {
             session.close();
         }
     }
+
+
+    public static Complaint updateComplaint(int id, String response, double refund) {
+        Session session = getSessionFactory(password).openSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+
+            Complaint c = session.get(Complaint.class, id);
+            if (c != null) {
+                c.setResponse(response);
+                c.setRefund(refund);
+                c.setStatus(true);
+                session.update(c);
+            }
+            tx.commit();
+            return c;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+            return null;
+        } finally {
+            session.close();
+        }
+    }
+
 
 
     public static void updateDailyReportComplaints(Complaint complaint) {
