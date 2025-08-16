@@ -12,6 +12,9 @@ public class Feedback implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    private String userId;
+    private String name;
+
     private String message;
 
     private int rating;
@@ -73,4 +76,18 @@ public class Feedback implements Serializable {
     public void setRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
     }
+
+    public String getUserId() {
+        return userId;
+    }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

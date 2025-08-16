@@ -30,6 +30,11 @@ public class ManagerFeedBackController {
     private TableColumn<Feedback, String> messageColumn;
 
     @FXML
+    private TableColumn<Feedback, String> idColumn;
+    @FXML
+    private TableColumn<Feedback, String> nameColumn;
+
+    @FXML
     private TableColumn<Feedback, Integer> ratingColumn;
 
     @FXML
@@ -50,6 +55,8 @@ public class ManagerFeedBackController {
         feedbackTable.setItems(feedbackList);
 
         messageColumn.setCellValueFactory(new PropertyValueFactory<>("message"));
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("user id"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         ratingColumn.setCellValueFactory(new PropertyValueFactory<>("rating"));
         restaurantColumn.setCellValueFactory(new PropertyValueFactory<>("restaurant"));
 

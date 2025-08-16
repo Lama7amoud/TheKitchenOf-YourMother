@@ -380,7 +380,7 @@ public class DataManager {
         }
     }
 
-    static boolean saveFeedback(String feedbackMsg, int rating, int restaurantId) {
+    static boolean saveFeedback(String feedbackMsg, int rating, int restaurantId,String idNumber,String name) {
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
             session = sessionFactory.openSession();
@@ -400,6 +400,9 @@ public class DataManager {
             feedback.setRating(rating);
             feedback.setSubmittedAt(LocalDateTime.now());
             feedback.setRestaurant(restaurant);
+            feedback.setUserId(idNumber);
+            feedback.setName(name);
+
 
             // Save to DB
             session.save(feedback);
@@ -471,6 +474,53 @@ public class DataManager {
             }
         }
     }
+
+    public static boolean userMatchesActiveReservationForFeedback(String idNumber, String name, int restaurantId) {
+        SessionFactory sf = getSessionFactory(password);
+        Session session = null;
+        try {
+            session = sf.openSession();
+            session.beginTransaction();
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+            Root<Reservation> root = cq.from(Reservation.class);
+
+            List<Predicate> preds = new ArrayList<>();
+
+            if (idNumber != null && !idNumber.isBlank()) {
+                preds.add(cb.equal(root.get("idNumber"), idNumber.trim()));
+            } else {
+                session.getTransaction().rollback();
+                return false;
+            }
+
+            if (name != null && !name.isBlank()) {
+                preds.add(cb.equal(cb.lower(root.get("name")), name.trim().toLowerCase()));
+            } else {
+                session.getTransaction().rollback();
+                return false;
+            }
+            preds.add(cb.equal(root.get("restaurant").get("id"), restaurantId));
+            preds.add(cb.equal(cb.lower(root.get("status")), "on"));
+
+            cq.select(cb.count(root)).where(preds.toArray(new Predicate[0]));
+            Long count = session.createQuery(cq).getSingleResult();
+
+            session.getTransaction().commit();
+            return count != null && count > 0;
+
+        } catch (Exception e) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null) session.close();
+        }
+    }
+
 
 
     public static Complaint saveComplaintReturn(String text, int restaurantId,String idNumber, String name, String email) {
@@ -1464,37 +1514,30 @@ public class DataManager {
         }
     }
 
-    public static boolean hasActiveReservationForUser(String idNumber, String name, String email) {
+    public static boolean hasActiveReservationForUser(String idNumber, int restaurantId, String name, String email) {
         SessionFactory sf = getSessionFactory(password);
         Session session = null;
         try {
             session = sf.openSession();
             session.beginTransaction();
-
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Long> cq = cb.createQuery(Long.class);
             Root<Reservation> root = cq.from(Reservation.class);
-
             List<Predicate> preds = new ArrayList<>();
-
-            // Required: idNumber (you can relax this if you want)
             if (idNumber != null && !idNumber.isBlank()) {
                 preds.add(cb.equal(root.get("idNumber"), idNumber.trim()));
             }
-
-            // Optional: name and email, case-insensitive if provided
             if (name != null && !name.isBlank()) {
                 preds.add(cb.equal(cb.lower(root.get("name")), name.trim().toLowerCase()));
             }
             if (email != null && !email.isBlank()) {
                 preds.add(cb.equal(cb.lower(root.get("email")), email.trim().toLowerCase()));
             }
-
-            // Only consider active reservations (your code uses "on"/"off")
             preds.add(cb.equal(cb.lower(root.get("status")), "on"));
-
+            if (restaurantId > 0) {
+                preds.add(cb.equal(root.get("restaurant").get("id"), restaurantId));
+            }
             cq.select(cb.count(root)).where(preds.toArray(new Predicate[0]));
-
             Long count = session.createQuery(cq).getSingleResult();
             session.getTransaction().commit();
 
@@ -1511,6 +1554,7 @@ public class DataManager {
             }
         }
     }
+
 
 
     public static void saveReservation(Reservation reservation) {

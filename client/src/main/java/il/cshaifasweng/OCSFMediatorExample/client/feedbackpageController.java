@@ -4,10 +4,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -20,19 +17,17 @@ import static il.cshaifasweng.OCSFMediatorExample.client.SessionManager.getUserI
 public class feedbackpageController implements Initializable {
 
     private String feedbackText;
-    private String complaintText;
 
     @FXML
     private Button backButton;
 
-    @FXML
-    private TextArea complaintTextArea;
+
+    @FXML private TextField idText;
+    @FXML private TextField nameText;
 
     @FXML
     private TextArea feedbackTextArea;
 
-    @FXML
-    private Button submitComplaintButton;
 
     @FXML
     private Button submitFeedbackButton;
@@ -44,32 +39,28 @@ public class feedbackpageController implements Initializable {
     private Label messsageLabel;
 
 
-    @FXML
-    void submitComplaintOnAction(ActionEvent event) throws IOException {
-        Platform.runLater(() -> {
-            messsageLabel.setText("");
-            complaintText = complaintTextArea.getText();
-            if (complaintText == null || complaintText.isEmpty()) {
-                messsageLabel.setStyle("-fx-text-fill: red;");
-                messsageLabel.setText("Complaint text field is empty");
-                return;
-            }
-            Client.getClient().sendToServer("complaint;" + complaintText + ";" + Client.getClientAttributes().getRestaurantInterest());
-            complaintTextArea.clear();
-        });
-    }
+
 
     @Subscribe
     public void insertconfirmation(String msg){
-        if(!(msg.startsWith("complaint") || msg.startsWith("feedback"))){
+        if(!(msg.startsWith("user") || msg.startsWith("feedback"))){
             return;
         }
         Platform.runLater(() -> {
-            if (msg.equals("complaint inserted successfully") || msg.equals("feedback inserted successfully")) {
+            if (msg.equals("feedback inserted successfully")) {
                 messsageLabel.setStyle("-fx-text-fill: green;");
-            } else if (msg.equals("complaint has not inserted") || msg.equals("feedback has not inserted")) {
+                feedbackTextArea.clear();
+                idText.clear();
+                nameText.clear();
+                ratingComboBox.setValue(null);
+            } else if (msg.equals("feedback has not inserted")) {
                 messsageLabel.setStyle("-fx-text-fill: red;");
-
+            }
+            else if(msg.equals("user not exist"))
+            {
+                messsageLabel.setStyle("-fx-text-fill: red;");
+                idText.clear();
+                nameText.clear();
             }
             messsageLabel.setText(msg);
         });
@@ -80,15 +71,48 @@ public class feedbackpageController implements Initializable {
     void submitFeedbackOnAction(ActionEvent event) throws IOException {
         Platform.runLater(() -> {
             messsageLabel.setText("");
-            feedbackText = feedbackTextArea.getText();
-            if (feedbackText == null || feedbackText.isEmpty()) {
+
+            // name required
+            String name = (nameText.getText() == null) ? "" : nameText.getText().trim();
+            String idNumber = (idText.getText() == null) ? "" : idText.getText().trim();
+            Integer rating = ratingComboBox.getValue();
+            String feedbackText = feedbackTextArea.getText();
+
+            if (name.isEmpty()) {
+                messsageLabel.setStyle("-fx-text-fill: red;");
+                messsageLabel.setText("Please enter your name");
+                return;
+            }
+
+            else if (idNumber.isEmpty() || !idNumber.matches("\\d+")) {
+                messsageLabel.setStyle("-fx-text-fill: red;");
+                messsageLabel.setText("Please enter your ID");
+                return;
+            }
+
+            else if (rating == null) {
+                messsageLabel.setStyle("-fx-text-fill: red;");
+                messsageLabel.setText("Please choose a rating");
+                return;
+            }
+            else if (feedbackText == null || feedbackText.isBlank()) {
                 messsageLabel.setStyle("-fx-text-fill: red;");
                 messsageLabel.setText("Feedback text field is empty");
                 return;
             }
-            int rating = ratingComboBox.getValue();
-            Client.getClient().sendToServer("feedback;" + feedbackText + ";" + rating + ";" + Client.getClientAttributes().getRestaurantInterest());
-            feedbackTextArea.clear();
+
+            int restaurantId = Client.getClientAttributes().getRestaurantInterest();
+
+            String msg = String.format("feedback;%s;%d;%d;%s;%s",
+                    feedbackText.replace(";", ","), // avoid breaking the protocol if ';' typed
+                    rating,
+                    restaurantId,
+                    idNumber,
+                    name.replace(";", ",")
+            );
+            Client.getClient().sendToServer(msg);
+
+
         });
     }
 
@@ -97,7 +121,7 @@ public class feedbackpageController implements Initializable {
         EventBus.getDefault().register(this);
         Platform.runLater(() -> {
             ratingComboBox.getItems().addAll(1, 2, 3, 4, 5);
-            ratingComboBox.setValue(5); // Default value
+            ratingComboBox.setValue(null);
             messsageLabel.setText("");
             messsageLabel.setVisible(true);
         });

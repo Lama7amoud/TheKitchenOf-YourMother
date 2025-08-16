@@ -203,7 +203,8 @@ public class PrimaryController {
         Platform.runLater(() -> {
             int user_permission = userAtt.getPermissionLevel();
             feedbackButton.setVisible((user_permission == 0));
-            complaintButton.setVisible(true);
+            complaintButton.setVisible((user_permission == 0));
+
             RestaurantDetailsInstructionLabel.setVisible(false);
             orderButton.setDisable(true);
             feedbackButton.setDisable(true);

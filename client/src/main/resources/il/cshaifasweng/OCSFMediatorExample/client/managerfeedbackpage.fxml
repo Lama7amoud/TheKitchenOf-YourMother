@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
 <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="700.0" prefWidth="900.0" style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.ManagerFeedBackController">
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" >
+<AnchorPane xmlns:fx="http://javafx.com/fxml">
    <children>
-      <Label layoutX="20" layoutY="10" text="Feedback List" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+      <Label layoutX="20" layoutY="10" style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Feedback List" />
 
       <TableView fx:id="feedbackTable" layoutX="20" layoutY="40" prefHeight="400" prefWidth="760">
          <columns>
-            <TableColumn fx:id="messageColumn" text="Message" prefWidth="250"/>
-            <TableColumn fx:id="ratingColumn" text="Rating" prefWidth="100"/>
-            <TableColumn fx:id="restaurantColumn" text="Restaurant" prefWidth="150"/>
-            <TableColumn fx:id="submittedAtColumn" text="Submitted At" prefWidth="200"/>
+            <TableColumn fx:id="idColumn" prefWidth="76.66665649414062" text="User ID" />
+            <TableColumn fx:id="nameColumn" prefWidth="83.99996948242188" text="Name" />
+            <TableColumn fx:id="messageColumn" prefWidth="217.3333740234375" text="Message" />
+            <TableColumn fx:id="ratingColumn" prefWidth="101.3333740234375" text="Rating" />
+               <TableColumn fx:id="restaurantColumn" prefWidth="115.33340454101562" text="Restaurant" />
+               <TableColumn fx:id="submittedAtColumn" prefWidth="128.6666259765625" text="Submitted At" />
          </columns>
       </TableView>
 
-      <Button fx:id="backButton" layoutX="20" layoutY="460" text="Back" onAction="#goBack" />
+      <Button fx:id="backButton" layoutX="20" layoutY="460" onAction="#goBack" text="Back" />
    </children>
    </AnchorPane>
 </ScrollPane>

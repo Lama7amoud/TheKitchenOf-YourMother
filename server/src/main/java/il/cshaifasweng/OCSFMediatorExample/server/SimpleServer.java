@@ -65,23 +65,48 @@ public class SimpleServer extends AbstractServer {
 			}
 		}
 		else if (msgString.startsWith("feedback;")) {
-			String[] parts = msgString.split(";");
-			String feedbackMsg = parts[1];
-			int rating = Integer.parseInt(parts[2]);
-			int restaurantId = Integer.parseInt(parts[3]);
+			// Keep -1 to preserve empty fields if any
+			String[] parts = msgString.split(";", -1);
 
-			boolean feedbackConfirm = DataManager.saveFeedback(feedbackMsg, rating, restaurantId);
+			if (parts.length < 6) {
+				try { client.sendToClient("feedback has not inserted"); } catch (IOException ignored) {}
+				return;
+			}
+
+			String feedbackMsg = parts[1];
+			int rating;
+			int restaurantId;
+			try {
+				rating = Integer.parseInt(parts[2].trim());
+				restaurantId = Integer.parseInt(parts[3].trim());
+			} catch (NumberFormatException nfe) {
+				try { client.sendToClient("feedback has not inserted"); } catch (IOException ignored) {}
+				return;
+			}
+
+			String idNumber = parts[4].trim();
+			String name     = parts[5].trim();
+
+
+			boolean ok = DataManager.userMatchesActiveReservationForFeedback(idNumber, name, restaurantId);
+			if (!ok) {
+				try { client.sendToClient("user not exist"); } catch (IOException ignored) {}
+				return;
+			}
+
+			boolean feedbackConfirm = DataManager.saveFeedback(feedbackMsg, rating, restaurantId, idNumber, name);
 
 			try {
-				if(feedbackConfirm) {
-					client.sendToClient("feedback inserted successfully");
-				} else{
-					client.sendToClient("feedback has not inserted");
-				}
+				client.sendToClient(feedbackConfirm
+						? "feedback inserted successfully"
+						: "feedback has not inserted");
+
+				client.sendToClient(DataManager.getManagerFeedback());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+
 
 
 		else if(msgString.startsWith("logIn:")){
@@ -456,14 +481,14 @@ public class SimpleServer extends AbstractServer {
 			String[] parts = msgString.split(";");
 
 			String complainttxt = parts[1];
-			int restaurantId    = Integer.parseInt(parts[2].trim());
-			String id           = parts[3].trim();
-			String name         = parts[4].trim();
-			String email        = parts[5].trim();
+			int restaurantId = Integer.parseInt(parts[2].trim());
+			String id= parts[3].trim();
+			String name  = parts[4].trim();
+			String email= parts[5].trim();
 
 			Complaint saved = null;
 			List<Complaint> s=null;
-			boolean exists = DataManager.hasActiveReservationForUser(id, name, email);
+			boolean exists = DataManager.hasActiveReservationForUser(id,restaurantId ,name, email);
 
 			if (exists) {
 				// use the helper that returns the saved entity
