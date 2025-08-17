@@ -507,7 +507,7 @@ public class DataManager {
             // -------------------------
             ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
             LocalDateTime now = LocalDateTime.now();
-                LocalDateTime targetTime = c.getSubmittedAt().plusMinutes(1);
+                LocalDateTime targetTime = c.getSubmittedAt().plusHours(24);
 
             long delay = Duration.between(now, targetTime).toMillis();
             final int complaintId = c.getId(); // effectively final for lambda
@@ -1540,7 +1540,7 @@ public class DataManager {
                         "FROM Complaint c WHERE c.autoresponse = false", Complaint.class).list();
 
                 for (Complaint c : complaints) {
-                    LocalDateTime targetTime = c.getSubmittedAt().plusMinutes(1);
+                    LocalDateTime targetTime = c.getSubmittedAt().plusHours(24);
 
                     if (!now.isBefore(targetTime)) {
                         // 24 hours have already passed → set autoresponse immediately
