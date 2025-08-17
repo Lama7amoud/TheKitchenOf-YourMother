@@ -10,6 +10,11 @@ import javax.persistence.criteria.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
+import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -17,7 +22,6 @@ import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
-import javafx.fxml.FXML;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.HostingTable;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
@@ -31,7 +35,6 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.Transaction;
-import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 
@@ -81,6 +84,7 @@ public class DataManager {
 
 
     private static void generateData() throws Exception {
+
         Business momKitchenLtd = new Business();
         momKitchenLtd.setName("Mom's Kitchen Ltd.");
         momKitchenLtd.setOwnerName("Sharbel Maroun");
@@ -426,55 +430,6 @@ public class DataManager {
     }
 
 
-    static boolean saveComplaint(String complainttxt, int restaurantId,String id,String name,String email) {
-        try {
-            SessionFactory sessionFactory = getSessionFactory(password);
-            session = sessionFactory.openSession();
-            session.beginTransaction();
-
-            // Load the restaurant from DB
-            Restaurant restaurant = session.get(Restaurant.class, restaurantId);
-            if (restaurant == null) {
-                System.err.println("Restaurant not found with ID: " + restaurantId);
-                session.getTransaction().rollback();
-                return false;
-            }
-
-            // Create and fill the complaint
-            Complaint complaint = new Complaint();
-            complaint.setComplaint(complainttxt);
-            complaint.setStatus(false); // Not responded yet
-            complaint.setSubmittedAt(LocalDateTime.now());
-            complaint.setRestaurant(restaurant);
-            complaint.setUserId(id);
-            complaint.setName(name);
-            complaint.setEmail(email);
-
-
-            // Save to DB
-            session.save(complaint);
-            session.getTransaction().commit();
-
-            // Update the daily report
-            DataManager.updateDailyReportComplaints(complaint);
-
-            return true;
-
-        } catch (Exception e) {
-            System.err.println("Error saving complaint:");
-            e.printStackTrace();
-            if (session != null && session.getTransaction().isActive()) {
-                session.getTransaction().rollback();
-            }
-            return false;
-        } finally {
-            if (session != null) {
-                session.close();
-                System.out.println("Session closed");
-            }
-        }
-    }
-
     public static boolean userMatchesActiveReservationForFeedback(String idNumber, String name, int restaurantId) {
         SessionFactory sf = getSessionFactory(password);
         Session session = null;
@@ -523,26 +478,70 @@ public class DataManager {
 
 
 
-    public static Complaint saveComplaintReturn(String text, int restaurantId,String idNumber, String name, String email) {
+    public static Complaint saveComplaintReturn(String text, int restaurantId, String idNumber, String name, String email) {
         Session session = getSessionFactory(password).openSession();
         Transaction tx = null;
+        Complaint c = null;
+
         try {
             tx = session.beginTransaction();
 
             Restaurant res = session.get(Restaurant.class, restaurantId);
 
-            Complaint c = new Complaint();
+            c = new Complaint();
             c.setComplaint(text);
             c.setRestaurant(res);
             c.setUserId(idNumber);
             c.setName(name);
             c.setEmail(email);
-            c.setSubmittedAt(java.time.LocalDateTime.now());
+            c.setSubmittedAt(LocalDateTime.now());
             c.setStatus(false); // unresolved by default
+            c.setAutoresponse(false); // default
+            c.setResponse("");      // empty response by default
 
             session.save(c);
             tx.commit();
+
+            // -------------------------
+            // Scheduler for auto-response after 24 hours
+            // -------------------------
+            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+            LocalDateTime now = LocalDateTime.now();
+                LocalDateTime targetTime = c.getSubmittedAt().plusMinutes(1);
+
+            long delay = Duration.between(now, targetTime).toMillis();
+            final int complaintId = c.getId(); // effectively final for lambda
+
+            scheduler.schedule(() -> {
+                try (Session taskSession = getSessionFactory(password).openSession()) {
+                    taskSession.beginTransaction();
+                    Complaint complaint = taskSession.get(Complaint.class, complaintId);
+                    if (complaint != null
+                            && !complaint.getAutoresponse()
+                            && (complaint.getResponse() == null || complaint.getResponse().isEmpty())) {
+
+                        // Send email before setting autoresponse
+                        EmailSender.sendEmail(
+                                complaint.getEmail(),
+                                "Auto Response - Complaint Follow-up",
+                                "Hello " + complaint.getName() + ",\n\nThis is an automatic response regarding your complaint submitted on "
+                                        + complaint.getSubmittedAt() + ". Our team will review it shortly."
+                        );
+
+                        complaint.setAutoresponse(true);
+                        taskSession.update(complaint);
+                    }
+                    taskSession.getTransaction().commit();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }, delay, TimeUnit.MILLISECONDS);
+            // -------------------------
+
+            // Update daily report if needed
+            updateDailyReportComplaints(c);
             return c;
+
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             e.printStackTrace();
@@ -551,6 +550,9 @@ public class DataManager {
             session.close();
         }
     }
+
+
+
 
 
     public static Complaint updateComplaint(int id, String response, double refund) {
@@ -565,6 +567,9 @@ public class DataManager {
                 c.setRefund(refund);
                 c.setStatus(true);
                 session.update(c);
+                EmailSender.sendEmail(c.getEmail(),
+                        "Customer Service Response - Complaint Follow-up",
+                        "Hello " + c.getName() + "\n\n" + c.getResponse());
             }
             tx.commit();
             return c;
@@ -1459,14 +1464,142 @@ public class DataManager {
     }
 
 
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter database password: ");
         password = scanner.nextLine();
 
-        if(!requestMenu().isEmpty())
+        if(!requestMenu().isEmpty()) {
+            try {
+                SessionFactory sessionFactory = getSessionFactory(password);
+                session = sessionFactory.openSession();
+                session.beginTransaction();
+
+                ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+                // Query reservations with status = on
+                List<Reservation> reservations = session.createQuery(
+                        "FROM Reservation r WHERE r.status = 'on'", Reservation.class).list();
+
+                for (Reservation r : reservations) {
+                    LocalDateTime reservationTime = r.getReservationTime();
+                    LocalDateTime now = LocalDateTime.now();
+
+                    if (r.isTakeAway()) {
+                        // TakeAway: turn off immediately if time passed
+                        if (!now.isBefore(reservationTime)) {
+                            r.setStatus("off");
+                            session.update(r);
+                        } else {
+                            // Schedule to turn off exactly at reservationTime
+                            long delay = Duration.between(now, reservationTime).toMillis();
+                            scheduler.schedule(() -> {
+                                try (Session taskSession = sessionFactory.openSession()) {
+                                    taskSession.beginTransaction();
+                                    Reservation res = taskSession.get(Reservation.class, r.getId());
+                                    if (res != null && "on".equals(res.getStatus())) {
+                                        res.setStatus("off");
+                                        taskSession.update(res);
+                                    }
+                                    taskSession.getTransaction().commit();
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
+                            }, delay, TimeUnit.MILLISECONDS);
+                        }
+                    } else {
+                        // Normal reservation: expiry after 90 minutes
+                        LocalDateTime expiryTime = reservationTime.plusMinutes(90);
+
+                        if (!now.isBefore(expiryTime)) {
+                            r.setStatus("off");
+                            session.update(r);
+                        } else {
+                            // Schedule to turn off after 90 minutes from reservationTime
+                            long delay = Duration.between(now, expiryTime).toMillis();
+                            scheduler.schedule(() -> {
+                                try (Session taskSession = sessionFactory.openSession()) {
+                                    taskSession.beginTransaction();
+                                    Reservation res = taskSession.get(Reservation.class, r.getId());
+                                    if (res != null && "on".equals(res.getStatus())) {
+                                        res.setStatus("off");
+                                        taskSession.update(res);
+                                    }
+                                    taskSession.getTransaction().commit();
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
+                            }, delay, TimeUnit.MILLISECONDS);
+                        }
+                    }
+                }
+
+                // Handle Complaints Auto-response
+                LocalDateTime now = LocalDateTime.now();
+                List<Complaint> complaints = session.createQuery(
+                        "FROM Complaint c WHERE c.autoresponse = false", Complaint.class).list();
+
+                for (Complaint c : complaints) {
+                    LocalDateTime targetTime = c.getSubmittedAt().plusMinutes(1);
+
+                    if (!now.isBefore(targetTime)) {
+                        // 24 hours have already passed → set autoresponse immediately
+                        if (!c.getAutoresponse() && (c.getResponse() == null || c.getResponse().isEmpty())) {
+                            // Send email first
+                            EmailSender.sendEmail(
+                                    c.getEmail(),
+                                    "Auto Response - Complaint Follow-up",
+                                    "Hello " + c.getName() + ",\n\nThis is an automatic response regarding your complaint submitted on "
+                                            + c.getSubmittedAt() + ". Our team will review it shortly."
+                            );
+
+                            // Then set autoresponse
+                            c.setAutoresponse(true);
+                            session.update(c);
+                        }
+                    } else {
+                        // Schedule autoresponse for exactly 24 hours after submittedAt
+                        long delay = Duration.between(now, targetTime).toMillis();
+                        final int complaintId = c.getId(); // make id effectively final for lambda
+
+                        scheduler.schedule(() -> {
+                            try (Session taskSession = sessionFactory.openSession()) {
+                                taskSession.beginTransaction();
+                                Complaint complaint = taskSession.get(Complaint.class, complaintId);
+                                if (complaint != null
+                                        && !complaint.getAutoresponse()
+                                        && (complaint.getResponse() == null || complaint.getResponse().isEmpty())) {
+
+                                    // Send email
+                                    EmailSender.sendEmail(
+                                            complaint.getEmail(),
+                                            "Auto Response - Complaint Follow-up",
+                                            "Hello " + complaint.getName() + ",\n\nThis is an automatic response regarding your complaint submitted on "
+                                                    + complaint.getSubmittedAt() + ". Our team will review it shortly."
+                                    );
+
+                                    // Then set autoresponse
+                                    complaint.setAutoresponse(true);
+                                    taskSession.update(complaint);
+                                }
+                                taskSession.getTransaction().commit();
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }, delay, TimeUnit.MILLISECONDS);
+                    }
+                }
+                session.getTransaction().commit();
+            }catch (Exception exception) {
+                if (session != null && session.isOpen()) {
+                    session.getTransaction().rollback();
+                }
+                System.err.println("An error occured, changes have been rolled back.");
+                exception.printStackTrace();
+            }
             return;
+        }
+
         try {
 
             SessionFactory sessionFactory = getSessionFactory(password);
@@ -1488,6 +1621,7 @@ public class DataManager {
             }
         }
     }
+
 
 
     public static boolean isTimeAvailable(Restaurant restaurant, String timeSlot) {
@@ -1514,7 +1648,7 @@ public class DataManager {
         }
     }
 
-    public static boolean hasActiveReservationForUser(String idNumber, int restaurantId, String name, String email) {
+    public static boolean hasReservationForUser(String idNumber, int restaurantId, String name, String email) {
         SessionFactory sf = getSessionFactory(password);
         Session session = null;
         try {
@@ -1533,7 +1667,6 @@ public class DataManager {
             if (email != null && !email.isBlank()) {
                 preds.add(cb.equal(cb.lower(root.get("email")), email.trim().toLowerCase()));
             }
-            preds.add(cb.equal(cb.lower(root.get("status")), "on"));
             if (restaurantId > 0) {
                 preds.add(cb.equal(root.get("restaurant").get("id"), restaurantId));
             }
@@ -1586,6 +1719,55 @@ public class DataManager {
 
             session.getTransaction().commit();
             System.out.println(">>> Reservation and reserved times committed");
+
+            // ------------------------
+            // Scheduler logic starts here
+            // ------------------------
+            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime targetTime;
+
+            if (reservation.isTakeAway()) {
+                // TakeAway → turn off at reservationTime
+                targetTime = reservation.getReservationTime();
+            } else {
+                // Normal → turn off 90 minutes after reservationTime
+                targetTime = reservation.getReservationTime().plusMinutes(90);
+            }
+
+            if (!now.isBefore(targetTime)) {
+                // Time already passed → turn off immediately
+                try (Session taskSession = sessionFactory.openSession()) {
+                    taskSession.beginTransaction();
+                    Reservation res = taskSession.get(Reservation.class, reservation.getId());
+                    if (res != null && "on".equals(res.getStatus())) {
+                        res.setStatus("off");
+                        taskSession.update(res);
+                    }
+                    taskSession.getTransaction().commit();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                // Schedule to turn off at targetTime
+                long delay = Duration.between(now, targetTime).toMillis();
+                scheduler.schedule(() -> {
+                    try (Session taskSession = sessionFactory.openSession()) {
+                        taskSession.beginTransaction();
+                        Reservation res = taskSession.get(Reservation.class, reservation.getId());
+                        if (res != null && "on".equals(res.getStatus())) {
+                            res.setStatus("off");
+                            taskSession.update(res);
+                        }
+                        taskSession.getTransaction().commit();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }, delay, TimeUnit.MILLISECONDS);
+            }
+            // ------------------------
+            // Scheduler logic ends here
+            // ------------------------
 
         } catch (Exception e) {
             session.getTransaction().rollback();

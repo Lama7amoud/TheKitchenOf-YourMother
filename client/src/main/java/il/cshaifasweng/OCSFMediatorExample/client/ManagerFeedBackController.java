@@ -55,10 +55,17 @@ public class ManagerFeedBackController {
         feedbackTable.setItems(feedbackList);
 
         messageColumn.setCellValueFactory(new PropertyValueFactory<>("message"));
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("user id"));
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("userId"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         ratingColumn.setCellValueFactory(new PropertyValueFactory<>("rating"));
-        restaurantColumn.setCellValueFactory(new PropertyValueFactory<>("restaurant"));
+        restaurantColumn.setCellValueFactory(cellData -> {
+            if (cellData.getValue().getRestaurant() != null) {
+                return new ReadOnlyStringWrapper(cellData.getValue().getRestaurant().getName());
+            } else {
+                return new ReadOnlyStringWrapper("");
+            }
+        });
+
 
         submittedAtColumn.setCellValueFactory(cellData -> {
             LocalDateTime time = cellData.getValue().getSubmittedAt();

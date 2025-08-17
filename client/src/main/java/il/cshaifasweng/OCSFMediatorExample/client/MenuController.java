@@ -908,7 +908,7 @@
                     reservation.setTakeAway(true);
                     reservation.setSittingType(data.getSittingType());
                     reservation.setTotalGuests(data.getGuestCount());
-                    reservation.setReservationTime(LocalDateTime.now());
+                    reservation.setReservationTime(LocalDateTime.of(data.getDate(), LocalTime.parse(data.getPreferredTime())));
                     reservation.setStatus("on");
                     reservation.setVisa(OrderData.getInstance().getVisa());
                     reservation.setExpirationMonth(OrderData.getInstance().getExpirationMonth());
@@ -917,10 +917,7 @@
 
 
                     // Receiving time
-                    LocalDateTime receivingTime = LocalDateTime.of(
-                            data.getDate(),
-                            LocalTime.parse(data.getPreferredTime())
-                    );
+                    LocalDateTime receivingTime = LocalDateTime.now();
                     reservation.setReceivingTime(receivingTime);
 
                     // Restaurant

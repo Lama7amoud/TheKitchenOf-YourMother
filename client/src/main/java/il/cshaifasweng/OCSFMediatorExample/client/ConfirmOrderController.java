@@ -321,7 +321,7 @@ public class ConfirmOrderController {
             if (reservationAlreadySent) return;
             idAlreadyUsed = event.doesExist();
             if (idAlreadyUsed) {
-                idLabel.setText("This ID already has a reservation.");
+                idLabel.setText("This ID already has a order.");
                 idLabel.setVisible(true);
                 idLabel.setManaged(true);
             } else {

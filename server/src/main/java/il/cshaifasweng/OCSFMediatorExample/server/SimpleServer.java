@@ -488,7 +488,7 @@ public class SimpleServer extends AbstractServer {
 
 			Complaint saved = null;
 			List<Complaint> s=null;
-			boolean exists = DataManager.hasActiveReservationForUser(id,restaurantId ,name, email);
+			boolean exists = DataManager.hasReservationForUser(id,restaurantId ,name, email);
 
 			if (exists) {
 				// use the helper that returns the saved entity
@@ -744,6 +744,7 @@ public class SimpleServer extends AbstractServer {
 
 						// Notify only this client
 						client.sendToClient("Reservation saved successfully");
+
 
 						DataManager.updateDailyReport(reservation);
 

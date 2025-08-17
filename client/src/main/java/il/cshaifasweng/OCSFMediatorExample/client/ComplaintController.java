@@ -75,7 +75,7 @@ public class ComplaintController implements Initializable {
                 messsageLabel.setText("Complaint text field is empty");
                 return;
             }
-            Client.getClient().sendToServer("complaint;" + complaintText + ";" + Client.getClientAttributes().getRestaurantInterest()+";"+id+";"+name+";"+email);
+            Client.getClient().sendToServer("complaint;" + complaintText + ";" + Client.getClientAttributes().getRestaurantInterest() + ";"+id + ";" + name+ ";" + email);
 
         });
     }

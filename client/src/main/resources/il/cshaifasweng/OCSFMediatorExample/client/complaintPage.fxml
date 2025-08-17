@@ -7,26 +7,26 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.ComplaintController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #ff6e5e;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.ComplaintController">
     <children>
-        <AnchorPane layoutX="41.0" layoutY="3.0" prefHeight="400.0" prefWidth="521.0">
+        <AnchorPane layoutX="21.0" prefHeight="402.0" prefWidth="558.0" style="-fx-background-color: white;">
             <children>
-                <TextArea fx:id="complaintTextArea" layoutX="169.0" layoutY="259.0" prefHeight="73.0" prefWidth="282.0" promptText="Write complaint here" />
-                <Label alignment="CENTER" layoutX="120.0" layoutY="14.0" prefHeight="32.0" prefWidth="236.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Complaint" textFill="ORANGE">
+                <TextArea fx:id="complaintTextArea" layoutX="152.0" layoutY="204.0" prefHeight="73.0" prefWidth="282.0" promptText="Write complaint here" />
+                <Label alignment="CENTER" layoutX="161.0" layoutY="14.0" prefHeight="32.0" prefWidth="236.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Complaint" textFill="#ff6e5e">
                     <font>
-                        <Font size="24.0" />
+                        <Font size="30.0" />
                     </font>
                 </Label>
                 <Label fx:id="messsageLabel" layoutX="94.0" layoutY="340.0" prefHeight="25.0" prefWidth="262.0" text="Can't send an empty complaint!" textFill="#e10e0e" visible="false" />
-                <TextField fx:id="idText" layoutX="80.0" layoutY="95.0" prefHeight="25.0" prefWidth="148.0" />
-                <Label layoutY="90.0" prefHeight="35.0" prefWidth="87.0" text="Write your ID" />
-                <Label layoutX="25.0" layoutY="259.0" prefHeight="35.0" prefWidth="131.0" text="Write your complaint" />
-                <Button fx:id="submitComplaintButton" layoutX="384.0" layoutY="341.0" mnemonicParsing="false" onAction="#submitComplaintOnAction" text="Send Complaint" />
-              <Button fx:id="backButton" layoutX="23.0" layoutY="341.0" mnemonicParsing="false" onAction="#back_func" text="Back" />
-            <Label layoutX="240.0" layoutY="90.0" prefHeight="35.0" prefWidth="116.0" text="Write your full name" />
-            <TextField fx:id="nameText" layoutX="350.0" layoutY="95.0" prefHeight="25.0" prefWidth="164.0" />
-            <Label layoutY="142.0" prefHeight="35.0" prefWidth="101.0" text="Write your email" />
-            <TextField fx:id="emailText" layoutX="92.0" layoutY="147.0" prefHeight="25.0" prefWidth="245.0" />
+                <TextField fx:id="idText" layoutX="64.0" layoutY="95.0" prefHeight="25.0" prefWidth="148.0" />
+                <Label layoutX="13.0" layoutY="90.0" prefHeight="35.0" prefWidth="32.0" style="-fx-font-weight: bold;" text="ID" />
+                <Label layoutX="14.0" layoutY="223.0" prefHeight="35.0" prefWidth="131.0" style="-fx-font-weight: bold;" text="Write your complaint" />
+                <Button fx:id="submitComplaintButton" layoutX="406.0" layoutY="340.0" mnemonicParsing="false" onAction="#submitComplaintOnAction" style="-fx-font-weight: bold; -fx-background-radius: 5em; -fx-background-color: #ff6e5e;" text="Send Complaint" textFill="WHITE" />
+              <Button fx:id="backButton" layoutX="45.0" layoutY="340.0" mnemonicParsing="false" onAction="#back_func" style="-fx-font-weight: bold; -fx-background-radius: 5em; -fx-background-color: green;" text="Back" textFill="WHITE" />
+            <Label layoutX="238.0" layoutY="90.0" prefHeight="35.0" prefWidth="123.0" style="-fx-font-weight: bold;" text="Write your full name" />
+            <TextField fx:id="nameText" layoutX="377.0" layoutY="95.0" prefHeight="25.0" prefWidth="164.0" />
+            <Label layoutX="13.0" layoutY="142.0" prefHeight="35.0" prefWidth="32.0" style="-fx-font-weight: bold;" text="Email" />
+            <TextField fx:id="emailText" layoutX="64.0" layoutY="147.0" prefHeight="25.0" prefWidth="245.0" />
             </children>
         </AnchorPane>
     </children>

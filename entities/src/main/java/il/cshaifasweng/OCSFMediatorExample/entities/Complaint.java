@@ -124,5 +124,10 @@ public class Complaint implements Serializable {
     public void setRefund(double Refund) {
         this.Refund = Refund;
     }
+    public boolean getAutoresponse() { return autoresponse; }
+    public void setAutoresponse(boolean autoresponse) {
+        this.autoresponse = autoresponse;
+    }
+
 
 }
