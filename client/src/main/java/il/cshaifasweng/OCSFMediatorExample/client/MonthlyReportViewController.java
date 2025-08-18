@@ -128,15 +128,32 @@ public class MonthlyReportViewController {
 
             errorLabel.setText("");
             String wantedRestaurant;
-            switch(restaurantNameBox.getValue()){
-                case("Haifa Branch"): wantedRestaurant = "Haifa-Mom Kitchen";
-                break;
-                case("Tel-Aviv Branch"): wantedRestaurant = "Tel-Aviv-Mom Kitchen";
-                break;
-                case ("Nahariya Branch"): wantedRestaurant = "Nahariya-Mom Kitchen";
-                break;
-                default: wantedRestaurant = "";
+
+            if(Client.getClientAttributes().getPermissionLevel() != 4){ // can reach this page the managers (branches or restaurant)
+                switch(Client.getClientAttributes().getRestaurantInterest()){
+                    case(1): wantedRestaurant = "Haifa-Mom Kitchen";
+                        break;
+                    case(2): wantedRestaurant = "Tel-Aviv-Mom Kitchen";
+                        break;
+                    case (3): wantedRestaurant = "Nahariya-Mom Kitchen";
+                        break;
+                    default: wantedRestaurant = "";
+                }
+            } else{
+                switch(restaurantNameBox.getValue()){
+                    case("Haifa Branch"): wantedRestaurant = "Haifa-Mom Kitchen";
+                        break;
+                    case("Tel-Aviv Branch"): wantedRestaurant = "Tel-Aviv-Mom Kitchen";
+                        break;
+                    case ("Nahariya Branch"): wantedRestaurant = "Nahariya-Mom Kitchen";
+                        break;
+                    case ("All") : wantedRestaurant = "All";
+                        break;
+                    default: wantedRestaurant = "";
+                }
+
             }
+            System.out.println("my restaurant is: " + wantedRestaurant);
             errorLabel.setText("");
             graphOrTableBox.setValue("None");
             totalCustomersLabel.setText("0");
@@ -227,6 +244,7 @@ public class MonthlyReportViewController {
             yAxis.setTickUnit(1);          // step 1
             yAxis.setMinorTickCount(0);    // no minor ticks
 
+            listChoice(null);
         });
     }
 
