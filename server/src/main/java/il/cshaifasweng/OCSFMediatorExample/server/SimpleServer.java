@@ -893,9 +893,17 @@ public class SimpleServer extends AbstractServer {
 				List<Discounts> updateDiscountConfirmation = DataManager.getDiscountConfirmations();
 				sendToAllClients(updateDiscountConfirmation);
 			}
-		}
+		} else if (msgString.startsWith("Check open times for res")) {
+			String[] parts = msgString.split(";");
+			int resId = Integer.parseInt(parts[1]);
+			Restaurant res = DataManager.getRestaurantById(resId);
+			try {
+				client.sendToClient(res);
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
 
-		else if (msgString.startsWith("Reject Discount")) {
+		} else if (msgString.startsWith("Reject Discount")) {
 			String details = msgString.substring("Reject Discount".length()).trim();
 			String[] parts = details.split("\"");
 

@@ -32,6 +32,7 @@
         import javafx.scene.layout.HBox;
 
         import java.io.IOException;
+        import java.time.LocalDate;
         import java.time.LocalDateTime;
         import java.time.LocalTime;
         import java.util.ArrayList;
@@ -48,6 +49,10 @@
             private boolean alreadySentReservation = false;
 
             private boolean isActive = false;
+
+
+            @FXML
+            private Label totalToPayLabel;
 
             @FXML
             private Button searchButton;
@@ -82,6 +87,11 @@
             @FXML
             private TableColumn<Meal, Void> quantityColumn;
 
+            @FXML
+            private Button payWithCashButton;
+
+            @FXML
+            private Button payWithVisaButton;
 
             private final Map<Meal, HBox> quantityMap = new HashMap<>();
             private Map<Meal, VBox> preferencesMap = new HashMap<>();
@@ -105,437 +115,442 @@
 
             @FXML
             void initialize() {
-                if (EventBus.getDefault().isRegistered(this)) {
-                    EventBus.getDefault().unregister(this);
-                }
-                EventBus.getDefault().register(this);
-                isActive = true;
-                // Update restaurant interest from the user's choice
-                short restaurantInterest = userAtt.getRestaurantInterest();
-                MenuController.setRestaurantInterest(restaurantInterest);
-                System.out.println("Initialized Menu with restaurant interest: " + restaurantInterest);
-                AuthorizedUser user = Client.getClientAttributes();
-
-                Restaurant restaurant = Client.getClientAttributes().getRestaurant();
-                System.out.println("Restaurant in Menu Page: " + (restaurant != null ? restaurant.getId() : "null"));
-
-                nameColumn.setCellValueFactory(new PropertyValueFactory<>("mealName"));
-                nameColumn.setCellFactory(column -> new TableCell<>() {
-                    private final Text text = new Text();
-
-                    {
-                        text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
-                        setPrefHeight(Control.USE_COMPUTED_SIZE);
+                Platform.runLater(() -> {
+                    if (EventBus.getDefault().isRegistered(this)) {
+                        EventBus.getDefault().unregister(this);
                     }
+                    EventBus.getDefault().register(this);
+                    isActive = true;
+                    if (OrderData.getInstance().getFullName() == null) {
+                        payWithCashButton.setVisible(false);
+                        payWithVisaButton.setVisible(false);
+                        totalToPayLabel.setVisible(false);
+                    } else {
+                        payWithCashButton.setVisible(true);
+                        payWithVisaButton.setVisible(true);
+                        totalToPayLabel.setText("Total: 0.00 ₪");
+                        totalToPayLabel.setVisible(true);
+                    }
+                    // Update restaurant interest from the user's choice
+                    short restaurantInterest = userAtt.getRestaurantInterest();
+                    MenuController.setRestaurantInterest(restaurantInterest);
+                    System.out.println("Initialized Menu with restaurant interest: " + restaurantInterest);
+                    AuthorizedUser user = Client.getClientAttributes();
 
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty || item == null) {
-                            setGraphic(null);
-                        } else {
-                            Meal meal = getTableView().getItems().get(getIndex());
-                            if (meal.getMealCategory().equals("header")) {
-                                text.setStyle("-fx-font-weight: bold; -fx-fill: #333;");
-                            } else {
-                                text.setStyle(""); // reset
-                            }
-                            text.setText(item);
-                            setGraphic(text);
+                    Restaurant restaurant = Client.getClientAttributes().getRestaurant();
+                    System.out.println("Restaurant in Menu Page: " + (restaurant != null ? restaurant.getId() : "null"));
+
+                    nameColumn.setCellValueFactory(new PropertyValueFactory<>("mealName"));
+                    nameColumn.setCellFactory(column -> new TableCell<>() {
+                        private final Text text = new Text();
+
+                        {
+                            text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
+                            setPrefHeight(Control.USE_COMPUTED_SIZE);
                         }
-                    }
-                });
-                preferencesColumn.setCellValueFactory(new PropertyValueFactory<>("mealPreferences"));
-                preferencesColumn.setCellFactory(column -> new TableCell<Meal, String>() {
-                    private final VBox vbox = new VBox(5);
-                    private final Text text = new Text();
 
-                    {
-                        text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
-                    }
+                        @Override
+                        protected void updateItem(String item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (empty || item == null) {
+                                setGraphic(null);
+                            } else {
+                                Meal meal = getTableView().getItems().get(getIndex());
+                                if (meal.getMealCategory().equals("header")) {
+                                    text.setStyle("-fx-font-weight: bold; -fx-fill: #333;");
+                                } else {
+                                    text.setStyle(""); // reset
+                                }
+                                text.setText(item);
+                                setGraphic(text);
+                            }
+                        }
+                    });
+                    preferencesColumn.setCellValueFactory(new PropertyValueFactory<>("mealPreferences"));
+                    preferencesColumn.setCellFactory(column -> new TableCell<Meal, String>() {
+                        private final VBox vbox = new VBox(5);
+                        private final Text text = new Text();
 
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
+                        {
+                            text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
+                        }
 
-                        vbox.getChildren().clear();
+                        @Override
+                        protected void updateItem(String item, boolean empty) {
+                            super.updateItem(item, empty);
 
-                        if (empty || item == null || item.isEmpty()) {
-                            setGraphic(null);
-                            setText(null);
-                        } else {
-                            Meal meal = getTableView().getItems().get(getIndex());
+                            vbox.getChildren().clear();
 
-                            if (meal.getMealCategory().equals("header")) {
+                            if (empty || item == null || item.isEmpty()) {
                                 setGraphic(null);
                                 setText(null);
-                                return;
-                            }
+                            } else {
+                                Meal meal = getTableView().getItems().get(getIndex());
 
-                            AuthorizedUser user = Client.getClientAttributes();
-
-                            if (user != null) {
-                                if (user.getPermissionLevel() == 0) { // Customer - editable checkboxes
-                                    String[] preferences = item.split(",");
-                                    for (String pref : preferences) {
-                                        String trimmedPref = pref.trim();
-                                        CheckBox checkBox = new CheckBox(trimmedPref);
-                                        checkBox.setDisable(false);
-
-// Restore previous selection if exists
-                                        String mealKey = meal.getMealName() + "_" + getIndex();
-                                        List<String> selected = selectedPreferencesMap.getOrDefault(mealKey, new ArrayList<>());
-                                        checkBox.setSelected(selected.contains(trimmedPref));
-
-// Track checkbox selection changes
-                                        checkBox.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
-                                            selectedPreferencesMap.putIfAbsent(mealKey, new ArrayList<>());
-                                            if (isNowSelected) {
-                                                if (!selectedPreferencesMap.get(mealKey).contains(trimmedPref)) {
-                                                    selectedPreferencesMap.get(mealKey).add(trimmedPref);
-                                                }
-                                            } else {
-                                                selectedPreferencesMap.get(mealKey).remove(trimmedPref);
-                                            }
-                                        });
-
-                                        vbox.getChildren().add(checkBox);
-
-                                    }
-                                    preferencesMap.put(meal, vbox);
-                                    setGraphic(vbox);
-                                    setText(null);
-                                } else if (user.getPermissionLevel() == 5) { // Dietitian - plain text
+                                if (meal.getMealCategory().equals("header")) {
                                     setGraphic(null);
-                                    setText(item); // Just show text, no checkboxes
-                                } else { // All other users - non-editable checkboxes
+                                    setText(null);
+                                    return;
+                                }
+
+                                AuthorizedUser user = Client.getClientAttributes();
+
+                                if (user != null) {
+                                    if (user.getPermissionLevel() == 0) { // Customer - editable checkboxes
+                                        String[] preferences = item.split(",");
+                                        for (String pref : preferences) {
+                                            String trimmedPref = pref.trim();
+                                            CheckBox checkBox = new CheckBox(trimmedPref);
+                                            checkBox.setDisable(false);
+
+                                            // Restore previous selection if exists
+                                            String mealKey = meal.getMealName() + "_" + getIndex();
+                                            List<String> selected = selectedPreferencesMap.getOrDefault(mealKey, new ArrayList<>());
+                                            checkBox.setSelected(selected.contains(trimmedPref));
+
+                                            // Track checkbox selection changes
+                                            checkBox.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+                                                selectedPreferencesMap.putIfAbsent(mealKey, new ArrayList<>());
+                                                if (isNowSelected) {
+                                                    if (!selectedPreferencesMap.get(mealKey).contains(trimmedPref)) {
+                                                        selectedPreferencesMap.get(mealKey).add(trimmedPref);
+                                                    }
+                                                } else {
+                                                    selectedPreferencesMap.get(mealKey).remove(trimmedPref);
+                                                }
+                                            });
+
+                                            vbox.getChildren().add(checkBox);
+
+                                        }
+                                        preferencesMap.put(meal, vbox);
+                                        setGraphic(vbox);
+                                        setText(null);
+                                    } else if (user.getPermissionLevel() == 5) { // Dietitian - plain text
+                                        setGraphic(null);
+                                        setText(item); // Just show text, no checkboxes
+                                    } else { // All other users - non-editable checkboxes
+                                        String[] preferences = item.split(",");
+                                        for (String pref : preferences) {
+                                            CheckBox checkBox = new CheckBox(pref.trim());
+                                            checkBox.setDisable(true); // Non-editable
+                                            vbox.getChildren().add(checkBox);
+                                        }
+                                        setGraphic(vbox);
+                                        setText(null);
+                                    }
+                                } else { // If user is null, default non-editable checkboxes
                                     String[] preferences = item.split(",");
                                     for (String pref : preferences) {
                                         CheckBox checkBox = new CheckBox(pref.trim());
-                                        checkBox.setDisable(true); // Non-editable
+                                        checkBox.setDisable(true); // Default to non-editable
                                         vbox.getChildren().add(checkBox);
                                     }
                                     setGraphic(vbox);
                                     setText(null);
                                 }
-                            } else { // If user is null, default non-editable checkboxes
-                                String[] preferences = item.split(",");
-                                for (String pref : preferences) {
-                                    CheckBox checkBox = new CheckBox(pref.trim());
-                                    checkBox.setDisable(true); // Default to non-editable
-                                    vbox.getChildren().add(checkBox);
-                                }
-                                setGraphic(vbox);
+                            }
+                        }
+                    });
+                    priceColumn.setCellValueFactory(new PropertyValueFactory<>("mealPrice"));
+                    priceColumn.setCellFactory(column -> new TableCell<>() {
+                        @Override
+                        protected void updateItem(Double item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (empty || item == null) {
                                 setText(null);
-                            }
-                        }
-                    }
-                });
-                priceColumn.setCellValueFactory(new PropertyValueFactory<>("mealPrice"));
-                priceColumn.setCellFactory(column -> new TableCell<>() {
-                    @Override
-                    protected void updateItem(Double item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty || item == null) {
-                            setText(null);
-                        } else {
-                            Meal meal = getTableView().getItems().get(getIndex());
-                            if (meal.getMealCategory().equals("header")) {
-                                setText("");
-                                return;
-                            }
-                            setText(String.format("%.2f", item));
-                        }
-                    }
-                });
-
-                imageColumn.setCellValueFactory(new PropertyValueFactory<>("imagePath"));
-                combo.getItems().addAll("Meal Name", "Ingredients","Description", "Price");
-                descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("mealDescription"));
-                descriptionColumn.setCellFactory(column -> new TableCell<>() {
-                    private final Text text = new Text();
-                    {
-                        text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
-                        setPrefHeight(Control.USE_COMPUTED_SIZE);
-                    }
-
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty || item == null) {
-                            setGraphic(null);
-                        } else {
-                            Meal meal = getTableView().getItems().get(getIndex());
-                            if (meal.getMealCategory().equals("header")) {
-                                setGraphic(null);
-                                setText("");
-                                return;
-                            }
-                            text.setText(item);
-                            setGraphic(text);
-                        }
-                    }
-                });
-
-                // Handle image display
-    // Real-time image display from file:// URI
-                imageColumn.setCellFactory(column -> new TableCell<Meal, String>() {
-                    private final ImageView imageView = new ImageView();
-                    @Override
-                    protected void updateItem(String imagePath, boolean empty) {
-                        super.updateItem(imagePath, empty);
-                        if (empty || imagePath == null || imagePath.isEmpty()) {
-                            setGraphic(null);
-                            return;
-                        }
-                        imageView.setFitWidth(50);
-                        imageView.setFitHeight(50);
-                        try {
-                            Image img = new Image(imagePath, true);   // direct load of file:///… URI
-                            imageView.setImage(img);
-                            setGraphic(imageView);
-                        } catch (Exception ex) {
-                            System.out.println("Failed to load image: " + imagePath);
-                            setGraphic(null);
-                        }
-                    }
-                });
-
-
-
-                menuTable.setEditable(true); // Allow editing
-                menuTable.setPlaceholder(new Label("No meals available"));
-                menuTable.setItems(menuData);
-                menuTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-                menuTable.setRowFactory(tv -> new TableRow<Meal>() {
-                    @Override
-                    protected void updateItem(Meal item, boolean empty) {
-                        super.updateItem(item, empty);
-                        setVisible(item != null && !empty);
-                        setManaged(item != null && !empty);
-                        if (item == null || empty) {
-                            setPrefHeight(0);
-                        } else {
-                            setPrefHeight(Region.USE_COMPUTED_SIZE);
-                        }
-                    }
-                });
-
-
-
-                if (user != null && user.getPermissionLevel() == 5) {
-
-                    descriptionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-                    descriptionColumn.setOnEditCommit(event -> {
-                        Meal meal = event.getRowValue();
-                        String newDesc = event.getNewValue();
-                        meal.setMealDescription(newDesc);
-                        try {
-                            Client.getClient().sendToServer("Update description \"" + meal.getMealName() + "\" \"" + newDesc + "\"");
-                            System.out.println("Updated description: " + meal.getMealName() + " -> " + newDesc);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
-
-                    preferencesColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-                    preferencesColumn.setOnEditCommit(event -> {
-                        Meal meal = event.getRowValue();
-                        String newPref = event.getNewValue();
-
-                        if (newPref.isEmpty())
-                        {
-                            showAlert("Preferences cannot be empty.");
-                            return;
-                        }
-                        ///
-
-                        if (!isValidPreferences(newPref)) {
-                            showAlert("Preferences must be separated by commas (,) with no leading, trailing, or consecutive commas.");
-                            return;
-                        }
-
-                        meal.setMealPreferences(newPref);
-                        try {
-                            Client.getClient().sendToServer("Update preferences \"" + meal.getMealName() + "\" \"" + newPref + "\"");
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
-
-                    editColumn.setCellFactory(col -> new TableCell<>() {
-                        private final TextField priceField = new TextField();
-                        private final Button editButton = new Button("Edit");
-
-                        {
-                            editButton.setOnAction(e -> {
-                                Meal meal = getTableView().getItems().get(getIndex());
-                                String text = priceField.getText().trim();
-                                try {
-                                    try {
-                                        double newPrice = Double.parseDouble(text);
-                                        if (newPrice < 0) {
-                                            showAlert("Price must be non-negative.");
-
-                                            return;
-                                        }
-                                        Client.getClient().sendToServer("Update price \"" + meal.getMealName() + "\" \"" + newPrice + "\"");
-                                        priceField.clear();
-                                    } catch (NumberFormatException ex) {
-                                        showAlert("Price must be a valid number.");
-                                    }
-
-                                    priceField.clear();
-                                } catch (Exception ex) {
-                                    System.err.println("Invalid price entered.");
-                                }
-                            });
-
-                            editButton.setStyle("-fx-background-color: #ffcc00; -fx-text-fill: black;");
-                            editButton.setPrefWidth(60);
-                            priceField.setPromptText("new price");
-                            priceField.setMaxWidth(100);
-                        }
-
-                        @Override
-                        protected void updateItem(Void item, boolean empty) {
-                            super.updateItem(item, empty);
-                            if (empty) {
-                                setGraphic(null);
                             } else {
                                 Meal meal = getTableView().getItems().get(getIndex());
                                 if (meal.getMealCategory().equals("header")) {
-                                    setGraphic(null); // Hide for header rows
+                                    setText("");
                                     return;
                                 }
-                                setGraphic(new HBox(5, priceField, editButton));
+                                setText(String.format("%.2f", item));
                             }
                         }
                     });
 
-                    TableColumn<Meal, Void> removeColumn = new TableColumn<>("Remove");
-                    removeColumn.setCellFactory(col -> new TableCell<>() {
-                        private final Button removeButton = new Button("❌");
+                    imageColumn.setCellValueFactory(new PropertyValueFactory<>("imagePath"));
+                    combo.getItems().addAll("Meal Name", "Ingredients", "Description", "Price");
+                    descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("mealDescription"));
+                    descriptionColumn.setCellFactory(column -> new TableCell<>() {
+                        private final Text text = new Text();
 
                         {
-                            removeButton.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white;");
-                            removeButton.setOnAction(e -> {
-                                Meal meal = getTableView().getItems().get(getIndex());
-                                String mealName = meal.getMealName();
-                                String messageToSend = String.format("Remove Meal \"%s\"", mealName);
-                                Client.getClient().sendToServer(messageToSend);
-                            });
+                            text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
+                            setPrefHeight(Control.USE_COMPUTED_SIZE);
                         }
 
                         @Override
-                        protected void updateItem(Void item, boolean empty) {
+                        protected void updateItem(String item, boolean empty) {
                             super.updateItem(item, empty);
-                            if (empty) {
-                                setGraphic(null);
-                            } else {
-                                Meal meal = getTableView().getItems().get(getIndex());
-                                if (meal.getMealCategory().equals("header")) {
-                                    setGraphic(null); // Hide for header rows
-                                    return;
-                                }
-                                setGraphic(removeButton);
-                            }
-                        }
-                    });
-                    menuTable.getColumns().add(removeColumn);
-                } else {
-                    editColumn.setVisible(false);
-                }
-
-                if (user != null && user.getPermissionLevel() == 0) {
-                    quantityColumn = new TableColumn<>("Quantity");
-                    quantityColumn.setPrefWidth(150);
-
-                    quantityColumn.setCellFactory(col -> new TableCell<>() {
-                        private final Button addButton = new Button("+");
-                        private final Button subButton = new Button("-");
-                        private final TextField qtyField = new TextField("0");
-
-                        {
-                            qtyField.setPrefWidth(40);
-                            qtyField.setEditable(false);
-
-                            addButton.setOnAction(e -> {
-                                Meal meal = getTableView().getItems().get(getIndex());
-                                String mealName = meal.getMealName();
-                                int current = mealQuantities.getOrDefault(mealName, 0);
-                                mealQuantities.put(mealName, current + 1);
-                                menuData.setAll(buildExpandedMenuList(fullMealList));
-
-                            });
-
-                            subButton.setOnAction(e -> {
-                                Meal meal = getTableView().getItems().get(getIndex());
-                                String mealName = meal.getMealName();
-                                int current = mealQuantities.getOrDefault(mealName, 0);
-
-                                if (current > 0) {
-                                    mealQuantities.put(mealName, current -1);
-                                    menuData.setAll(buildExpandedMenuList(fullMealList));
-                                }
-                            });
-
-
-
-
-
-
-                            addButton.setStyle("-fx-background-color: lightgreen;");
-                            subButton.setStyle("-fx-background-color: lightcoral;");
-                        }
-
-                        @Override
-                        protected void updateItem(Void item, boolean empty) {
-                            super.updateItem(item, empty);
-                            if (empty) {
+                            if (empty || item == null) {
                                 setGraphic(null);
                             } else {
                                 Meal meal = getTableView().getItems().get(getIndex());
                                 if (meal.getMealCategory().equals("header")) {
                                     setGraphic(null);
+                                    setText("");
                                     return;
                                 }
-
-
-
-
-                                meal = getTableView().getItems().get(getIndex());
-                                String mealName = meal.getMealName();
-
-                                long countBefore = getTableView().getItems().subList(0, getIndex()).stream()
-                                        .filter(m -> m.getMealName().equals(mealName))
-                                        .count();
-
-                                if (meal.getMealCategory().equals("header") || countBefore > 0) {
-                                    setGraphic(null); // Show counter only for first row of each meal
-                                    return;
-                                }
-
-
-                                qtyField.setText(String.valueOf(mealQuantities.getOrDefault(mealName, 0)));
-                                HBox box = new HBox(5, subButton, qtyField, addButton);
-                                quantityMap.put(meal, box);
-                                setGraphic(box);
-
-                                /*HBox box = new HBox(5, subButton, qtyField, addButton);
-                                quantityMap.put(getTableView().getItems().get(getIndex()), box);//added
-                                setGraphic(box);*/
+                                text.setText(item);
+                                setGraphic(text);
                             }
                         }
                     });
 
-                    // Add it to the table
-                    menuTable.getColumns().add(quantityColumn);
-                }
+                    // Handle image display
+                    // Real-time image display from file:// URI
+                    imageColumn.setCellFactory(column -> new TableCell<Meal, String>() {
+                        private final ImageView imageView = new ImageView();
+
+                        @Override
+                        protected void updateItem(String imagePath, boolean empty) {
+                            super.updateItem(imagePath, empty);
+                            if (empty || imagePath == null || imagePath.isEmpty()) {
+                                setGraphic(null);
+                                return;
+                            }
+                            imageView.setFitWidth(50);
+                            imageView.setFitHeight(50);
+                            try {
+                                Image img = new Image(imagePath, true);   // direct load of file:///… URI
+                                imageView.setImage(img);
+                                setGraphic(imageView);
+                            } catch (Exception ex) {
+                                System.out.println("Failed to load image: " + imagePath);
+                                setGraphic(null);
+                            }
+                        }
+                    });
 
 
-                Client.getClient().sendToServer("Request Menu");
+                    menuTable.setEditable(true); // Allow editing
+                    menuTable.setPlaceholder(new Label("No meals available"));
+                    menuTable.setItems(menuData);
+                    menuTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+                    menuTable.setRowFactory(tv -> new TableRow<Meal>() {
+                        @Override
+                        protected void updateItem(Meal item, boolean empty) {
+                            super.updateItem(item, empty);
+                            setVisible(item != null && !empty);
+                            setManaged(item != null && !empty);
+                            if (item == null || empty) {
+                                setPrefHeight(0);
+                            } else {
+                                setPrefHeight(Region.USE_COMPUTED_SIZE);
+                            }
+                        }
+                    });
 
+
+                    if (user != null && user.getPermissionLevel() == 5) {
+
+                        descriptionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+                        descriptionColumn.setOnEditCommit(event -> {
+                            Meal meal = event.getRowValue();
+                            String newDesc = event.getNewValue();
+                            meal.setMealDescription(newDesc);
+                            try {
+                                Client.getClient().sendToServer("Update description \"" + meal.getMealName() + "\" \"" + newDesc + "\"");
+                                System.out.println("Updated description: " + meal.getMealName() + " -> " + newDesc);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+
+                        preferencesColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+                        preferencesColumn.setOnEditCommit(event -> {
+                            Meal meal = event.getRowValue();
+                            String newPref = event.getNewValue();
+
+                            if (newPref.isEmpty()) {
+                                showAlert("Preferences cannot be empty.");
+                                return;
+                            }
+                            ///
+
+                            if (!isValidPreferences(newPref)) {
+                                showAlert("Preferences must be separated by commas (,) with no leading, trailing, or consecutive commas.");
+                                return;
+                            }
+
+                            meal.setMealPreferences(newPref);
+                            try {
+                                Client.getClient().sendToServer("Update preferences \"" + meal.getMealName() + "\" \"" + newPref + "\"");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+
+                        editColumn.setCellFactory(col -> new TableCell<>() {
+                            private final TextField priceField = new TextField();
+                            private final Button editButton = new Button("Edit");
+
+                            {
+                                editButton.setOnAction(e -> {
+                                    Meal meal = getTableView().getItems().get(getIndex());
+                                    String text = priceField.getText().trim();
+                                    try {
+                                        try {
+                                            double newPrice = Double.parseDouble(text);
+                                            if (newPrice < 0) {
+                                                showAlert("Price must be non-negative.");
+
+                                                return;
+                                            }
+                                            Client.getClient().sendToServer("Update price \"" + meal.getMealName() + "\" \"" + newPrice + "\"");
+                                            priceField.clear();
+                                        } catch (NumberFormatException ex) {
+                                            showAlert("Price must be a valid number.");
+                                        }
+
+                                        priceField.clear();
+                                    } catch (Exception ex) {
+                                        System.err.println("Invalid price entered.");
+                                    }
+                                });
+
+                                editButton.setStyle("-fx-background-color: #ffcc00; -fx-text-fill: black;");
+                                editButton.setPrefWidth(60);
+                                priceField.setPromptText("new price");
+                                priceField.setMaxWidth(100);
+                            }
+
+                            @Override
+                            protected void updateItem(Void item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                } else {
+                                    Meal meal = getTableView().getItems().get(getIndex());
+                                    if (meal.getMealCategory().equals("header")) {
+                                        setGraphic(null); // Hide for header rows
+                                        return;
+                                    }
+                                    setGraphic(new HBox(5, priceField, editButton));
+                                }
+                            }
+                        });
+
+                        TableColumn<Meal, Void> removeColumn = new TableColumn<>("Remove");
+                        removeColumn.setCellFactory(col -> new TableCell<>() {
+                            private final Button removeButton = new Button("❌");
+
+                            {
+                                removeButton.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white;");
+                                removeButton.setOnAction(e -> {
+                                    Meal meal = getTableView().getItems().get(getIndex());
+                                    String mealName = meal.getMealName();
+                                    String messageToSend = String.format("Remove Meal \"%s\"", mealName);
+                                    Client.getClient().sendToServer(messageToSend);
+                                });
+                            }
+
+                            @Override
+                            protected void updateItem(Void item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                } else {
+                                    Meal meal = getTableView().getItems().get(getIndex());
+                                    if (meal.getMealCategory().equals("header")) {
+                                        setGraphic(null); // Hide for header rows
+                                        return;
+                                    }
+                                    setGraphic(removeButton);
+                                }
+                            }
+                        });
+                        menuTable.getColumns().add(removeColumn);
+                    } else {
+                        editColumn.setVisible(false);
+                    }
+
+                    if (user != null && user.getPermissionLevel() == 0 && OrderData.getInstance().getFullName() != null) {
+                        quantityColumn = new TableColumn<>("Quantity");
+                        quantityColumn.setPrefWidth(150);
+
+                        quantityColumn.setCellFactory(col -> new TableCell<>() {
+                            private final Button addButton = new Button("+");
+                            private final Button subButton = new Button("-");
+                            private final TextField qtyField = new TextField("0");
+
+                            {
+                                qtyField.setPrefWidth(40);
+                                qtyField.setEditable(false);
+
+                                addButton.setOnAction(e -> {
+                                    Meal meal = getTableView().getItems().get(getIndex());
+                                    String mealName = meal.getMealName();
+                                    int current = mealQuantities.getOrDefault(mealName, 0);
+                                    mealQuantities.put(mealName, current + 1);
+                                    menuData.setAll(buildExpandedMenuList(fullMealList));
+                                    updateTotalToPay();
+                                });
+
+                                subButton.setOnAction(e -> {
+                                    Meal meal = getTableView().getItems().get(getIndex());
+                                    String mealName = meal.getMealName();
+                                    int current = mealQuantities.getOrDefault(mealName, 0);
+
+                                    if (current > 0) {
+                                        mealQuantities.put(mealName, current - 1);
+                                        menuData.setAll(buildExpandedMenuList(fullMealList));
+                                    }
+                                    updateTotalToPay();
+                                });
+
+
+                                addButton.setStyle("-fx-background-color: lightgreen;");
+                                subButton.setStyle("-fx-background-color: lightcoral;");
+                            }
+
+                            @Override
+                            protected void updateItem(Void item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                } else {
+                                    Meal meal = getTableView().getItems().get(getIndex());
+                                    if (meal.getMealCategory().equals("header")) {
+                                        setGraphic(null);
+                                        return;
+                                    }
+
+
+                                    meal = getTableView().getItems().get(getIndex());
+                                    String mealName = meal.getMealName();
+
+                                    long countBefore = getTableView().getItems().subList(0, getIndex()).stream()
+                                            .filter(m -> m.getMealName().equals(mealName))
+                                            .count();
+
+                                    if (meal.getMealCategory().equals("header") || countBefore > 0) {
+                                        setGraphic(null); // Show counter only for first row of each meal
+                                        return;
+                                    }
+
+
+                                    qtyField.setText(String.valueOf(mealQuantities.getOrDefault(mealName, 0)));
+                                    HBox box = new HBox(5, subButton, qtyField, addButton);
+                                    quantityMap.put(meal, box);
+                                    setGraphic(box);
+
+                                    /*HBox box = new HBox(5, subButton, qtyField, addButton);
+                                    quantityMap.put(getTableView().getItems().get(getIndex()), box);//added
+                                    setGraphic(box);*/
+                                }
+                            }
+                        });
+
+                        // Add it to the table
+                        menuTable.getColumns().add(quantityColumn);
+                    }
+
+
+                    Client.getClient().sendToServer("Request Menu");
+                });
             }
 
             private VBox getPreferencesVBoxForMeal(Meal meal) {
@@ -1102,4 +1117,17 @@
                     e.printStackTrace();
                 }
             }
+
+            private void updateTotalToPay() {
+                double total = fullMealList.stream()
+                        .filter(m -> !"header".equals(m.getMealCategory()))
+                        .mapToDouble(m -> mealQuantities.getOrDefault(m.getMealName(), 0) * m.getMealPrice())
+                        .sum();
+
+                Platform.runLater(() ->
+                        totalToPayLabel.setText(String.format("Total: %.2f ₪", total))
+                );
+            }
+
+
         }

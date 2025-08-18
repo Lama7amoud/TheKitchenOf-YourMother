@@ -1,6 +1,8 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
 import il.cshaifasweng.OCSFMediatorExample.client.events.MessageEvent;
+import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
+import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,13 +15,26 @@ import javafx.stage.Stage;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TakeAwayOrReservationController {
 
 
-
+    @FXML
+    private Label takeAwayInfoLabel;
+    @FXML
+    private Button takeAwayButton;
+    @FXML
+    private Button eatWithUsButton;
 
     @FXML private Button cancelButton;   // Cancel Reservation
     @FXML private Button cancelButton1;  // Cancel Order
@@ -37,24 +52,40 @@ public class TakeAwayOrReservationController {
 
     @FXML
     void initialize() {
-        cancelButton.setDisable(true);
-        cancelButton1.setDisable(true);
+        Platform.runLater(() -> {
+            cancelButton.setDisable(true);
+            cancelButton1.setDisable(true);
 
-        IDtextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.matches("\\d{9}")) {
-                Client.getClient().sendToServer("check_id_type:" + newValue + ":" + Client.getClientAttributes().getRestaurantInterest()); // changed ; to :
+            takeAwayInfoLabel.setVisible(false);
+            takeAwayButton.setDisable(true); // disable till we check the times
+
+            AuthorizedUser user = Client.getClientAttributes();
+            if (user.getPermissionLevel() != 0) {
+                takeAwayButton.setVisible(false);
+                eatWithUsButton.setText("Host Customers");
             } else {
-                cancelButton.setDisable(true);
-                cancelButton1.setDisable(true);
+                takeAwayButton.setVisible(true);
+                eatWithUsButton.setText("Eat With Us!");
             }
+
+            Client.getClient().sendToServer("Check open times for res;" + user.getRestaurantInterest());
+
+            IDtextField.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue.matches("\\d{9}")) {
+                    Client.getClient().sendToServer("check_id_type:" + newValue + ":" + Client.getClientAttributes().getRestaurantInterest()); // changed ; to :
+                } else {
+                    cancelButton.setDisable(true);
+                    cancelButton1.setDisable(true);
+                }
+            });
+
+            if (!EventBus.getDefault().isRegistered(this)) {
+                EventBus.getDefault().register(this);
+            }
+
+            branchDetailsButton.setVisible(false);
+            isActive = true;
         });
-
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
-
-        branchDetailsButton.setVisible(false);
-        isActive = true;
     }
 
 
@@ -66,6 +97,62 @@ public class TakeAwayOrReservationController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    @Subscribe
+    public void restaurantEntityReceived(Restaurant res) {
+        if (res == null) {
+            System.out.println("Restaurant is null");
+            return;
+        }
+        Client.getClientAttributes().setRestaurantInterestEntity(res);
+        boolean isOpen = isRestaurantOpenNow(res);
+
+        Platform.runLater(() -> {
+            if (isOpen) {
+                takeAwayButton.setDisable(false);
+                takeAwayInfoLabel.setVisible(false);
+            } else {
+                takeAwayButton.setDisable(true);
+                takeAwayInfoLabel.setVisible(true);
+            }
+        });
+    }
+
+    private boolean isRestaurantOpenNow(Restaurant res) {
+        // Check holidays first
+        if (res.getHolidays() != null && !res.getHolidays().isEmpty()) {
+            Set<DayOfWeek> holidays = Arrays.stream(res.getHolidays().split(","))
+                    .map(String::trim)
+                    .map(String::toUpperCase)
+                    .map(DayOfWeek::valueOf)
+                    .collect(Collectors.toSet());
+
+            DayOfWeek today = LocalDate.now().getDayOfWeek();
+            if (holidays.contains(today)) {
+                return false; // Closed due to holiday
+            }
+        }
+
+        LocalTime now = LocalTime.now();
+        LocalTime opening = convertDoubleToLocalTime(res.getOpeningTime());
+        LocalTime closing = convertDoubleToLocalTime(res.getClosingTime());
+
+        // Handle normal case (open and close on same day)
+        if (closing.isAfter(opening)) {
+            return !now.isBefore(opening) && !now.isAfter(closing);
+        }
+        // Handle overnight case (e.g., open 22:00, close 02:00 next day)
+        else {
+            return !now.isBefore(opening) || !now.isAfter(closing);
+        }
+    }
+
+    private LocalTime convertDoubleToLocalTime(double time) {
+        int hours = (int) time;
+        int minutes = (int) Math.round((time - hours) * 100);
+        return LocalTime.of(hours, minutes);
+    }
+
 
     @Subscribe
     public void handleIdTypeResponse(MessageEvent evt) {

@@ -37,7 +37,7 @@
         <AnchorPane prefWidth="470.0" BorderPane.alignment="CENTER">
             <children>
 
-                <Label layoutX="56.0" layoutY="14.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="We are almost there!" textFill="ORANGE">
+                <Label layoutX="127.0" layoutY="15.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="We are almost there!" textFill="ORANGE">
                     <font>
                         <Font size="20.0" />
                     </font>
@@ -64,17 +64,17 @@
                 <Label fx:id="emailErrorLabel" layoutX="326.0" layoutY="278.0" text="Invalid Email" textFill="RED" />
 
 
-                <Button fx:id="backToOrderTablesButton" layoutX="25.0" layoutY="360.0" onAction="#switchPage" text="Back" />
+                <Button fx:id="backToOrderTablesButton" alignment="CENTER" layoutX="25.0" layoutY="360.0" onAction="#switchPage" style="-fx-background-color: #ff0d0d; -fx-font-weight: bold; -fx-font-style: italic; -fx-background-radius: 5em;" text="Back" textFill="WHITE" />
 
                 <!-- Hidden labels for passing state -->
                 <Label fx:id="preferredTimeLabel" layoutX="50.0" layoutY="30.0" text="Time:" visible="false" />
                 <Label fx:id="sittingTypeLabel" layoutX="50.0" layoutY="70.0" text="Sitting:" visible="false" />
                 <Label fx:id="guestCountLabel" layoutX="50.0" layoutY="110.0" text="Guests:" visible="false" />
                 <Label fx:id="notesLabel" layoutX="50.0" layoutY="150.0" text="Note:" visible="false" />
-                <ComboBox fx:id="favTimeComboBox" layoutX="141.0" layoutY="312.0" prefHeight="26.0" prefWidth="160.0" promptText="Choose Favorite Time" />
+                <ComboBox fx:id="favTimeComboBox" layoutX="141.0" layoutY="312.0" prefHeight="26.0" prefWidth="160.0" promptText="Choose Favorite Time" style="-fx-background-color: #ffa500; -fx-background-radius: 5em;" />
                 <Label layoutX="26.0" layoutY="316.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Favorite Time:" textFill="#151515" />
                 <Label fx:id="favTimeLabel" layoutX="326.0" layoutY="316.0" text="Invalid favorite Time" textFill="RED" />
-                <Button fx:id="ContinueButton" layoutX="152.0" layoutY="360.0" mnemonicParsing="false" onAction="#handleContinue" prefHeight="30.0" prefWidth="147.0" text="Continue" />
+                <Button fx:id="ContinueButton" layoutX="152.0" layoutY="360.0" mnemonicParsing="false" onAction="#handleContinue" prefHeight="30.0" prefWidth="147.0" style="-fx-background-color: green; -fx-font-style: italic; -fx-background-radius: 5em; -fx-font-weight: bold;" text="Continue" textFill="WHITE" />
                 <Label fx:id="fullNameLabel" layoutX="326.0" layoutY="132.0" text="Invalid Full Name" textFill="RED" />
             <Label fx:id="numberLabel" layoutX="326.0" layoutY="168.0" text="Invalid Phone Number" textFill="RED" />
             <Label fx:id="iDLabel" layoutX="326.0" layoutY="207.0" text="Invalid ID" textFill="RED" />

@@ -34,7 +34,10 @@ public class AuthorizedUser implements Serializable {
     @Transient
     private short restaurantInterest;
 
-    // Default constructor (required by Hibernate!!)
+    @Transient
+    private Restaurant restaurantInterestentity;
+
+    // Default constructor (required by Hibernate)
     public AuthorizedUser() {}
 
     // Getters and Setters
@@ -139,6 +142,12 @@ public class AuthorizedUser implements Serializable {
         return (restaurant != null) ? (short) restaurant.getId() : 0;
     }
 
+    public Restaurant getRestaurantInterestEntity() {
+        return restaurantInterestentity;}
+
+    public void setRestaurantInterestEntity(Restaurant restaurantInterestentity) {
+        this.restaurantInterestentity = restaurantInterestentity;}
+
     // Copy user attributes from another user
     public void copyUser(AuthorizedUser user) {
         this.setId(user.getId());
@@ -153,6 +162,7 @@ public class AuthorizedUser implements Serializable {
         this.setConnected(user.isConnected());
         this.setMessageToServer(user.getMessageToServer());
         this.setPermissionLevel(user.getPermissionLevel());
+        this.setRestaurantInterestEntity(user.getRestaurantInterestEntity());
     }
 
     public void resetAttributes() {
@@ -168,5 +178,6 @@ public class AuthorizedUser implements Serializable {
         this.setConnected(false);
         this.setMessageToServer(null);
         this.setPermissionLevel((short) 0);
+        this.setRestaurantInterestEntity(null);
     }
 }

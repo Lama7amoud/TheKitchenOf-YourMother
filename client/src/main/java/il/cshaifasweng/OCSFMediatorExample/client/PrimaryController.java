@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.OrderData;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -201,6 +202,13 @@ public class PrimaryController {
     @FXML
     void initialize() {
         Platform.runLater(() -> {
+            OrderData.getInstance().setFullName(null);
+            OrderData.getInstance().setPhoneNumber(null);
+            OrderData.getInstance().setIdNumber(null);
+            OrderData.getInstance().setAddress(null);
+            OrderData.getInstance().setPreferredTime(null);
+            OrderData.getInstance().setEmail(null);
+
             int user_permission = userAtt.getPermissionLevel();
             feedbackButton.setVisible((user_permission == 0));
             complaintButton.setVisible((user_permission == 0));

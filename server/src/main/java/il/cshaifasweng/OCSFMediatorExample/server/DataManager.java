@@ -1688,7 +1688,24 @@ public class DataManager {
         }
     }
 
+    public static Restaurant getRestaurantById(int resId) {
+        try {
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
 
+            return session.get(Restaurant.class, resId);
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return null; // Restaurant not found or error
+        } finally {
+            if (session != null) {
+                session.close();
+                System.out.println("Session closed");
+            }
+        }
+    }
 
     public static void saveReservation(Reservation reservation) {
 

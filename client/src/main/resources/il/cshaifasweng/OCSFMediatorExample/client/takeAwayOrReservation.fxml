@@ -8,142 +8,82 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/23.0.1"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="il.cshaifasweng.OCSFMediatorExample.client.TakeAwayOrReservationController"
-            prefWidth="600.0" prefHeight="400.0"
-            minWidth="-Infinity" minHeight="-Infinity"
-            maxWidth="-Infinity" maxHeight="-Infinity">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.TakeAwayOrReservationController">
 
     <!-- Left side: “Order Tables” + navigation buttons -->
     <left>
-        <AnchorPane prefWidth="235.0" prefHeight="200.0" style="-fx-background-color: #FDF8E2;" BorderPane.alignment="CENTER">
+        <AnchorPane prefHeight="200.0" prefWidth="235.0" style="-fx-background-color: #FDF8E2;" BorderPane.alignment="CENTER">
             <children>
-                <Label layoutX="42.0" layoutY="29.0"
-                       text="Order Tables"
-                       textFill="ORANGE"
-                       style="-fx-font-style: italic; -fx-font-weight: bold;">
+                <Label layoutX="42.0" layoutY="29.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Order Tables" textFill="ORANGE">
                     <font>
-                        <Font size="25.0"/>
+                        <Font size="25.0" />
                     </font>
                 </Label>
 
-                <Label fx:id="branchNameLabel"
-                       layoutX="38.0" layoutY="77.0"
-                       text="Branch Name"
-                       textFill="ORANGE"
-                       style="-fx-font-style: italic; -fx-font-weight: bold;">
+                <Label fx:id="branchNameLabel" layoutX="38.0" layoutY="77.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="Branch Name" textFill="ORANGE">
                     <font>
-                        <Font size="25.0"/>
+                        <Font size="25.0" />
                     </font>
                 </Label>
 
-                <Button fx:id="backButton"
-                        layoutX="56.0" layoutY="351.0"
-                        prefWidth="124.0" prefHeight="26.0"
-                        text="Back To Main Page"
-                        textFill="WHITE"
-                        style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;"
-                        onAction="#switchPage"/>
+                <Button fx:id="backButton" layoutX="56.0" layoutY="351.0" onAction="#switchPage" prefHeight="26.0" prefWidth="124.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Back To Main Page" textFill="WHITE" />
 
-                <Button fx:id="branchDetailsButton"
-                        layoutX="56.0" layoutY="315.0"
-                        prefWidth="124.0" prefHeight="26.0"
-                        text="See Branch Details"
-                        textFill="WHITE"
-                        style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;"/>
+                <Button fx:id="branchDetailsButton" layoutX="56.0" layoutY="315.0" prefHeight="26.0" prefWidth="124.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="See Branch Details" textFill="WHITE" />
             </children>
         </AnchorPane>
     </left>
 
     <!-- Right side: Eat With Us, Take Away, Cancel Reservation, Cancel Order, ID field, labels, etc. -->
     <right>
-        <AnchorPane prefWidth="470.0" prefHeight="400.0" BorderPane.alignment="CENTER">
+        <AnchorPane prefHeight="400.0" prefWidth="470.0" BorderPane.alignment="CENTER">
             <children>
                 <!-- “Eat With Us!” button -->
-                <Button fx:id="eatWithUsButton"
-                        layoutX="96.0" layoutY="41.0"
-                        prefWidth="167.0" prefHeight="75.0"
-                        text="Eat With Us!"
-                        textFill="WHITE"
-                        style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;"
-                        onAction="#goToOrderTables">
+                <Button fx:id="eatWithUsButton" layoutX="96.0" layoutY="41.0" onAction="#goToOrderTables" prefHeight="75.0" prefWidth="167.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Eat With Us!" textFill="WHITE">
                     <font>
-                        <Font size="20.0"/>
+                        <Font size="18.0" />
                     </font>
                 </Button>
 
                 <!-- “Take Away” button -->
-                <Button fx:id="takeAwayButton"
-                        layoutX="94.0" layoutY="128.0"
-                        prefWidth="171.0" prefHeight="71.0"
-                        text="Take Away"
-                        textFill="WHITE"
-                        style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;"
-                        onAction="#goToTakeAwayPage">
+                <Button fx:id="takeAwayButton" layoutX="94.0" layoutY="128.0" onAction="#goToTakeAwayPage" prefHeight="71.0" prefWidth="171.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Take Away" textFill="WHITE">
                     <font>
-                        <Font size="20.0"/>
+                        <Font size="18.0" />
                     </font>
                 </Button>
 
                 <!-- “Cancel Reservation” button -->
-                <Button fx:id="cancelButton"
-                        layoutX="14.0" layoutY="335.0"
-                        prefWidth="152.0" prefHeight="51.0"
-                        text="Cancel Reservation"
-                        textFill="WHITE"
-                        style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;"
-                        onAction="#handleCancelReservation">
+                <Button fx:id="cancelButton" layoutX="14.0" layoutY="335.0" onAction="#handleCancelReservation" prefHeight="51.0" prefWidth="152.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Cancel Reservation" textFill="WHITE">
                     <font>
-                        <Font size="13.0"/>
+                        <Font size="13.0" />
                     </font>
                 </Button>
 
                 <!-- “Cancel Order” button -->
-                <Button fx:id="cancelButton1"
-                        layoutX="189.0" layoutY="335.0"
-                        prefWidth="152.0" prefHeight="51.0"
-                        text="Cancel Order"
-                        textFill="WHITE"
-                        style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;"
-                        onAction="#handleCancelOrder">
+                <Button fx:id="cancelButton1" layoutX="189.0" layoutY="335.0" onAction="#handleCancelOrder" prefHeight="51.0" prefWidth="152.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Cancel Order" textFill="WHITE">
                     <font>
-                        <Font size="13.0"/>
+                        <Font size="13.0" />
                     </font>
                 </Button>
 
                 <!-- ID input field -->
-                <TextField fx:id="IDtextField"
-                           layoutX="96.0" layoutY="286.0"/>
+                <TextField fx:id="IDtextField" layoutX="96.0" layoutY="286.0" />
 
                 <!-- “Enter Your ID:” label -->
-                <Label layoutX="4.0" layoutY="287.0"
-                       prefWidth="83.0" prefHeight="23.0"
-                       text="Enter Your ID:"
-                       textAlignment="CENTER"/>
+                <Label layoutX="4.0" layoutY="287.0" prefHeight="23.0" prefWidth="83.0" text="Enter Your ID:" textAlignment="CENTER" />
 
                 <!-- Decorative line -->
-                <Line startX="-105.0" startY="225.0"
-                      endX="262.2" endY="225.0"
-                      layoutX="105.0"/>
+                <Line endX="262.2" endY="225.0" layoutX="101.0" layoutY="7.0" startX="-105.0" startY="225.0" />
 
                 <!-- Instruction label -->
-                <Label layoutX="4.0" layoutY="242.0"
-                       prefWidth="350.0" prefHeight="36.0"
-                       text="If you have an Order/Reservation you can cancel it:"
-                       textFill="#fa930c"
-                       style="-fx-font-style: italic; -fx-font-weight: bold;"
-                       textAlignment="CENTER">
+                <Label layoutX="4.0" layoutY="242.0" prefHeight="36.0" prefWidth="350.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="If you have an Order/Reservation you can cancel it:" textAlignment="CENTER" textFill="#fa930c">
                     <font>
-                        <Font size="14.0"/>
+                        <Font size="14.0" />
                     </font>
                 </Label>
 
                 <!-- “There's no such ID” error label (initially hidden) -->
-                <Label layoutX="256.0" layoutY="290.0"
-                       text="There's no such ID"
-                       textFill="#ef0808"
-                       visible="false"/>
+                <Label layoutX="256.0" layoutY="290.0" text="There's no such ID" textFill="#ef0808" visible="false" />
+            <Label fx:id="takeAwayInfoLabel" alignment="CENTER" layoutX="17.0" layoutY="207.0" prefHeight="18.0" prefWidth="331.0" text="Takeaway orders are same-day only. We’re closed now" textFill="RED" />
 
             </children>
         </AnchorPane>

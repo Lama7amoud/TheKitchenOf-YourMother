@@ -42,7 +42,7 @@ public class EmailSender {
             message.setText(body);
 
             Transport.send(message);
-            System.out.println("Email sent successfully to " + to);
+            System.out.println("Email sent to " + to);
         } catch (MessagingException e) {
             e.printStackTrace();
         }

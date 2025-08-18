@@ -45,37 +45,56 @@ public class TakeAwayController implements Initializable {
     private Label emailErrorLabel;
 
 
+    private LocalTime convertDoubleToLocalTime(double time) {
+        int hours = (int) time;
+        int minutes = (int) Math.round((time - hours) * 100);
+        return LocalTime.of(hours, minutes);
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        EventBus.getDefault().register(this);
-        LocalTime now = LocalTime.now().withSecond(0).withNano(0);
+        Platform.runLater(() -> {
+            EventBus.getDefault().register(this);
+            LocalTime now = LocalTime.now().withSecond(0).withNano(0);
 
-// Round up to the next 30-minute mark
-        int minute = now.getMinute();
-        int minutesToAdd = (minute < 30) ? (30 - minute) : (60 - minute);
-        LocalTime firstSlot = now.plusMinutes(minutesToAdd);
+            Restaurant res = Client.getClientAttributes().getRestaurantInterestEntity();
+            // Current time rounded up to next 15 minutes
+            int minutes = ((now.getMinute() + 14) / 15) * 15; // round up
+            LocalTime firstSlot = now.withMinute(0).plusMinutes(minutes);
 
-// Add 7 half-hour spaced options
-        for (int i = 0; i < 7; i++) {
-            LocalTime slot = firstSlot.plusMinutes(i * 30);
-            favTimeComboBox.getItems().add(slot.toString());
-        }
+            // Get restaurant opening/closing times
+            LocalTime opening = convertDoubleToLocalTime(res.getOpeningTime());
+            LocalTime closing = convertDoubleToLocalTime(res.getClosingTime());
 
-        // Initially hide all error labels
-        hideAllErrorLabels();
+            // Make sure the first slot is not before opening
+            if (firstSlot.isBefore(opening)) {
+                firstSlot = opening;
+            }
 
-        // Set buttons that should not be visible
-        viewMapButton.setVisible(false);
-        branchDetailsButton.setVisible(false);
+            // Add 15-min interval slots until closing time
+            LocalTime slot = firstSlot;
+            while (!slot.isAfter(closing)) {
+                favTimeComboBox.getItems().add(slot.toString());
+                slot = slot.plusMinutes(15);
+            }
 
-        // Display the selected restaurant from userAtt (if available)
-        short restaurantInterest = userAtt.getRestaurantInterest();
-        String restaurantName = switch (restaurantInterest) {
-            case 1 -> "Haifa Branch";
-            case 2 -> "Tel-Aviv Branch";
-            case 3 -> "Nahariya Branch";
-            default -> "Unknown";
-        };
+
+            // Initially hide all error labels
+            hideAllErrorLabels();
+
+            // Set buttons that should not be visible
+            viewMapButton.setVisible(false);
+            branchDetailsButton.setVisible(false);
+
+            // Display the selected restaurant from userAtt (if available)
+            short restaurantInterest = userAtt.getRestaurantInterest();
+            String restaurantName = switch (restaurantInterest) {
+                case 1 -> "Haifa Branch";
+                case 2 -> "Tel-Aviv Branch";
+                case 3 -> "Nahariya Branch";
+                default -> "Unknown";
+            };
+        });
     }
 
     // Hide all error labels

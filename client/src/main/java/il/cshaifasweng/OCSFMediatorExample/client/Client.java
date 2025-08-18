@@ -65,7 +65,7 @@ public class Client extends AbstractClient {
         if (userAtt == null) {
             return userAtt = new AuthorizedUser();
         }
-        return userAtt;
+        return userAtt; // Singleton
     }
 
     public static String getClientUsername() {
