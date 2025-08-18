@@ -1,10 +1,7 @@
 
 package il.cshaifasweng.OCSFMediatorExample.client;
 
-import il.cshaifasweng.OCSFMediatorExample.entities.HostingTable;
-import il.cshaifasweng.OCSFMediatorExample.entities.OrderData;
-import il.cshaifasweng.OCSFMediatorExample.entities.Reservation;
-import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
+import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -332,6 +329,14 @@ public class TablesViewController {
     public void handleReservationList(List<String[]> reservedTable) {
         if (reservedTable == null || reservedTable.isEmpty()) {
             return;
+        }
+
+        if (!reservedTable.isEmpty()) {
+            Object first = reservedTable.get(0);
+
+            if (!(first instanceof String[])) {
+                return;
+            }
         }
 
         String[] firstRow = reservedTable.get(0);

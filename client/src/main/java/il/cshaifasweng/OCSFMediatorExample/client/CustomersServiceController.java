@@ -225,6 +225,7 @@ public class CustomersServiceController {
 
     @FXML
     void goBack(ActionEvent event) {
+        EventBus.getDefault().unregister(this);
         App.switchScreen("Main Page");
     }
 

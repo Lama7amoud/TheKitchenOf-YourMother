@@ -121,6 +121,8 @@
                     }
                     EventBus.getDefault().register(this);
                     isActive = true;
+                    payWithVisaButton.setDisable(true);
+                    payWithCashButton.setDisable(true);
                     if (OrderData.getInstance().getFullName() == null) {
                         payWithCashButton.setVisible(false);
                         payWithVisaButton.setVisible(false);
@@ -1124,9 +1126,16 @@
                         .mapToDouble(m -> mealQuantities.getOrDefault(m.getMealName(), 0) * m.getMealPrice())
                         .sum();
 
-                Platform.runLater(() ->
-                        totalToPayLabel.setText(String.format("Total: %.2f ₪", total))
-                );
+                Platform.runLater(() -> {
+                        totalToPayLabel.setText(String.format("Total: %.2f ₪", total));
+                        if (total > 0){
+                            payWithVisaButton.setDisable(false);
+                            payWithCashButton.setDisable(false);
+                        } else {
+                            payWithVisaButton.setDisable(true);
+                            payWithCashButton.setDisable(true);
+                        }
+                });
             }
 
 

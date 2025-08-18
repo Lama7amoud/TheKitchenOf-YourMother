@@ -238,7 +238,7 @@ protected void handleMessageFromServer(Object msg) {
             return;
         }*/
 
-        if(strMsg.startsWith("complaint") || strMsg.startsWith("feedback")|| strMsg.startsWith("user")){
+        if(strMsg.startsWith("complaint") || strMsg.startsWith("feedback")|| strMsg.startsWith("user") || strMsg.equals("Monthly report updated")){
             EventBus.getDefault().post(strMsg);
             return;
         }

@@ -499,6 +499,7 @@ public class SimpleServer extends AbstractServer {
 			try {
 				if (saved != null) {
 					client.sendToClient("complaint inserted successfully");
+					sendToAllClients("Monthly report updated");
 					sendToAllClients(s);
 				} else {
 					client.sendToClient(exists ? "complaint has not inserted" : "user not exist");
@@ -745,8 +746,8 @@ public class SimpleServer extends AbstractServer {
 						// Notify only this client
 						client.sendToClient("Reservation saved successfully");
 
-
 						DataManager.updateDailyReport(reservation);
+						sendToAllClients("Monthly report updated");
 
 						// Send reservation to this client only, for client-side processing if needed
 						client.sendToClient(reservation);

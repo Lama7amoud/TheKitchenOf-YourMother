@@ -54,7 +54,7 @@ public class TakeAwayController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Platform.runLater(() -> {
-            EventBus.getDefault().register(this);
+            //EventBus.getDefault().register(this);
             LocalTime now = LocalTime.now().withSecond(0).withNano(0);
 
             Restaurant res = Client.getClientAttributes().getRestaurantInterestEntity();
@@ -190,14 +190,14 @@ public class TakeAwayController implements Initializable {
         if (!validatePhoneNumber(phone)) isValid = false;
         if (!validateID(id)) {
             isValid = false;
-        } else {
+        }/* else {
             waitingForIdCheck = true;
             Client.getClient().sendToServer("check_reservation_id;" + id);
-        }
+        }*/
         if (!validateAddress(address)) isValid = false;
 
 
-        if (isValid && !waitingForIdCheck) {
+        if (isValid /*&& !waitingForIdCheck*/) {
             continueIfValid(name, phone, id, address, favoriteTime);
         }
 
@@ -230,7 +230,7 @@ public class TakeAwayController implements Initializable {
 
         int restaurantId = userAtt.getRestaurantInterest();
         Client.getClient().sendToServer("Get branch details;" + restaurantId);
-        EventBus.getDefault().unregister(this);
+        // EventBus.getDefault().unregister(this);
         App.switchScreen("Menu Page");
     }
 
@@ -247,7 +247,7 @@ public class TakeAwayController implements Initializable {
 
 
 
-    @Subscribe
+   /* @Subscribe
     public void handleIdCheck(IdCheckEvent event) {
         Platform.runLater(() -> {
             waitingForIdCheck = false;
@@ -271,7 +271,7 @@ public class TakeAwayController implements Initializable {
                 }
             }
         });
-    }
+    }*/
 
 
     @FXML
@@ -283,7 +283,7 @@ public class TakeAwayController implements Initializable {
             default -> "";
         };
         if (!page.isEmpty()) {
-            EventBus.getDefault().unregister(this);
+            // EventBus.getDefault().unregister(this);
             App.switchScreen(page);
         }
     }

@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -65,7 +66,7 @@ public class MonthlyReportViewController {
     private TableColumn<Reservation, String> sittingTypeCol;
     private TableColumn<Reservation, String> addressCol;
     private TableColumn<Reservation, String> payedMethodCol;
-
+    private String message = null;
 
     @FXML
     void back(ActionEvent event){
@@ -143,7 +144,7 @@ public class MonthlyReportViewController {
             TableView.getColumns().clear();
             complaintsHistogram.getData().clear();
             currentReportList = null;
-            String message = wantedRestaurant + ";" + monthLabel.getText() + ";" + yearLabel.getText();
+            message = wantedRestaurant + ";" + monthLabel.getText() + ";" + yearLabel.getText();
             Client client = Client.getClient();
             client.sendToServer("request_reports;" + message);
         });
@@ -151,7 +152,26 @@ public class MonthlyReportViewController {
     }
 
     @Subscribe
+    public void reportsUpdated(String msg){
+        if((!(msg.equals("Monthly report updated"))) || (message == null)){
+            return;
+        }
+        Client client = Client.getClient();
+        client.sendToServer("request_reports;" + message);
+    }
+
+    @Subscribe
     public void reportsReceived(List<DailyReport> reportsList) {
+        if (reportsList == null) {
+            return;
+        }
+        if (!reportsList.isEmpty()) {
+            Object first = reportsList.get(0);
+
+            if (!(first instanceof DailyReport)) {
+                return;
+            }
+        }
         currentReportList = reportsList;
 
         Platform.runLater(() -> {
@@ -167,7 +187,7 @@ public class MonthlyReportViewController {
             }
 
             errorLabel.setStyle("-fx-text-fill: green;");
-            errorLabel.setText("Data has received");
+            errorLabel.setText("Live data displayed");
 
             // Show totals from all reports
             long totalCustomers = reportsList.stream().mapToLong(DailyReport::getTotalCustomers).sum();
@@ -193,6 +213,20 @@ public class MonthlyReportViewController {
                 series1.getData().add(new XYChart.Data<>(String.valueOf(day), complaints));
             }
             complaintsHistogram.getData().add(series1);
+            NumberAxis yAxis = (NumberAxis) complaintsHistogram.getYAxis();
+            yAxis.setAutoRanging(false);   // disable auto-scaling
+            yAxis.setLowerBound(0);
+
+            // find the max complaints count from your reports
+            int maxComplaints = complaintsMap.values().stream().max(Integer::compareTo).orElse(0);
+
+            // round up a little so chart looks nice
+            int upperBound = Math.max(5, maxComplaints + 1);
+
+            yAxis.setUpperBound(upperBound);
+            yAxis.setTickUnit(1);          // step 1
+            yAxis.setMinorTickCount(0);    // no minor ticks
+
         });
     }
 
