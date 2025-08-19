@@ -58,24 +58,21 @@ public class TakeAwayController implements Initializable {
             LocalTime now = LocalTime.now().withSecond(0).withNano(0);
 
             Restaurant res = Client.getClientAttributes().getRestaurantInterestEntity();
-            // Current time rounded up to next 15 minutes
-            int minutes = ((now.getMinute() + 14) / 15) * 15; // round up
+
+            int minutes = ((now.getMinute() / 30) + 2) * 30; // +2 to skip the next slot
             LocalTime firstSlot = now.withMinute(0).plusMinutes(minutes);
 
-            // Get restaurant opening/closing times
             LocalTime opening = convertDoubleToLocalTime(res.getOpeningTime());
             LocalTime closing = convertDoubleToLocalTime(res.getClosingTime());
 
-            // Make sure the first slot is not before opening
             if (firstSlot.isBefore(opening)) {
                 firstSlot = opening;
             }
 
-            // Add 15-min interval slots until closing time
             LocalTime slot = firstSlot;
             while (!slot.isAfter(closing)) {
                 favTimeComboBox.getItems().add(slot.toString());
-                slot = slot.plusMinutes(15);
+                slot = slot.plusMinutes(30);
             }
 
 

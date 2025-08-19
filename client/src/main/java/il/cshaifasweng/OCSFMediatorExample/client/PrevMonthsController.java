@@ -147,7 +147,7 @@ public class PrevMonthsController {
 
                 if (selectedYear != null) {
                     // if selected year is current year → allow months up to current month
-                    int maxMonth = (selectedYear == currentYear) ? currentMonth : 12;
+                    int maxMonth = (selectedYear == currentYear) ? currentMonth-1 : 12;
 
                     for (int m = 1; m <= maxMonth; m++) {
                         monthsCombo.getItems().add(m);

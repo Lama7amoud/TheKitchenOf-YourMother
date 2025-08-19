@@ -3,14 +3,12 @@ package il.cshaifasweng.OCSFMediatorExample.server;
 import il.cshaifasweng.OCSFMediatorExample.entities.Reservation;
 
 
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import javax.persistence.*;
 import javax.persistence.criteria.*;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.LocalDateTime;
-import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -1591,45 +1589,66 @@ public class DataManager {
                     }
                 }
 
-                // === Update Monthly Reports ===
-                LocalDateTime today = LocalDateTime.now();
-                int currentYear = today.getYear();
-                int currentMonth = today.getMonthValue();
+                // ===== Monthly Reports handled here =====
 
-                // get all restaurants
-                List<Restaurant> restaurants = session.createQuery("FROM Restaurant", Restaurant.class).list();
+                // 1) Backfill missing monthly reports for past months
+                ZoneId tz = ZoneId.of("Asia/Jerusalem");
+                LocalDateTime firstDayCurrentMonth = LocalDate.now(tz).withDayOfMonth(1).atStartOfDay();
+                List<Restaurant> allRestaurants = session.createQuery("FROM Restaurant", Restaurant.class).list();
 
-                for (Restaurant restaurant : restaurants) {
-                    // get or create monthly report for this restaurant
-                    MonthlyReport monthlyReport = session.createQuery(
-                                    "FROM MonthlyReport mr WHERE mr.restaurant = :restaurant AND YEAR(mr.month) = :year AND MONTH(mr.month) = :month",
-                                    MonthlyReport.class)
-                            .setParameter("restaurant", restaurant)
-                            .setParameter("year", currentYear)
-                            .setParameter("month", currentMonth)
-                            .uniqueResult();
-
-                    if (monthlyReport == null) {
-                        monthlyReport = new MonthlyReport();
-                        monthlyReport.setRestaurant(restaurant);
-                        // set the month as the first day of current month at midnight
-                        monthlyReport.setMonth(LocalDateTime.of(currentYear, currentMonth, 1, 0, 0));
-                    }
-
-                    // fetch all daily reports of this restaurant for this month
-                    List<DailyReport> dailyReports = session.createQuery(
-                                    "FROM DailyReport dr WHERE dr.restaurant = :restaurant AND YEAR(dr.day) = :year AND MONTH(dr.day) = :month",
+                for (Restaurant r : allRestaurants) {
+                    List<DailyReport> pastDRs = session.createQuery(
+                                    "FROM DailyReport dr WHERE dr.restaurant = :r AND dr.day < :start",
                                     DailyReport.class)
-                            .setParameter("restaurant", restaurant)
-                            .setParameter("year", currentYear)
-                            .setParameter("month", currentMonth)
+                            .setParameter("r", r)
+                            .setParameter("start", firstDayCurrentMonth)
                             .list();
 
-                    monthlyReport.setDailyReports(dailyReports);
-                    monthlyReport.updateFromDailyReports();
+                    Map<YearMonth, List<DailyReport>> byYM = pastDRs.stream()
+                            .collect(Collectors.groupingBy(dr -> YearMonth.from(dr.getDay())));
 
-                    session.saveOrUpdate(monthlyReport);
+                    for (Map.Entry<YearMonth, List<DailyReport>> e : byYM.entrySet()) {
+                        YearMonth ym = e.getKey();
+                        LocalDateTime monthStart = ym.atDay(1).atStartOfDay();
+                        LocalDateTime monthEnd = ym.plusMonths(1).atDay(1).atStartOfDay();
+
+                        if (!monthEnd.isBefore(firstDayCurrentMonth)) continue;
+
+                        MonthlyReport existing = session.createQuery(
+                                        "FROM MonthlyReport mr WHERE mr.restaurant = :r AND mr.month = :m",
+                                        MonthlyReport.class)
+                                .setParameter("r", r)
+                                .setParameter("m", monthStart)
+                                .uniqueResult();
+
+                        if (existing == null) {
+                            List<DailyReport> monthDRs = session.createQuery(
+                                            "FROM DailyReport dr WHERE dr.restaurant = :r AND dr.day >= :start AND dr.day < :end",
+                                            DailyReport.class)
+                                    .setParameter("r", r)
+                                    .setParameter("start", monthStart)
+                                    .setParameter("end", monthEnd)
+                                    .list();
+
+                            if (!monthDRs.isEmpty()) {
+                                MonthlyReport mr = new MonthlyReport();
+                                mr.setRestaurant(r);
+                                mr.setMonth(monthStart);
+                                mr.setDailyReports(monthDRs);
+                                for (DailyReport dr : monthDRs) { dr.setMonthlyReport(mr); session.merge(dr); }
+                                mr.updateFromDailyReports();
+                                session.save(mr);
+                            }
+                        }
+                    }
                 }
+
+                // 2) Schedule monthly task at next month boundary
+                ZonedDateTime nowZ = ZonedDateTime.now(tz);
+                ZonedDateTime nextMonthStart = nowZ.plusMonths(1).withDayOfMonth(1).truncatedTo(ChronoUnit.DAYS);
+                long delayMs = Duration.between(nowZ, nextMonthStart).toMillis();
+
+                scheduler.schedule(new MonthBoundaryTask(sessionFactory, scheduler), delayMs, TimeUnit.MILLISECONDS);
 
 
                 session.getTransaction().commit();
