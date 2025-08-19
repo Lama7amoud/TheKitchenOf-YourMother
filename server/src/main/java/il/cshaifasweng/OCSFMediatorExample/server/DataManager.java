@@ -59,6 +59,7 @@ public class DataManager {
         configuration.addAnnotatedClass(Feedback.class);
         configuration.addAnnotatedClass(Complaint.class);
         configuration.addAnnotatedClass(DailyReport.class);
+        configuration.addAnnotatedClass(MonthlyReport.class);
         configuration.addAnnotatedClass(AuthorizedUser.class);
         configuration.addAnnotatedClass(Restaurant.class);
         configuration.addAnnotatedClass(HostingTable.class);
@@ -597,7 +598,7 @@ public class DataManager {
             session.beginTransaction();
 
             DailyReport report = session.createQuery(
-                            "FROM DailyReport WHERE restaurant = :restaurant AND generatedTime = :startOfDay",
+                            "FROM DailyReport WHERE restaurant = :restaurant AND day = :startOfDay",
                             DailyReport.class)
                     .setParameter("restaurant", restaurant)
                     .setParameter("startOfDay", startOfDay)
@@ -614,7 +615,7 @@ public class DataManager {
             if (report == null) {
                 report = new DailyReport();
                 report.setRestaurant(restaurant);
-                report.setGeneratedTime(startOfDay);
+                report.setDay(startOfDay);
                 report.setComplaintsCount(complaintCount != null ? complaintCount.intValue() : 1);
                 report.setTotalCustomers(0);
                 report.setDeliveryOrders(0);
@@ -653,7 +654,7 @@ public class DataManager {
             session.beginTransaction();
 
             DailyReport report = session.createQuery(
-                            "FROM DailyReport WHERE restaurant = :restaurant AND generatedTime = :startOfDay",
+                            "FROM DailyReport WHERE restaurant = :restaurant AND day = :startOfDay",
                             DailyReport.class)
                     .setParameter("restaurant", restaurant)
                     .setParameter("startOfDay", startOfDay)
@@ -663,7 +664,7 @@ public class DataManager {
             if (report == null) {
                 report = new DailyReport();
                 report.setRestaurant(restaurant);
-                report.setGeneratedTime(startOfDay);
+                report.setDay(startOfDay);
 
                 report.setTotalCustomers(reservation.isTakeAway()? 0 : reservation.getTotalGuests());
                 report.setReservations(reservation.isTakeAway() ? 0 : 1);
@@ -1589,6 +1590,48 @@ public class DataManager {
                         }, delay, TimeUnit.MILLISECONDS);
                     }
                 }
+
+                // === Update Monthly Reports ===
+                LocalDateTime today = LocalDateTime.now();
+                int currentYear = today.getYear();
+                int currentMonth = today.getMonthValue();
+
+                // get all restaurants
+                List<Restaurant> restaurants = session.createQuery("FROM Restaurant", Restaurant.class).list();
+
+                for (Restaurant restaurant : restaurants) {
+                    // get or create monthly report for this restaurant
+                    MonthlyReport monthlyReport = session.createQuery(
+                                    "FROM MonthlyReport mr WHERE mr.restaurant = :restaurant AND YEAR(mr.month) = :year AND MONTH(mr.month) = :month",
+                                    MonthlyReport.class)
+                            .setParameter("restaurant", restaurant)
+                            .setParameter("year", currentYear)
+                            .setParameter("month", currentMonth)
+                            .uniqueResult();
+
+                    if (monthlyReport == null) {
+                        monthlyReport = new MonthlyReport();
+                        monthlyReport.setRestaurant(restaurant);
+                        // set the month as the first day of current month at midnight
+                        monthlyReport.setMonth(LocalDateTime.of(currentYear, currentMonth, 1, 0, 0));
+                    }
+
+                    // fetch all daily reports of this restaurant for this month
+                    List<DailyReport> dailyReports = session.createQuery(
+                                    "FROM DailyReport dr WHERE dr.restaurant = :restaurant AND YEAR(dr.day) = :year AND MONTH(dr.day) = :month",
+                                    DailyReport.class)
+                            .setParameter("restaurant", restaurant)
+                            .setParameter("year", currentYear)
+                            .setParameter("month", currentMonth)
+                            .list();
+
+                    monthlyReport.setDailyReports(dailyReports);
+                    monthlyReport.updateFromDailyReports();
+
+                    session.saveOrUpdate(monthlyReport);
+                }
+
+
                 session.getTransaction().commit();
             }catch (Exception exception) {
                 if (session != null && session.isOpen()) {
@@ -2143,8 +2186,6 @@ public static Reservation getActiveReservationById(String idNumber, int restaura
         int month = Integer.parseInt(parts[2]);
         int year = Integer.parseInt(parts[3]);
 
-        Session session = null;
-
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
             session = sessionFactory.openSession();
@@ -2163,7 +2204,7 @@ public static Reservation getActiveReservationById(String idNumber, int restaura
             LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0);
             LocalDateTime endDate = startDate.withDayOfMonth(startDate.toLocalDate().lengthOfMonth())
                     .plusDays(1).minusSeconds(1);
-            predicates.add(builder.between(root.get("generatedTime"), startDate, endDate));
+            predicates.add(builder.between(root.get("day"), startDate, endDate));
 
             // Filter by restaurant name if not "All"
             if (!restaurantName.equalsIgnoreCase("All")) {
@@ -2193,6 +2234,61 @@ public static Reservation getActiveReservationById(String idNumber, int restaura
 
         return reports;
     }
+
+
+    static List<MonthlyReport> getPrevMonthlyReport(int restaurantId, int month, int year) {
+        List<MonthlyReport> reports = new ArrayList<>();
+        Session session = null;
+
+        try {
+            SessionFactory sessionFactory = getSessionFactory(password);
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<MonthlyReport> query = builder.createQuery(MonthlyReport.class);
+            Root<MonthlyReport> root = query.from(MonthlyReport.class);
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Create range for the month
+            LocalDateTime startOfMonth = LocalDateTime.of(year, month, 1, 0, 0);
+            LocalDateTime startOfNextMonth = startOfMonth.plusMonths(1);
+
+            predicates.add(builder.greaterThanOrEqualTo(root.get("month"), startOfMonth));
+            predicates.add(builder.lessThan(root.get("month"), startOfNextMonth));
+
+            // Filter by restaurant if needed
+            if (restaurantId != 0) {
+                Join<MonthlyReport, Restaurant> restaurantJoin = root.join("restaurant");
+                predicates.add(builder.equal(restaurantJoin.get("id"), restaurantId));
+            }
+
+            query.select(root)
+                    .where(predicates.toArray(new Predicate[0]))
+                    .distinct(true);
+
+            // Get all matching reports
+            reports = session.createQuery(query).getResultList();
+
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+        } finally {
+            if (session != null) {
+                session.close();
+                System.out.println("session closed");
+            }
+        }
+
+        return reports;
+    }
+
+
+
 
 
     //    visa payment

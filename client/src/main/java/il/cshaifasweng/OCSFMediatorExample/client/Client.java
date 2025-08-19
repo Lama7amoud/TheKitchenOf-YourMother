@@ -312,8 +312,11 @@ protected void handleMessageFromServer(Object msg) {
                 System.out.println("Received list of hosting tables from server.");
                 EventBus.getDefault().post((List<HostingTable>) list);
             } else if (first instanceof DailyReport) {
-                System.out.println("Received list of monthly reports from server.");
+                System.out.println("Received list of daily reports as monthly from server.");
                 EventBus.getDefault().post((List<DailyReport>) list);
+            } else if (first instanceof MonthlyReport) {
+                System.out.println("Received list of prev only months reports from server.");
+                EventBus.getDefault().post((List<MonthlyReport>) list);
             } else if (first instanceof Restaurant) {
                 List<Restaurant> restaurantList = (List<Restaurant>) list;
                 System.out.println("Received list of restaurants from server: " + restaurantList.size());

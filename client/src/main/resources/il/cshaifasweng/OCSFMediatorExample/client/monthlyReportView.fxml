@@ -25,9 +25,10 @@
          <TextField fx:id="yearLabel" layoutX="340.0" layoutY="89.0" prefHeight="25.0" prefWidth="75.0" />
          <Label layoutX="107.0" layoutY="88.0" style="-fx-font-size: 18px;" text="Month" textFill="#ffa100" />
          <Label layoutX="291.0" layoutY="87.0" style="-fx-font-size: 18px;" text="Year" textFill="#ffa100" />
-         <Button fx:id="backButtun" alignment="CENTER" layoutX="21.0" layoutY="24.0" mnemonicParsing="false" onAction="#back" prefHeight="26.0" prefWidth="55.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Back" textFill="WHITE" />
+         <Button fx:id="backButtun" alignment="CENTER" layoutX="21.0" layoutY="14.0" mnemonicParsing="false" onAction="#back" prefHeight="26.0" prefWidth="55.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Back" textFill="WHITE" />
          <Button fx:id="Confirm" alignment="CENTER" layoutX="736.0" layoutY="88.0" mnemonicParsing="false" onAction="#checkInputs" prefHeight="26.0" prefWidth="75.0" style="-fx-background-color: Green; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Confirm" textFill="WHITE" />
          <Label fx:id="errorLabel" alignment="CENTER" layoutX="279.0" layoutY="119.0" prefHeight="17.0" prefWidth="313.0" text="Error Label" textFill="RED" />
+         <Button fx:id="prevMonthsButton" alignment="CENTER" layoutX="21.0" layoutY="47.0" mnemonicParsing="false" onAction="#toPrevMonthsPage" prefHeight="26.0" prefWidth="245.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Prev Months only - Report final numbers" textFill="WHITE" />
       </children>
    </Pane>
 

@@ -28,6 +28,9 @@ import static il.cshaifasweng.OCSFMediatorExample.client.Client.userAtt;
 public class MonthlyReportViewController {
 
     @FXML
+    private Button prevMonthsButton;
+
+    @FXML
     private Button backButtun;
 
     @FXML
@@ -163,7 +166,7 @@ public class MonthlyReportViewController {
             currentReportList = null;
             message = wantedRestaurant + ";" + monthLabel.getText() + ";" + yearLabel.getText();
             Client client = Client.getClient();
-            client.sendToServer("request_reports;" + message);
+            client.sendToServer("request_reports_daily_as_monthly;" + message);
         });
 
     }
@@ -219,11 +222,11 @@ public class MonthlyReportViewController {
 
             Map<Integer, Integer> complaintsMap = new HashMap<>();
             for (DailyReport report : reportsList) {
-                int day = report.getGeneratedTime().getDayOfMonth();
+                int day = report.getDay().getDayOfMonth();
                 complaintsMap.put(day, report.getComplaintsCount());
             }
 
-            LocalDate firstDate = reportsList.get(0).getGeneratedTime().toLocalDate();
+            LocalDate firstDate = reportsList.get(0).getDay().toLocalDate();
             int daysInMonth = firstDate.lengthOfMonth();
             for (int day = 1; day <= daysInMonth; day++) {
                 int complaints = complaintsMap.getOrDefault(day, 0);
@@ -340,7 +343,13 @@ public class MonthlyReportViewController {
         });
     }
 
-
+    @FXML
+    void toPrevMonthsPage(ActionEvent event){
+        EventBus.getDefault().unregister(this);
+        Platform.runLater(() -> {
+            App.switchScreen("Prev Months Page");
+        });
+    }
 
     @FXML
     void initialize(){

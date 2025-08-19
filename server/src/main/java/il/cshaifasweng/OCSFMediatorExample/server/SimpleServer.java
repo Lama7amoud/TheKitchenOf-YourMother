@@ -508,7 +508,7 @@ public class SimpleServer extends AbstractServer {
 				e.printStackTrace();
 			}
 		}
-		else if (msgString.startsWith("request_reports")) {
+		else if (msgString.startsWith("request_reports_daily_as_monthly")) {
 			List<DailyReport> reports = DataManager.getReportsByMonth(msgString);  // Make sure this method exists
 			if (reports != null){
 				try {
@@ -518,6 +518,19 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 
+		}
+		else if (msgString.startsWith("request_prev_only_monthly_reports")){
+			String[] parts = msgString.split(";");
+			int restaurantId = Integer.parseInt(parts[1]);
+			int month = Integer.parseInt(parts[2]);
+			int year = Integer.parseInt(parts[3]);
+
+			List<MonthlyReport> report = DataManager.getPrevMonthlyReport(restaurantId, month, year);
+			try {
+				client.sendToClient(report);
+			} catch (IOException ioException) {
+				ioException.printStackTrace();
+			}
 		}
 		else if (msgString.startsWith("Update preferences")) {
 			String details = msgString.substring("Update preferences".length()).trim();

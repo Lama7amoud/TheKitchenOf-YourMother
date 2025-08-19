@@ -17,7 +17,7 @@ public class DailyReport implements Serializable {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-    private LocalDateTime generatedTime;
+    private LocalDateTime day;
 
     private int totalCustomers;
 
@@ -30,6 +30,14 @@ public class DailyReport implements Serializable {
     // Bidirectional mapping: all reservations for this report (no filtering here)
     @OneToMany(mappedBy = "dailyReport", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Reservation> reservationsList;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "monthly_report_id")
+    private MonthlyReport monthlyReport;
+
+    public MonthlyReport getMonthlyReport() {return monthlyReport;}
+
+    public void setMonthlyReport(MonthlyReport monthlyReport) {this.monthlyReport = monthlyReport;}
 
     public int getId() {
         return id;
@@ -52,12 +60,12 @@ public class DailyReport implements Serializable {
         this.restaurant = restaurant;
     }
 
-    public LocalDateTime getGeneratedTime() {
-        return generatedTime;
+    public LocalDateTime getDay() {
+        return day;
     }
 
-    public void setGeneratedTime(LocalDateTime generatedTime) {
-        this.generatedTime = generatedTime;
+    public void setDay(LocalDateTime day) {
+        this.day = day;
     }
 
     public int getTotalCustomers() {
