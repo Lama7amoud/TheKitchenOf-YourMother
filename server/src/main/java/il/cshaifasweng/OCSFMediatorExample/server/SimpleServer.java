@@ -15,6 +15,7 @@ import java.util.*;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class SimpleServer extends AbstractServer {
 
@@ -23,7 +24,11 @@ public class SimpleServer extends AbstractServer {
 	public SimpleServer(int port) {
 		super(port);
 		System.out.println("[SimpleServer] Listening for new connections on port " + port);
+
+
 	}
+
+
 
 	private Timer reportTimer;
 
@@ -195,6 +200,7 @@ public class SimpleServer extends AbstractServer {
 							} else {
 								reservation.setAmountDue(feeShekels);
 								reservation.setStatus("off");
+								reservation.setCancellationStatus("cancelled");
 								reservation.setPayed(false);
 								DataManager.updateReservation(reservation);
 								System.out.println("[SimpleServer] → about to send order_cancellation_debt; fee="
@@ -242,6 +248,7 @@ public class SimpleServer extends AbstractServer {
 					try {
 						if (paymentSucceeded) {
 							reservation.setStatus("off");
+
 							// Leave isPayed = true for Visa (assuming you had set it true at time of ordering)
 							DataManager.updateReservation(reservation);
 							client.sendToClient("order_cancellation_success;" + fee);
@@ -262,7 +269,9 @@ public class SimpleServer extends AbstractServer {
 					reservation.setAmountDue(totalShekels);
 					reservation.setStatus("off");      // still “off” (canceled)
 					reservation.setPayed(false);       // explicitly ensure isPayed stays false
+					reservation.setCancellationStatus("cancelled");
 					DataManager.updateReservation(reservation);
+
 
 					// 3) Notify client – “you have a debt of ₪ totalShekels under your ID”:
 					try {
@@ -306,6 +315,7 @@ public class SimpleServer extends AbstractServer {
 					} else {
 						System.out.println("[SimpleServer]   → Reservation > 1 hour away. Cancelling with no fee.");
 						reservation.setStatus("off");
+						reservation.setCancellationStatus("cancelled");
 						DataManager.updateReservation(reservation);
 						System.out.println("[SimpleServer]   → Sending cancellation_success;0");
 						client.sendToClient("cancellation_success;0");
@@ -330,6 +340,7 @@ public class SimpleServer extends AbstractServer {
 				} else if (reservation.getVisa() != null) {
 					// Visa path
 					reservation.setStatus("off");
+					reservation.setCancellationStatus("cancelled");
 					DataManager.updateReservation(reservation);
 					client.sendToClient("cancellation_success;" + fee);
 				} else {
@@ -738,7 +749,7 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 		}*/
-		else if (msg instanceof ReservationRequest) {
+		/*else if (msg instanceof ReservationRequest) {
 			ReservationRequest request = (ReservationRequest) msg;
 			Reservation reservation = request.getReservation();
 			boolean shouldSave = request.isShouldSave();
@@ -785,7 +796,67 @@ public class SimpleServer extends AbstractServer {
 					throw new RuntimeException(e);
 				}
 			}
+		}*/
+		else if (msg instanceof ReservationRequest) {
+			ReservationRequest request = (ReservationRequest) msg;
+			Reservation reservation = request.getReservation();
+			boolean shouldSave = request.isShouldSave();
+
+			if (shouldSave) {
+				System.out.println("Saving reservation to DB...");
+
+				// Only block if there's an active reservation for this ID within ±90 minutes
+				boolean clash = DataManager.hasActiveReservationAround(
+						reservation.getIdNumber(),
+						reservation.getReservationTime(),
+						90
+				);
+				if (clash) {
+					try {
+						client.sendToClient("Reservation failed: ID already used.");
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+					return;
+				}
+
+				try {
+					boolean ok = DataManager.saveReservation(reservation);
+					if (!ok) {
+						client.sendToClient("Reservation failed: ID already used.");
+						return;
+					}
+
+					// Notify only this client
+					client.sendToClient("Reservation saved successfully");
+
+					DataManager.updateDailyReport(reservation);
+					sendToAllClients("Monthly report updated");
+
+					// Send reservation to this client only, for client-side processing if needed
+					client.sendToClient(reservation);
+
+					// Notify all other clients about reservation update
+					sendToAllClientsExceptSender(new Message("reservation_update", reservation), client);
+
+					// sent to all clients for update
+					List<HostingTable> updatedAvailability = DataManager.getAvailableTables(reservation);
+					sendToAllClients(updatedAvailability);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Checking availability for reservation...");
+				List<HostingTable> availability = DataManager.getAvailableTables(reservation);
+				System.out.println("Available tables: " + availability.size());
+				try {
+					client.sendToClient(availability);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
+
 		else if (msg instanceof Reservation) {
 			System.out.println("Received raw Reservation (availability check assumed)");
 			List<HostingTable> availability = DataManager.getAvailableTables((Reservation) msg);

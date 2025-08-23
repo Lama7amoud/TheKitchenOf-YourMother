@@ -2,6 +2,7 @@ package il.cshaifasweng.OCSFMediatorExample.client;
 
 import il.cshaifasweng.OCSFMediatorExample.client.events.MessageEvent;
 import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
+import il.cshaifasweng.OCSFMediatorExample.entities.OrderData;
 import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -43,6 +44,7 @@ public class TakeAwayOrReservationController {
 
     @FXML
     private Button branchDetailsButton;
+    @FXML private Label branchNameLabel;
 
     private Stage stage;
     private Scene scene;
@@ -50,12 +52,39 @@ public class TakeAwayOrReservationController {
 
     private boolean isActive = false;
 
+
+    private String nameForInterest() {
+        short id = Client.getClientAttributes().getRestaurantInterest();
+        return switch (id) {
+            case 1 -> "Haifa Branch";
+            case 2 -> "Tel-Aviv Branch";
+            case 3 -> "Nahariya Branch";
+            default -> "";
+        };
+    }
+
+
+    private void setBranchLabel(Restaurant r) {
+        Platform.runLater(() -> {
+            if (branchNameLabel != null) {
+                branchNameLabel.setText(
+                        (r != null && r.getName() != null && !r.getName().isEmpty())
+                                ? r.getName()
+                                : nameForInterest()  // fallback until entity arrives
+                );
+            }
+        });
+    }
+
+
     @FXML
     void initialize() {
         Platform.runLater(() -> {
+
             cancelButton.setDisable(true);
             cancelButton1.setDisable(true);
-
+            Restaurant restaurant = OrderData.getInstance().getSelectedRestaurant();
+            branchNameLabel.setText(restaurant != null ? restaurant.getName() : "");
             takeAwayInfoLabel.setVisible(false);
             takeAwayButton.setDisable(true); // disable till we check the times
 
@@ -79,6 +108,9 @@ public class TakeAwayOrReservationController {
                 }
             });
 
+
+            setBranchLabel(null);
+
             if (!EventBus.getDefault().isRegistered(this)) {
                 EventBus.getDefault().register(this);
             }
@@ -87,6 +119,7 @@ public class TakeAwayOrReservationController {
             isActive = true;
         });
     }
+
 
 
     // Convenience method to show a simple information alert
@@ -106,7 +139,7 @@ public class TakeAwayOrReservationController {
         }
         Client.getClientAttributes().setRestaurantInterestEntity(res);
         boolean isOpen = isRestaurantOpenNow(res);
-
+        setBranchLabel(res);
         Platform.runLater(() -> {
             if (isOpen) {
                 takeAwayButton.setDisable(false);

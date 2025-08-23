@@ -70,6 +70,41 @@ public class DataManager {
         return configuration.buildSessionFactory(serviceRegistry);
     }
 
+    public static boolean hasActiveReservationAround(String idNumber,
+                                                     LocalDateTime candidateTime,
+                                                     int minutesEitherSide) {
+        SessionFactory sf = getSessionFactory(password);
+        Session s = null;
+        try {
+            s = sf.openSession();
+            s.beginTransaction();
+
+            LocalDateTime start = candidateTime.minusMinutes(minutesEitherSide);
+            LocalDateTime end   = candidateTime.plusMinutes(minutesEitherSide);
+
+            Long count = s.createQuery(
+                            "SELECT COUNT(r) FROM Reservation r " +
+                                    "WHERE r.idNumber = :id " +
+                                    "  AND lower(r.status) = 'on' " +
+                                    "  AND r.reservationTime BETWEEN :start AND :end", Long.class)
+                    .setParameter("id", idNumber)
+                    .setParameter("start", start)
+                    .setParameter("end", end)
+                    .getSingleResult();
+
+            s.getTransaction().commit();
+            return (count != null && count > 0);
+        } catch (Exception e) {
+            if (s != null && s.getTransaction().isActive()) s.getTransaction().rollback();
+            e.printStackTrace();
+            // On error, be conservative and say there's a conflict
+            return true;
+        } finally {
+            if (s != null) s.close();
+        }
+    }
+
+
 
     // called by a function that already opened the session
     private static List<Meal> getMenu() throws Exception {
@@ -1769,7 +1804,7 @@ public class DataManager {
         }
     }
 
-    public static void saveReservation(Reservation reservation) {
+    /*public static void saveReservation(Reservation reservation) {
 
         SessionFactory sessionFactory = getSessionFactory(password);
         session = sessionFactory.openSession();
@@ -1777,9 +1812,13 @@ public class DataManager {
 
         try {
             // Do not save if ID already exists
-            boolean exists = checkIfIdHasReservation(reservation.getIdNumber());
-            if (exists) {
-                System.out.println("Reservation ID already exists. Skipping save.");
+            boolean timeClash = hasActiveReservationAround(
+                    reservation.getIdNumber(),
+                    reservation.getReservationTime(),
+                    90
+            );
+            if (timeClash) {
+                System.out.println("User has another active reservation within ±90 minutes. Rejecting.");
                 session.getTransaction().rollback();
                 return;
             }
@@ -1855,7 +1894,106 @@ public class DataManager {
         } finally {
             session.close();
         }
+    }*/
+
+    public static boolean saveReservation(Reservation reservation) {
+
+        SessionFactory sessionFactory = getSessionFactory(password);
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        if (reservation.getCancellationStatus() == null) reservation.setCancellationStatus("on");
+        try {
+            // Reject if there is another ACTIVE reservation for this ID within ±90 minutes
+            boolean timeClash = hasActiveReservationAround(
+                    reservation.getIdNumber(),
+                    reservation.getReservationTime(),
+                    90
+            );
+            if (timeClash) {
+                System.out.println("User has another active reservation within ±90 minutes. Rejecting.");
+                session.getTransaction().rollback();
+                return false;
+            }
+
+
+            // Save the reservation FIRST to assign its ID
+            session.save(reservation);
+
+            // Save ReservedTime instances using the now-persistent reservation
+            if (reservation.getReservedTables() != null) {
+                LocalDateTime startTime = reservation.getReservationTime();
+                for (HostingTable table : reservation.getReservedTables()) {
+                    ReservedTime rt = new ReservedTime(table, startTime, reservation);
+                    session.save(rt);
+                }
+            }
+
+            session.getTransaction().commit();
+            System.out.println(">>> Reservation and reserved times committed");
+
+        } catch (Exception e) {
+            if (session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            System.err.println(">>> Error during reservation save:");
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+
+        // ------------------------
+        // Scheduler logic (outside the transaction)
+        // ------------------------
+        try {
+            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime targetTime = reservation.isTakeAway()
+                    ? reservation.getReservationTime()
+                    : reservation.getReservationTime().plusMinutes(90);
+
+            if (!now.isBefore(targetTime)) {
+                // Time already passed → turn off immediately
+                try (Session taskSession = sessionFactory.openSession()) {
+                    taskSession.beginTransaction();
+                    Reservation res = taskSession.get(Reservation.class, reservation.getId());
+                    if (res != null && "on".equals(res.getStatus())) {
+                        res.setStatus("off");
+                        taskSession.update(res);
+                    }
+                    taskSession.getTransaction().commit();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                // Schedule to turn off at targetTime
+                long delay = Duration.between(now, targetTime).toMillis();
+                final long savedId = reservation.getId();
+                scheduler.schedule(() -> {
+                    try (Session taskSession = sessionFactory.openSession()) {
+                        taskSession.beginTransaction();
+                        Reservation res = taskSession.get(Reservation.class, savedId);
+                        if (res != null && "on".equals(res.getStatus())) {
+                            res.setStatus("off");
+                            taskSession.update(res);
+                        }
+                        taskSession.getTransaction().commit();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }, delay, TimeUnit.MILLISECONDS);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        // ------------------------
+
+        return true;
     }
+
 
     public static List<String[]> findOverlappingReservations(String[] details) {
         Session session = null;
@@ -2051,6 +2189,7 @@ public class DataManager {
             for (Reservation res : reservations) {
                 if (res.getStatus().equalsIgnoreCase("on")) {
                     res.setStatus("off");
+                    res.setCancellationStatus("cancelled");
                     session.update(res);
 
                     // Delete all related ReservedTime entries

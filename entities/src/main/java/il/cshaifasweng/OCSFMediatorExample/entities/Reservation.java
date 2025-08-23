@@ -29,6 +29,7 @@ public class Reservation implements Serializable {
     private String cvv;
     private String email;
     private double amountDue = 0.0;   //addedddd
+    private String cancellationStatus = "on"; //addedd by m7md
 
     @Transient  // If using JPA
     private String senderId;
@@ -156,4 +157,8 @@ public class Reservation implements Serializable {
 
     public boolean isPayed() { return isPayed; }
     public void setPayed(boolean payed) { isPayed = payed; }
+
+
+    public String getCancellationStatus() { return cancellationStatus; }
+    public void setCancellationStatus(String cancellationStatus) { this.cancellationStatus = cancellationStatus; }
 }

@@ -44,11 +44,42 @@ public class TakeAwayController implements Initializable {
     @FXML
     private Label emailErrorLabel;
 
+    @FXML private Label branchNameLabel;
 
     private LocalTime convertDoubleToLocalTime(double time) {
         int hours = (int) time;
         int minutes = (int) Math.round((time - hours) * 100);
         return LocalTime.of(hours, minutes);
+    }
+
+
+    private String nameForInterest() {
+        short id = Client.getClientAttributes().getRestaurantInterest();
+        return switch (id) {
+            case 1 -> "Haifa Branch";
+            case 2 -> "Tel-Aviv Branch";
+            case 3 -> "Nahariya Branch";
+            default -> "";
+        };
+    }
+
+
+    private void setBranchLabel(Restaurant r) {
+        Platform.runLater(() -> {
+            if (branchNameLabel != null) {
+                branchNameLabel.setText(
+                        (r != null && r.getName() != null && !r.getName().isEmpty())
+                                ? r.getName()
+                                : nameForInterest()  // fallback until entity arrives
+                );
+            }
+        });
+    }
+
+    @Subscribe
+    public void restaurantEntityReceived(Restaurant res) {
+        if (res == null) return;
+        setBranchLabel(res);
     }
 
     @Override
@@ -58,7 +89,7 @@ public class TakeAwayController implements Initializable {
             LocalTime now = LocalTime.now().withSecond(0).withNano(0);
 
             Restaurant res = Client.getClientAttributes().getRestaurantInterestEntity();
-
+            setBranchLabel(res);
             int minutes = ((now.getMinute() / 30) + 2) * 30; // +2 to skip the next slot
             LocalTime firstSlot = now.withMinute(0).plusMinutes(minutes);
 
@@ -273,6 +304,9 @@ public class TakeAwayController implements Initializable {
 
     @FXML
     void switchPage(ActionEvent event) {
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
         Button sourceButton = (Button) event.getSource();
         String page = switch (sourceButton.getId()) {
             case "backToOrderTablesButton" -> "TakeAwayOrReservation Page";

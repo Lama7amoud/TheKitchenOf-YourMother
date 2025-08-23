@@ -37,8 +37,11 @@ public class ConfirmOrderController {
     @FXML
     private Button backToMainPageButton, backToOrderTablesButton, branchDetailsButton, viewMapButton, ConfirmOrderButton;
 
+
     @FXML
     private Label guestCountLabel, notesLabel, preferredTimeLabel, sittingTypeLabel,visaLabel;
+
+    @FXML private Label branchNameLabel;
 
     @FXML
     private  Label phoneLabel,nameLabel,idLabel,addressLabel,errorTimeLabel;
@@ -54,9 +57,10 @@ public class ConfirmOrderController {
 
 
 
-
+    private Restaurant selectedRestaurant;
     private List<HostingTable> lastReceivedTables = new ArrayList<>();
     private boolean reservationAlreadySent = false;
+
 
     @FXML
     private void handleBackToMainPage(ActionEvent event) {
@@ -101,7 +105,8 @@ public class ConfirmOrderController {
         isActive = true;
         branchDetailsButton.setVisible(false);
         viewMapButton.setVisible(false);
-
+        Restaurant restaurant = OrderData.getInstance().getSelectedRestaurant();
+        branchNameLabel.setText(restaurant != null ? restaurant.getName() : "");
         // Populate expiration month/year
         expirationMonthCombo.getItems().addAll("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12");
         int currentYear = LocalDate.now().getYear();
@@ -290,8 +295,8 @@ public class ConfirmOrderController {
 
         if (!isValid || reservationAlreadySent) return;
         currentFormData = new String[]{name, phone, id, address, visa, expirationMonth, expirationYear, cvv, email};
-        Client.getClient().sendToServer("check_reservation_id;" + id);
-
+        reservationAlreadySent = true;
+        proceedWithReservation();
     }
 
 
@@ -312,6 +317,14 @@ public class ConfirmOrderController {
         });
     }
 
+    //added later for +-90 hours reservations
+    @Subscribe
+    public void onReservationFailure(MessageEvent evt) {
+        if (!isActive) return;
+        if ("Reservation failed: ID already used.".equals(evt.getMessage())) {
+            reservationAlreadySent = false; // allow another attempt on the same page
+        }
+    }
 
     @Subscribe
     public void onIdCheckResponse(IdCheckEvent event) {
@@ -418,11 +431,24 @@ public class ConfirmOrderController {
         LocalTime restaurantClosing = LocalTime.of(closingHour, closingMinutes);
         LocalDateTime endOfDay = LocalDateTime.of(date, restaurantClosing).minusMinutes(RESERVATION_DURATION_MINUTES);
 
+        if (start.isAfter(endOfDay)) {
+            Platform.runLater(() -> {
+                AvailableTimeBox.getItems().clear();
+                AvailableTimeBox.setDisable(true);
+                errorTimeLabel.setText("No available times remain before closing.");
+                errorTimeLabel.setVisible(true);
+            });
+            return;
+        }
+
         this.lastReceivedTables = availableTables;
         List<String> timeSlots = new ArrayList<>();
 
-        // Try first: slots within next hour
         LocalDateTime endOneHour = start.plusMinutes(60);
+        if (endOneHour.isAfter(endOfDay)) {
+            endOneHour = endOfDay;
+        }
+
         List<String> nextHourSlots = findAvailableSlots(start, endOneHour, availableTables, sittingType, requiredSeats);
         timeSlots.addAll(nextHourSlots);
 
@@ -538,7 +564,5 @@ public class ConfirmOrderController {
             }
         }
     }
-
-
 
 }

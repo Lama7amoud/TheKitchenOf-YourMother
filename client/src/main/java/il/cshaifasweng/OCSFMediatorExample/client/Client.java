@@ -256,13 +256,25 @@ protected void handleMessageFromServer(Object msg) {
             return;
         }
 
-        if (strMsg.equals("Reservation failed: ID already used.")) {
+/*        if (strMsg.equals("Reservation failed: ID already used.")) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Reservation Failed");
                 alert.setHeaderText(null);
                 alert.setContentText("A reservation already exists for this ID.");
                 alert.showAndWait();
+            });
+            return;
+        }*/
+
+
+        //error pops when time conflict
+        if (strMsg.startsWith("Reservation failed: ID already used.")) {
+            Platform.runLater(() -> {
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText(null);
+                a.setContentText(strMsg);
+                a.showAndWait();
             });
             return;
         }
