@@ -27,10 +27,10 @@
                   <Insets left="10.0" right="10.0" />
                </padding>
             </Label>
-            <Button fx:id="managerConfirmButton" alignment="CENTER" layoutX="36.0" layoutY="128.0" mnemonicParsing="false" onAction="#manager_confirm_price_func" prefHeight="35.0" prefWidth="164.0" style="-fx-background-radius: 5em; -fx-background-color: white;" text="Price Change Confirmation" textOverrun="CLIP" wrapText="true" AnchorPane.bottomAnchor="238.0" AnchorPane.leftAnchor="36.0" AnchorPane.rightAnchor="35.0" />
+            <Button fx:id="managerConfirmButton" alignment="CENTER" layoutX="36.0" layoutY="128.0" mnemonicParsing="false" onAction="#manager_confirm_price_func" prefHeight="35.0" prefWidth="164.0" style="-fx-background-radius: 5em; -fx-background-color: white;" text="Price Change Confirmation" textOverrun="CLIP" visible="false" wrapText="true" AnchorPane.bottomAnchor="238.0" AnchorPane.leftAnchor="36.0" AnchorPane.rightAnchor="35.0" />
             <Button fx:id="managerFeedbackButton" alignment="CENTER" layoutX="36.0" layoutY="220.0" mnemonicParsing="false" onAction="#manager_feedback_func" prefHeight="35.0" prefWidth="164.0" style="-fx-background-radius: 5em; -fx-background-color: white;" text="view feedback" />
             <Button layoutX="40.0" layoutY="343.0" mnemonicParsing="false" onAction="#backFunc" prefHeight="31.0" prefWidth="43.0" style="-fx-background-radius: 5em; -fx-background-color: white;" text="back" />
-            <Button fx:id="managerDiscountButton" alignment="CENTER" layoutX="34.0" layoutY="173.0" mnemonicParsing="false" onAction="#manager_confirm_discount_func" prefHeight="35.0" prefWidth="166.0" style="-fx-background-radius: 5em; -fx-background-color: white;" text="Discount Confirmation" textOverrun="CLIP" wrapText="true" />
+            <Button fx:id="managerDiscountButton" alignment="CENTER" layoutX="34.0" layoutY="173.0" mnemonicParsing="false" onAction="#manager_confirm_discount_func" prefHeight="35.0" prefWidth="166.0" style="-fx-background-radius: 5em; -fx-background-color: white;" text="Discount Confirmation" textOverrun="CLIP" visible="false" wrapText="true" />
             <Button fx:id="monthlyReportsButton" alignment="CENTER" layoutX="36.0" layoutY="267.0" mnemonicParsing="false" onAction="#monthlyReportsPage" prefHeight="35.0" prefWidth="164.0" style="-fx-background-radius: 5em; -fx-background-color: white;" text="View Monthly Reports" />
          </children>
       </AnchorPane>

@@ -267,7 +267,7 @@ public class DataManager {
         user4.setAge((short) 22);
         user4.setRestaurant(restaurant1);
         user4.setConnected(false);
-        user4.setPermissionLevel((short) 2);
+        user4.setPermissionLevel((short) 3);
 
         AuthorizedUser user6 = new AuthorizedUser();
         user6.setUsername("Malki");
