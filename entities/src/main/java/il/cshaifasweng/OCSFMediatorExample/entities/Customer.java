@@ -1,4 +1,4 @@
 package il.cshaifasweng.OCSFMediatorExample.entities;
 
-public abstract class AuthorizedUser extends User {
+public class Customer extends User{
 }

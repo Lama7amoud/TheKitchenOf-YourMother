@@ -1,6 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
+import il.cshaifasweng.OCSFMediatorExample.entities.User;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -130,7 +130,7 @@ public class PersonalAreaPageController {
     @FXML
     void initialize(){
         Platform.runLater(() -> {
-            AuthorizedUser user = Client.getClientAttributes();
+            User user = Client.getClientAttributes();
             j = 0;
             try {
                 // if not the restaurant manager

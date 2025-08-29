@@ -23,8 +23,6 @@
         import javafx.scene.layout.VBox;
         import javafx.scene.control.CheckBox;
 
-        import java.io.File;
-
         import javafx.stage.Modality;
         import javafx.stage.Stage;
         import org.greenrobot.eventbus.EventBus;
@@ -32,7 +30,6 @@
         import javafx.scene.layout.HBox;
 
         import java.io.IOException;
-        import java.time.LocalDate;
         import java.time.LocalDateTime;
         import java.time.LocalTime;
         import java.util.ArrayList;
@@ -137,7 +134,7 @@
                     short restaurantInterest = userAtt.getRestaurantInterest();
                     MenuController.setRestaurantInterest(restaurantInterest);
                     System.out.println("Initialized Menu with restaurant interest: " + restaurantInterest);
-                    AuthorizedUser user = Client.getClientAttributes();
+                    User user = Client.getClientAttributes();
 
                     Restaurant restaurant = Client.getClientAttributes().getRestaurant();
                     System.out.println("Restaurant in Menu Page: " + (restaurant != null ? restaurant.getId() : "null"));
@@ -195,7 +192,7 @@
                                     return;
                                 }
 
-                                AuthorizedUser user = Client.getClientAttributes();
+                                User user = Client.getClientAttributes();
 
                                 if (user != null) {
                                     if (user.getPermissionLevel() == 0) { // Customer - editable checkboxes

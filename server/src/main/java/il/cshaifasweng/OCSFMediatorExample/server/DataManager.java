@@ -23,7 +23,7 @@ import il.cshaifasweng.OCSFMediatorExample.entities.*;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.HostingTable;
 import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
+import il.cshaifasweng.OCSFMediatorExample.entities.User;
 import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
 import il.cshaifasweng.OCSFMediatorExample.entities.ReservedTime;
 import org.hibernate.HibernateException;
@@ -58,7 +58,7 @@ public class DataManager {
         configuration.addAnnotatedClass(Complaint.class);
         configuration.addAnnotatedClass(DailyReport.class);
         configuration.addAnnotatedClass(MonthlyReport.class);
-        configuration.addAnnotatedClass(AuthorizedUser.class);
+        configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(Restaurant.class);
         configuration.addAnnotatedClass(HostingTable.class);
         configuration.addAnnotatedClass(Business.class);
@@ -222,7 +222,7 @@ public class DataManager {
 
         // Create authorized users
         //mnhelt resht
-        AuthorizedUser user1 = new AuthorizedUser();
+        User user1 = new User();
         user1.setUsername("Sharbel");
         user1.setPassword("password123");
         user1.setFirstname("Sharbel");
@@ -234,7 +234,7 @@ public class DataManager {
         user1.setPermissionLevel((short) 4);
 
         //ditanit
-        AuthorizedUser user2 = new AuthorizedUser();
+        User user2 = new User();
         user2.setUsername("Falah");
         user2.setPassword("password456");
         user2.setFirstname("Falah");
@@ -246,7 +246,7 @@ public class DataManager {
         user2.setPermissionLevel((short) 5);
 
         //30fedt kshre lko7ot
-        AuthorizedUser user3 = new AuthorizedUser();
+        User user3 = new User();
         user3.setUsername("Mohammed");
         user3.setPassword("password789");
         user3.setFirstname("Mohammed");
@@ -258,7 +258,7 @@ public class DataManager {
         user3.setPermissionLevel((short) 2);
 
         //mnhlot snefem
-        AuthorizedUser user4 = new AuthorizedUser();
+        User user4 = new User();
         user4.setUsername("Lama");
         user4.setPassword("password777");
         user4.setFirstname("Lama");
@@ -269,7 +269,7 @@ public class DataManager {
         user4.setConnected(false);
         user4.setPermissionLevel((short) 3);
 
-        AuthorizedUser user6 = new AuthorizedUser();
+        User user6 = new User();
         user6.setUsername("Malki");
         user6.setPassword("password111");
         user6.setFirstname("Malki");
@@ -280,7 +280,7 @@ public class DataManager {
         user6.setConnected(false);
         user6.setPermissionLevel((short) 3);
 
-        AuthorizedUser user7 = new AuthorizedUser();
+        User user7 = new User();
         user7.setUsername("Abedalftah");
         user7.setPassword("password222");
         user7.setFirstname("Abedalftah");
@@ -293,7 +293,7 @@ public class DataManager {
 
 
         //30fdot
-        AuthorizedUser user5 = new AuthorizedUser();
+        User user5 = new User();
         user5.setUsername("Oraib");
         user5.setPassword("password888");
         user5.setFirstname("Oraib");
@@ -304,7 +304,7 @@ public class DataManager {
         user5.setConnected(false);
         user5.setPermissionLevel((short) 1);
 
-        AuthorizedUser user8 = new AuthorizedUser();
+        User user8 = new User();
         user8.setUsername("Rasha");
         user8.setPassword("password333");
         user8.setFirstname("Rasha");
@@ -315,7 +315,7 @@ public class DataManager {
         user8.setConnected(false);
         user8.setPermissionLevel((short) 1);
 
-        AuthorizedUser user9 = new AuthorizedUser();
+        User user9 = new User();
         user9.setUsername("Waleed");
         user9.setPassword("password666");
         user9.setFirstname("Waleed");
@@ -705,29 +705,43 @@ public class DataManager {
                 report.setComplaintsCount(0);  // complaints not updated here
             } else {
                 Long totalCustomers = session.createQuery(
-                                "SELECT COALESCE(SUM(r.totalGuests), 0) FROM Reservation r WHERE r.restaurant = :restaurant " +
+                                "SELECT COALESCE(SUM(r.totalGuests), 0) FROM Reservation r " +
+                                        "WHERE r.restaurant = :restaurant " +
                                         "AND r.isTakeAway = false " +
-                                        "AND r.reservationTime >= :startOfDay AND r.reservationTime < :endOfDay", Long.class)
+                                        "AND r.cancellationStatus = 'on' " +
+                                        "AND r.reservationTime >= :startOfDay " +
+                                        "AND r.reservationTime < :endOfDay", Long.class)
                         .setParameter("restaurant", restaurant)
                         .setParameter("startOfDay", startOfDay)
                         .setParameter("endOfDay", endOfDay)
                         .uniqueResult();
+
 
                 Long deliveryOrders = session.createQuery(
-                                "SELECT COUNT(r) FROM Reservation r WHERE r.restaurant = :restaurant " +
-                                        "AND r.isTakeAway = true AND r.reservationTime >= :startOfDay AND r.reservationTime < :endOfDay", Long.class)
+                                "SELECT COUNT(r) FROM Reservation r " +
+                                        "WHERE r.restaurant = :restaurant " +
+                                        "AND r.isTakeAway = true " +
+                                        "AND r.cancellationStatus = 'on' " +
+                                        "AND r.reservationTime >= :startOfDay " +
+                                        "AND r.reservationTime < :endOfDay", Long.class)
                         .setParameter("restaurant", restaurant)
                         .setParameter("startOfDay", startOfDay)
                         .setParameter("endOfDay", endOfDay)
                         .uniqueResult();
 
+
                 Long reservations = session.createQuery(
-                                "SELECT COUNT(r) FROM Reservation r WHERE r.restaurant = :restaurant " +
-                                        "AND r.isTakeAway = false AND r.reservationTime >= :startOfDay AND r.reservationTime < :endOfDay", Long.class)
+                                "SELECT COUNT(r) FROM Reservation r " +
+                                        "WHERE r.restaurant = :restaurant " +
+                                        "AND r.isTakeAway = false " +
+                                        "AND r.cancellationStatus = 'on' " +
+                                        "AND r.reservationTime >= :startOfDay " +
+                                        "AND r.reservationTime < :endOfDay", Long.class)
                         .setParameter("restaurant", restaurant)
                         .setParameter("startOfDay", startOfDay)
                         .setParameter("endOfDay", endOfDay)
                         .uniqueResult();
+
 
                 report.setTotalCustomers(totalCustomers.intValue());
                 report.setDeliveryOrders(deliveryOrders.intValue());
@@ -753,7 +767,7 @@ public class DataManager {
 
 
 
-    static AuthorizedUser checkPermission(String details) {
+    static User checkPermission(String details) {
         try {
             SessionFactory sessionFactory = getSessionFactory(password);
             session = sessionFactory.openSession();
@@ -765,7 +779,7 @@ public class DataManager {
             String[] parts = details.split(";");
             System.out.println(Arrays.toString(parts));
             if (parts.length < 2) {
-                AuthorizedUser errorUser = new AuthorizedUser();
+                User errorUser = new User();
                 errorUser.setMessageToServer("Invalid input format. Expected 'username;password'");
                 return errorUser;
             }
@@ -774,29 +788,29 @@ public class DataManager {
             String password = parts[1].trim();
 
             CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaQuery<AuthorizedUser> query = builder.createQuery(AuthorizedUser.class);
-            Root<AuthorizedUser> root = query.from(AuthorizedUser.class);
+            CriteriaQuery<User> query = builder.createQuery(User.class);
+            Root<User> root = query.from(User.class);
 
             // Search for user by username
             query.select(root).where(builder.equal(root.get("username"), username));
-            AuthorizedUser user = session.createQuery(query).uniqueResult();
+            User user = session.createQuery(query).uniqueResult();
 
             if (user == null) {
-                AuthorizedUser errorUser = new AuthorizedUser();
+                User errorUser = new User();
                 errorUser.setMessageToServer("User does not exist");
                 return errorUser;
             }
 
             // Verify password
             if (!user.getPassword().equals(password)) {
-                AuthorizedUser errorUser = new AuthorizedUser();
+                User errorUser = new User();
                 errorUser.setMessageToServer("Incorrect password");
                 return errorUser;
             }
 
             // Check if the user is already connected
             if (user.isConnected()) {
-                AuthorizedUser errorUser = new AuthorizedUser();
+                User errorUser = new User();
                 errorUser.setMessageToServer("You are already connected with this user.");
                 return errorUser;
             }
@@ -805,7 +819,7 @@ public class DataManager {
             session.update(user);
             session.getTransaction().commit();
 
-            AuthorizedUser currentUser = new AuthorizedUser();
+            User currentUser = new User();
             currentUser.copyUser(user);
             currentUser.setMessageToServer("Login successful");
 
@@ -814,7 +828,7 @@ public class DataManager {
         } catch (Exception exception) {
             System.err.println("An error occurred");
             exception.printStackTrace();
-            AuthorizedUser errorUser = new AuthorizedUser();
+            User errorUser = new User();
             errorUser.setMessageToServer("An error occurred while checking permissions");
             return errorUser;
         } finally {
@@ -832,14 +846,14 @@ public class DataManager {
             session.beginTransaction();
 
             CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaQuery<AuthorizedUser> query = builder.createQuery(AuthorizedUser.class);
-            Root<AuthorizedUser> root = query.from(AuthorizedUser.class);
+            CriteriaQuery<User> query = builder.createQuery(User.class);
+            Root<User> root = query.from(User.class);
 
             // Search for user by username
             query.select(root).where(builder.equal(root.get("username"), username));
 
             // Get the user object from the query result
-            AuthorizedUser user = session.createQuery(query).uniqueResult();
+            User user = session.createQuery(query).uniqueResult();
 
             if (user != null) {
                 // Set isConnected to false
@@ -2333,6 +2347,7 @@ public static Reservation getActiveReservationById(String idNumber, int restaura
             if (session != null) {
                 session.close();
                 System.out.println("Session closed");
+                updateDailyReport(reservation);
             }
         }
     }

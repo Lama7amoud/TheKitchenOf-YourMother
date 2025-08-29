@@ -3,7 +3,6 @@ package il.cshaifasweng.OCSFMediatorExample.client;
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
-import net.bytebuddy.asm.Advice;
 import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
 
@@ -18,7 +17,7 @@ public class Client extends AbstractClient {
     private static Client client = null;
     public static String host;
     public static int port;
-    static AuthorizedUser userAtt;
+    static User userAtt;
     private static final String CLIENT_ID = UUID.randomUUID().toString();
     public static String getClientId() {
         return CLIENT_ID;
@@ -61,9 +60,9 @@ public class Client extends AbstractClient {
         userAtt.resetAttributes();
     }
 
-    public static AuthorizedUser getClientAttributes() {
+    public static User getClientAttributes() {
         if (userAtt == null) {
-            return userAtt = new AuthorizedUser();
+            return userAtt = new User();
         }
         return userAtt; // Singleton
     }
@@ -196,8 +195,8 @@ public class Client extends AbstractClient {
                 // You can now post the reports to EventBus or open a new page
                 EventBus.getDefault().post(new MonthlyReportsEvent(reports));
             }
-    }  else if (msg instanceof AuthorizedUser) {
-            userAtt.copyUser((AuthorizedUser) msg);
+    }  else if (msg instanceof User) {
+            userAtt.copyUser((User) msg);
             String response = "Authorized user request:" + userAtt.getMessageToServer();
             EventBus.getDefault().post(response);
         } else if (msg instanceof Restaurant) {
@@ -369,9 +368,9 @@ protected void handleMessageFromServer(Object msg) {
         EventBus.getDefault().post(msg);
     }
 
-    // Handle AuthorizedUser object
-    if (msg instanceof AuthorizedUser) {
-        userAtt.copyUser((AuthorizedUser) msg);
+    // Handle User object
+    if (msg instanceof User) {
+        userAtt.copyUser((User) msg);
         String response = "Authorized user request: " + userAtt.getMessageToServer();
         EventBus.getDefault().post(response);
     }

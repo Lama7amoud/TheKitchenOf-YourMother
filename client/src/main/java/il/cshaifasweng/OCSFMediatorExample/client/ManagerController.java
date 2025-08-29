@@ -1,13 +1,11 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
 import javafx.application.Platform;
-import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Button;
 
 public class ManagerController {
 
@@ -36,7 +34,7 @@ public class ManagerController {
     @FXML
     void initialize(){
         Platform.runLater(() -> {
-            AuthorizedUser user = Client.getClientAttributes();
+            User user = Client.getClientAttributes();
             helloTitleLabel.setText("Hello " + user.getFirstname());
             switch (user.getPermissionLevel()){
 

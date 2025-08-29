@@ -1,20 +1,14 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
 import javafx.application.Platform;
-import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.greenrobot.eventbus.EventBus;
-import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
 
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
-import org.greenrobot.eventbus.EventBus;
-import il.cshaifasweng.OCSFMediatorExample.entities.Meal;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -148,7 +142,7 @@ public class updateMenuPageController {
             });*/
 
 
-            AuthorizedUser user = Client.getClientAttributes();
+            User user = Client.getClientAttributes();
             helloTitleLabel.setText("Hello " + user.getFirstname());
             managerTypeLabel.setText("Dietitian");
             Client.getClient().setUpdateMenuController(this);

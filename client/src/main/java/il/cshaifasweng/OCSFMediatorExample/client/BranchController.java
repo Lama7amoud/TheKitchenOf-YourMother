@@ -1,6 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
+import il.cshaifasweng.OCSFMediatorExample.entities.User;
 import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -107,7 +107,7 @@ public class BranchController {
     void initialize() {
         Platform.runLater(() -> {
             EventBus.getDefault().register(this);
-            AuthorizedUser user = Client.getClientAttributes();
+            User user = Client.getClientAttributes();
             String locationPrefix = "";
 
             switch (user.getRestaurantInterest()) {

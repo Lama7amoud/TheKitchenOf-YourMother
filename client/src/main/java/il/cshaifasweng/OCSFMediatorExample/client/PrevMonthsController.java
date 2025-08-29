@@ -1,7 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
-import il.cshaifasweng.OCSFMediatorExample.entities.DailyReport;
+import il.cshaifasweng.OCSFMediatorExample.entities.User;
 import il.cshaifasweng.OCSFMediatorExample.entities.MonthlyReport;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -53,7 +52,7 @@ public class PrevMonthsController {
     @FXML
     void getReports(ActionEvent event){
         Client client = Client.getClient();
-        AuthorizedUser user = Client.getClientAttributes();
+        User user = Client.getClientAttributes();
 
         int restaurantId;
         if(user.getPermissionLevel() != 4){

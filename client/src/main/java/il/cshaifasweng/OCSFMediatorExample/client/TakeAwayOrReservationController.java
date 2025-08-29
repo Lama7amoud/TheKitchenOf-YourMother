@@ -1,7 +1,7 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
 import il.cshaifasweng.OCSFMediatorExample.client.events.MessageEvent;
-import il.cshaifasweng.OCSFMediatorExample.entities.AuthorizedUser;
+import il.cshaifasweng.OCSFMediatorExample.entities.User;
 import il.cshaifasweng.OCSFMediatorExample.entities.OrderData;
 import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
 import javafx.application.Platform;
@@ -88,7 +88,7 @@ public class TakeAwayOrReservationController {
             takeAwayInfoLabel.setVisible(false);
             takeAwayButton.setDisable(true); // disable till we check the times
 
-            AuthorizedUser user = Client.getClientAttributes();
+            User user = Client.getClientAttributes();
             if (user.getPermissionLevel() != 0) {
                 takeAwayButton.setVisible(false);
                 eatWithUsButton.setText("Host Customers");

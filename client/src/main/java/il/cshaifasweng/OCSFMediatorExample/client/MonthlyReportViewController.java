@@ -177,7 +177,7 @@ public class MonthlyReportViewController {
             return;
         }
         Client client = Client.getClient();
-        client.sendToServer("request_reports;" + message);
+        client.sendToServer("request_reports_daily_as_monthly;" + message);
     }
 
     @Subscribe
@@ -268,11 +268,14 @@ public class MonthlyReportViewController {
             List<Reservation> filteredReservations = currentReportList.stream()
                     .flatMap(report -> report.getReservationsList().stream())
                     .filter(res -> {
+                        if (!"on".equals(res.getCancellationStatus())) return false; // only active reservations
+
                         if (choice.equals("Reservations")) return !res.isTakeAway();
                         else if (choice.equals("deliveries")) return res.isTakeAway();
                         else return true;
                     })
                     .collect(Collectors.toList());
+
 
             // Create columns once
             if (TableView.getColumns().isEmpty()) {

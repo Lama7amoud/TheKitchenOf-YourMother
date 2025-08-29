@@ -1,6 +1,5 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
-import il.cshaifasweng.OCSFMediatorExample.client.Client;
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
 
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
@@ -9,13 +8,10 @@ import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import java.time.LocalTime;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class SimpleServer extends AbstractServer {
 
@@ -115,7 +111,7 @@ public class SimpleServer extends AbstractServer {
 
 
 		else if(msgString.startsWith("logIn:")){
-			AuthorizedUser currentUser = DataManager.checkPermission(msgString);
+			User currentUser = DataManager.checkPermission(msgString);
 			try {
 				System.out.println(currentUser.getMessageToServer());
 				client.sendToClient(currentUser);
@@ -231,6 +227,7 @@ public class SimpleServer extends AbstractServer {
 					}
 				}
 			}
+			sendToAllClients("Monthly report updated");
 		}
 		else if (msgString.startsWith("process_order_cancellation;")) {
 			String[] parts = msgString.split(";");
@@ -288,6 +285,7 @@ public class SimpleServer extends AbstractServer {
 					e.printStackTrace();
 				}
 			}
+			sendToAllClients("Monthly report updated");
 		}
 
 
@@ -324,6 +322,7 @@ public class SimpleServer extends AbstractServer {
 					e.printStackTrace();
 				}
 			}
+			sendToAllClients("Monthly report updated");
 		}
 
 		// ───────── (D) “process_cancellation;<idNumber>;<fee>” branch (unchanged) ─────────
@@ -354,6 +353,7 @@ public class SimpleServer extends AbstractServer {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			sendToAllClients("Monthly report updated");
 		}
 
 
