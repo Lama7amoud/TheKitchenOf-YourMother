@@ -79,41 +79,52 @@ public class ManagerFeedBackController {
 
     @Subscribe
     public void handleFeedbackList(Object msg) {
-        if (msg instanceof List<?>) {
-            List<?> list = (List<?>) msg;
-            if (!list.isEmpty() && list.get(0) instanceof Feedback) {
-                List<Feedback> allFeedbacks = (List<Feedback>) list;
+        if (!(msg instanceof List<?>)) return;
 
-                List<Feedback> filtered;
+        List<?> list = (List<?>) msg;
+        if (list.isEmpty() || !(list.get(0) instanceof Feedback)) return;
 
-                if (userAtt.getPermissionLevel()==4)
-                {
-                    filtered = allFeedbacks;
-                }
-                else {
-                    int restaurantId = userAtt.getRestaurantId();
-                    System.out.println(restaurantId);
-                    if (restaurantId == 1) {
-                        filtered = allFeedbacks.stream()
-                                .filter(f -> f.getRestaurant().getName().equalsIgnoreCase("Haifa"))
-                                .collect(Collectors.toList());
-                    } else if (restaurantId == 2) {
-                        filtered = allFeedbacks.stream()
-                                .filter(f -> f.getRestaurant().getName().equalsIgnoreCase("Tel-Aviv"))
-                                .collect(Collectors.toList());
-                    } else if (restaurantId == 3) {
-                        filtered = allFeedbacks.stream()
-                                .filter(f -> f.getRestaurant().getName().equalsIgnoreCase("Nahariya"))
-                                .collect(Collectors.toList());
-                    } else {
-                        filtered = allFeedbacks;
-                    }
-                }
+        List<Feedback> allFeedbacks = (List<Feedback>) list;
 
-                Platform.runLater(() -> feedbackList.setAll(filtered));
-            }
+        // === filter ===
+        List<Feedback> filtered;
+        if (userAtt != null && userAtt.getPermissionLevel() == 4) {
+            // Admin (permission 4) sees everything
+            filtered = allFeedbacks;
+        } else {
+            // Non-admins see only feedbacks from their restaurant
+            int userRestaurantId = (userAtt != null) ? userAtt.getRestaurantId() : -1;
+
+            filtered = allFeedbacks.stream()
+                    .filter(f -> f != null && f.getRestaurant() != null)
+                    // Prefer matching by restaurant ID (safer than names)
+                    .filter(f -> {
+                        try {
+                            // If your Restaurant entity has getId():
+                            return f.getRestaurant().getId() == userRestaurantId;
+                        } catch (NoSuchMethodError | NullPointerException e) {
+                            // Fallback: if you *don’t* have getId(), map names by ID:
+                            String expectedName =
+                                    switch (userRestaurantId) {
+                                        case 1 -> "Haifa";
+                                        case 2 -> "Tel-Aviv";
+                                        case 3 -> "Nahariya";
+                                        default -> null;
+                                    };
+                            return expectedName != null &&
+                                    expectedName.equalsIgnoreCase(f.getRestaurant().getName());
+                        }
+                    })
+                    .toList();
         }
+
+        Platform.runLater(() -> {
+            feedbackList.setAll(filtered);
+            // Optional: keep any current sorting
+            feedbackTable.sort();
+        });
     }
+
 
 
     @FXML
