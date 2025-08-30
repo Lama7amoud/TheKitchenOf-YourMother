@@ -199,7 +199,7 @@ public class TablesViewController {
                 datePicker.setValue(null);
                 timePicker.setValue(null);
                 userAtt.setRestaurantInterest((short)restaurantId);
-                Client.getClient().sendToServer("Get branch details;" + userAtt.getRestaurantInterest());
+                Client.getClient().sendToServer(Customer.requestBranchDetailsMsg() + userAtt.getRestaurantInterest());
             }
         });
     }
@@ -320,7 +320,7 @@ public class TablesViewController {
             default -> 0;
         };
 
-        String message = String.format("CheckTablesAvailability;%d;%s;%s", restaurantId,
+        String message = String.format(AuthorizedUser.requestMapMsg() + "%d;%s;%s", restaurantId,
                 selectedDate.toString(), selectedTime);
         Client.getClient().sendToServer(message);
     }
@@ -501,7 +501,7 @@ public class TablesViewController {
                 }
             });
 
-            Client.getClient().sendToServer("Get branch details;" + userAtt.getRestaurantInterest());
+            Client.getClient().sendToServer(Customer.requestBranchDetailsMsg() + userAtt.getRestaurantInterest());
         });
     }
 

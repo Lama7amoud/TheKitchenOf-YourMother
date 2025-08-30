@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.BranchManager;
 import il.cshaifasweng.OCSFMediatorExample.entities.Feedback;
 import il.cshaifasweng.OCSFMediatorExample.entities.PriceConfirmation;
 import javafx.application.Platform;
@@ -73,7 +74,7 @@ public class ManagerFeedBackController {
             return new ReadOnlyStringWrapper(formatted);
         });
 
-        Client.getClient().sendToServer("Get Manager feedback");
+        Client.getClient().sendToServer(BranchManager.requestFeedbackMsg());
     }
 
     @Subscribe
@@ -117,6 +118,7 @@ public class ManagerFeedBackController {
 
     @FXML
     void goBack(ActionEvent event) {
+        EventBus.getDefault().unregister(this);
         App.switchScreen("Management Page");
     }
 

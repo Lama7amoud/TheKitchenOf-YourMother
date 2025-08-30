@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.Customer;
 import il.cshaifasweng.OCSFMediatorExample.entities.User;
 import il.cshaifasweng.OCSFMediatorExample.entities.Restaurant;
 import javafx.application.Platform;
@@ -133,7 +134,7 @@ public class BranchController {
                 PrevImageButton.setDisable(true);
 
                 Client clientInstance = Client.getClient();
-                clientInstance.sendToServer("Get branch details;" + userAtt.getRestaurantInterest());
+                clientInstance.sendToServer(Customer.requestBranchDetailsMsg() + userAtt.getRestaurantInterest());
             } catch (Exception e) {
                 e.printStackTrace();
             }

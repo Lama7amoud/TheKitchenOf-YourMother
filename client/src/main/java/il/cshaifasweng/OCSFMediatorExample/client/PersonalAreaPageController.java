@@ -188,7 +188,7 @@ public class PersonalAreaPageController {
             }
             short userPermissionLevel = user.getPermissionLevel();
             jobPositionLabel.setText("Job Position: " + switch (userPermissionLevel) {
-                case 1 -> "Employee";
+                case 1 -> "RestaurantEmployee";
                 case 2 -> "Service";
                 case 3 -> "Branch Manager";
                 case 4 -> "Restaurant Manager";

@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.BranchManager;
 import il.cshaifasweng.OCSFMediatorExample.entities.User;
 import il.cshaifasweng.OCSFMediatorExample.entities.MonthlyReport;
 import javafx.application.Platform;
@@ -64,7 +65,7 @@ public class PrevMonthsController {
         int month = monthsCombo.getValue();
         int year = yearCombo.getValue();
 
-        client.sendToServer("request_prev_only_monthly_reports;" + restaurantId + ";" + month + ";" + year);
+        client.sendToServer(BranchManager.requestPrevReportsMsg() + restaurantId + ";" + month + ";" + year);
         Platform.runLater(() -> {
             totalCustomersNumLabel.setText("Total Customers:");
             deliveryOrdersNumLabel.setText("Delivery Orders:");

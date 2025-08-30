@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "monthly_reports")
-public class MonthlyReport implements Serializable {
+public class MonthlyReport implements Serializable, IReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -106,4 +106,31 @@ public class MonthlyReport implements Serializable {
         this.reservations = dailyReports.stream().mapToInt(DailyReport::getReservations).sum();
         this.complaintsCount = dailyReports.stream().mapToInt(DailyReport::getComplaintsCount).sum();
     }
+
+    @Override
+    public String GetReportAsString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Monthly Report for Restaurant ID: ").append(restaurant.getId()).append("\n");
+        sb.append("Month: ").append(month.getMonth()).append(" ").append(month.getYear()).append("\n");
+        sb.append("Total Customers: ").append(totalCustomers).append("\n");
+        sb.append("Reservations: ").append(reservations).append("\n");
+        sb.append("Delivery Orders: ").append(deliveryOrders).append("\n");
+        sb.append("Complaints: ").append(complaintsCount).append("\n");
+
+        // summarize daily reports
+        if (dailyReports != null && !dailyReports.isEmpty()) {
+            sb.append("Daily Reports:\n");
+            for (DailyReport dr : dailyReports) {
+                sb.append(" - Date: ").append(dr.getDay().toLocalDate())
+                        .append(", Customers: ").append(dr.getTotalCustomers())
+                        .append(", Reservations: ").append(dr.getReservations())
+                        .append(", Delivery Orders: ").append(dr.getDeliveryOrders())
+                        .append(", Complaints: ").append(dr.getComplaintsCount())
+                        .append("\n");
+            }
+        }
+
+        return sb.toString();
+    }
+
 }

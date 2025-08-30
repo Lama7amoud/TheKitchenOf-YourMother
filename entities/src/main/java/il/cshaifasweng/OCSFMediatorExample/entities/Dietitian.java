@@ -1,5 +1,9 @@
 package il.cshaifasweng.OCSFMediatorExample.entities;
 
-public class Dietitian extends Employee {
+import javax.persistence.*;
+
+@Entity
+@DiscriminatorValue("DIETITIAN")
+public class Dietitian extends AuthorizedUser {
 
 }

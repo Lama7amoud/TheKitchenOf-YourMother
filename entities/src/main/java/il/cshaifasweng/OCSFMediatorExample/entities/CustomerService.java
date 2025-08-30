@@ -1,5 +1,9 @@
 package il.cshaifasweng.OCSFMediatorExample.entities;
 
-public class CustomerService extends Employee {
+import javax.persistence.*;
+
+@Entity
+@DiscriminatorValue("CUSTOMER_SERVICE")
+public class CustomerService extends AuthorizedUser {
 
 }

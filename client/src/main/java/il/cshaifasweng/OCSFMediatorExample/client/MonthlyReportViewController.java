@@ -1,7 +1,9 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.BranchManager;
 import il.cshaifasweng.OCSFMediatorExample.entities.DailyReport;
 import il.cshaifasweng.OCSFMediatorExample.entities.Reservation;
+import il.cshaifasweng.OCSFMediatorExample.entities.RestaurantChainManager;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -143,17 +145,7 @@ public class MonthlyReportViewController {
                     default: wantedRestaurant = "";
                 }
             } else{
-                switch(restaurantNameBox.getValue()){
-                    case("Haifa Branch"): wantedRestaurant = "Haifa-Mom Kitchen";
-                        break;
-                    case("Tel-Aviv Branch"): wantedRestaurant = "Tel-Aviv-Mom Kitchen";
-                        break;
-                    case ("Nahariya Branch"): wantedRestaurant = "Nahariya-Mom Kitchen";
-                        break;
-                    case ("All") : wantedRestaurant = "All";
-                        break;
-                    default: wantedRestaurant = "";
-                }
+                wantedRestaurant = RestaurantChainManager.reportRestaurantMsg(restaurantNameBox.getValue());
 
             }
             System.out.println("my restaurant is: " + wantedRestaurant);
@@ -164,9 +156,10 @@ public class MonthlyReportViewController {
             TableView.getColumns().clear();
             complaintsHistogram.getData().clear();
             currentReportList = null;
+
             message = wantedRestaurant + ";" + monthLabel.getText() + ";" + yearLabel.getText();
             Client client = Client.getClient();
-            client.sendToServer("request_reports_daily_as_monthly;" + message);
+            client.sendToServer(BranchManager.requestReportMsg() + message);
         });
 
     }
@@ -177,7 +170,7 @@ public class MonthlyReportViewController {
             return;
         }
         Client client = Client.getClient();
-        client.sendToServer("request_reports_daily_as_monthly;" + message);
+        client.sendToServer(BranchManager.requestReportMsg() + message);
     }
 
     @Subscribe

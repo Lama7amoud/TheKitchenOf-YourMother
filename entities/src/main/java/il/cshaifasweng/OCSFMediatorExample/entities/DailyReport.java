@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "daily_reports")
-public class DailyReport implements Serializable {
+public class DailyReport implements Serializable, IReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -100,5 +100,30 @@ public class DailyReport implements Serializable {
         this.complaintsCount = complaintsCount;
     }
 
-    // Constructors as needed
+    @Override
+    public String GetReportAsString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Daily Report for Restaurant ID: ").append(restaurant.getId()).append("\n");
+        sb.append("Date: ").append(day.toLocalDate()).append("\n");
+        sb.append("Total Customers: ").append(totalCustomers).append("\n");
+        sb.append("Reservations: ").append(reservations).append("\n");
+        sb.append("Delivery Orders: ").append(deliveryOrders).append("\n");
+        sb.append("Complaints: ").append(complaintsCount).append("\n");
+
+        // list reservations
+        if (reservationsList != null && !reservationsList.isEmpty()) {
+            sb.append("Reservations Details:\n");
+            for (Reservation r : reservationsList) {
+                sb.append(" - Reservation ID: ").append(r.getId())
+                        .append(", Guests: ").append(r.getTotalGuests())
+                        .append(", TakeAway: ").append(r.isTakeAway())
+                        .append("\n");
+            }
+        }
+
+        return sb.toString();
+    }
+
+
+
 }
