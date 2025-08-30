@@ -120,8 +120,6 @@ public class ManagerFeedBackController {
 
         Platform.runLater(() -> {
             feedbackList.setAll(filtered);
-            // Optional: keep any current sorting
-            feedbackTable.sort();
         });
     }
 

@@ -98,10 +98,14 @@ public class SimpleServer extends AbstractServer {
 			boolean feedbackConfirm = DataManager.saveFeedback(feedbackMsg, rating, restaurantId, idNumber, name);
 
 			try {
-				client.sendToClient(feedbackConfirm
-						? "feedback inserted successfully"
-						: "feedback has not inserted");
-
+				if (feedbackConfirm) {
+					client.sendToClient("feedback inserted successfully");
+					sendToAllClients("feedback updated");
+					List<Feedback> updated = DataManager.getManagerFeedback();
+					sendToAllClients(updated);
+				} else {
+					client.sendToClient("feedback has not inserted");
+				}
 				client.sendToClient(DataManager.getManagerFeedback());
 			} catch (IOException e) {
 				e.printStackTrace();
