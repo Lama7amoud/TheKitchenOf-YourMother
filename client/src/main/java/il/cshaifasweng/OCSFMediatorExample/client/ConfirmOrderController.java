@@ -103,6 +103,7 @@ public class ConfirmOrderController {
             EventBus.getDefault().register(this);
         }
         isActive = true;
+        ConfirmOrderButton.setDisable(false);
         branchDetailsButton.setVisible(false);
         viewMapButton.setVisible(false);
         Restaurant restaurant = OrderData.getInstance().getSelectedRestaurant();
@@ -474,6 +475,7 @@ public class ConfirmOrderController {
                     AvailableTimeBox.setDisable(true);
                     errorTimeLabel.setText("There is no available time today, please try another day.");
                     errorTimeLabel.setVisible(true);
+                    ConfirmOrderButton.setDisable(true);
                 }
             }
         });

@@ -327,7 +327,10 @@ public class TablesViewController {
 
     @Subscribe
     public void handleReservationList(List<String[]> reservedTable) {
+
+
         if (reservedTable == null || reservedTable.isEmpty()) {
+            System.out.println("received tables list is empty");
             return;
         }
 
@@ -335,12 +338,14 @@ public class TablesViewController {
             Object first = reservedTable.get(0);
 
             if (!(first instanceof String[])) {
+                System.out.println("first is not a String[]");
                 return;
             }
         }
 
         String[] firstRow = reservedTable.get(0);
         if (firstRow.length != 4 || !Character.isDigit(firstRow[0].charAt(0))) {
+            System.out.println("first row != 4..");
             return;
         }
 
@@ -350,9 +355,16 @@ public class TablesViewController {
         // Clear previous reservation data
         reservationMap.clear();
 
+        int tableIdOffset = 0;
+        switch(Client.getClientAttributes().getRestaurantInterest()){
+            case(2): tableIdOffset = -13;
+                break;
+            case(3): tableIdOffset = -21;
+        }
         // Process each reservation
         for (String[] row : reservedTable) {
-            String tableId = row[0];
+            int tableIdNum = Integer.parseInt(row[0]) + tableIdOffset;
+            String tableId = String.valueOf(tableIdNum);
             String time = row[1];
             String name = row[2];
             String guests = row[3];

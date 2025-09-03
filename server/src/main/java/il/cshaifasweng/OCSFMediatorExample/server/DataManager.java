@@ -603,7 +603,7 @@ public class DataManager {
                 session.update(c);
                 EmailSender.sendEmail(c.getEmail(),
                         "Customer Service Response - Complaint Follow-up",
-                        "Hello " + c.getName() + "\n\n" + c.getResponse());
+                        "Hello " + c.getName() + "\n\n" + c.getResponse()+ "\n\n"+"Refund = "+refund);
             }
             tx.commit();
             return c;
