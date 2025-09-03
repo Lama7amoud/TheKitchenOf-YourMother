@@ -1661,8 +1661,10 @@ public class DataManager {
                         LocalDateTime monthStart = ym.atDay(1).atStartOfDay();
                         LocalDateTime monthEnd = ym.plusMonths(1).atDay(1).atStartOfDay();
 
-                        if (!monthEnd.isBefore(firstDayCurrentMonth)) continue;
-
+                        if (!monthStart.isBefore(firstDayCurrentMonth)) {
+                            System.out.println("continued");
+                            continue;
+                        }
                         MonthlyReport existing = session.createQuery(
                                         "FROM MonthlyReport mr WHERE mr.restaurant = :r AND mr.month = :m",
                                         MonthlyReport.class)
