@@ -268,15 +268,17 @@ protected void handleMessageFromServer(Object msg) {
 
 
         //error pops when time conflict
-        if (strMsg.startsWith("Reservation failed: ID already used.")) {
+        if ("Reservation failed: time conflict".equals(strMsg)) {
             Platform.runLater(() -> {
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setHeaderText(null);
-                a.setContentText(strMsg);
-                a.showAndWait();
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Time Unavailable");
+                alert.setHeaderText(null);
+                alert.setContentText("Someone just booked those seats first. Please choose another slot.");
+                alert.showAndWait();
             });
             return;
         }
+
 
         if (strMsg.equals("client added successfully")) {
             App.switchScreen("Log In Page");

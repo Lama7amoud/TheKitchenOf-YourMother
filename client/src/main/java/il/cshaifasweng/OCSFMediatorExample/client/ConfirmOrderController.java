@@ -319,6 +319,7 @@ public class ConfirmOrderController {
     }
 
     //added later for +-90 hours reservations
+/*
     @Subscribe
     public void onReservationFailure(MessageEvent evt) {
         if (!isActive) return;
@@ -326,6 +327,17 @@ public class ConfirmOrderController {
             reservationAlreadySent = false; // allow another attempt on the same page
         }
     }
+*/
+    @Subscribe
+    public void onReservationFailure(MessageEvent evt) {
+        if (!isActive) return;
+        String m = evt.getMessage();
+        if ("Reservation failed: ID already used.".equals(m) ||
+                "Reservation failed: time conflict".equals(m)) {
+            reservationAlreadySent = false; // allow another attempt on the same page
+        }
+    }
+
 
     @Subscribe
     public void onIdCheckResponse(IdCheckEvent event) {

@@ -36,6 +36,8 @@ public class TakeAwayOrReservationController {
     private Button takeAwayButton;
     @FXML
     private Button eatWithUsButton;
+    @FXML private TextField reservationIdField;
+
 
     @FXML private Button cancelButton;   // Cancel Reservation
     @FXML private Button cancelButton1;  // Cancel Order
@@ -99,15 +101,6 @@ public class TakeAwayOrReservationController {
 
             Client.getClient().sendToServer("Check open times for res;" + user.getRestaurantInterest());
 
-            IDtextField.textProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue.matches("\\d{9}")) {
-                    Client.getClient().sendToServer("check_id_type:" + newValue + ":" + Client.getClientAttributes().getRestaurantInterest()); // changed ; to :
-                } else {
-                    cancelButton.setDisable(true);
-                    cancelButton1.setDisable(true);
-                }
-            });
-
 
             setBranchLabel(null);
 
@@ -115,10 +108,35 @@ public class TakeAwayOrReservationController {
                 EventBus.getDefault().register(this);
             }
 
+            //added by mohammad
+            IDtextField.textProperty().addListener((a,b,c) -> updateCancelButtons());
+            reservationIdField.textProperty().addListener((a,b,c) -> updateCancelButtons());
+            updateCancelButtons();
+
             branchDetailsButton.setVisible(false);
             isActive = true;
         });
     }
+
+    //added by mohammad
+    private void updateCancelButtons() {
+        String idNumber = (IDtextField.getText() == null) ? "" : IDtextField.getText().trim();
+        String resIdStr = (reservationIdField.getText() == null) ? "" : reservationIdField.getText().trim();
+
+        boolean idOk  = idNumber.matches("\\d{9}");
+        boolean ridOk = resIdStr.matches("\\d+");
+
+        // default: both off
+        cancelButton.setDisable(true);
+        cancelButton1.setDisable(true);
+
+        // ONLY when both are valid, ask the server exactly for that pair
+        if (idOk && ridOk) {
+            Client.getClient().sendToServer("check_id_type_exact:" + idNumber + ":" + resIdStr);
+        }
+    }
+
+
 
 
 
@@ -186,13 +204,46 @@ public class TakeAwayOrReservationController {
         return LocalTime.of(hours, minutes);
     }
 
-
     @Subscribe
     public void handleIdTypeResponse(MessageEvent evt) {
         String msg = evt.getMessage();
         if (!msg.startsWith("id_type:")) return;
 
         String type = msg.split(":")[1].trim();
+
+        String idNumber = (IDtextField.getText() == null) ? "" : IDtextField.getText().trim();
+        String resIdStr = (reservationIdField.getText() == null) ? "" : reservationIdField.getText().trim();
+        boolean idOk  = idNumber.matches("\\d{9}");
+        boolean ridOk = resIdStr.matches("\\d+");
+
+        Platform.runLater(() -> {
+            if (!idOk || !ridOk) {
+                cancelButton.setDisable(true);
+                cancelButton1.setDisable(true);
+                return;
+            }
+            if ("reservation".equals(type)) {
+                cancelButton.setDisable(false);
+                cancelButton1.setDisable(true);
+            } else if ("takeaway".equals(type)) {
+                cancelButton1.setDisable(false);
+                cancelButton.setDisable(true);
+            } else {
+                cancelButton.setDisable(true);
+                cancelButton1.setDisable(true);
+            }
+        });
+    }
+
+
+/*
+    @Subscribe
+    public void handleIdTypeResponse(MessageEvent evt) {
+        String msg = evt.getMessage();
+        if (!msg.startsWith("id_type:")) return;
+
+        String type = msg.split(":")[1].trim();
+
 
         Platform.runLater(() -> {
             switch (type) {
@@ -210,6 +261,7 @@ public class TakeAwayOrReservationController {
             }
         });
     }
+*/
 
 
     // Convenience method to show an error alert
@@ -221,10 +273,7 @@ public class TakeAwayOrReservationController {
         alert.showAndWait();
     }
 
-    /**
-     * This method is bound to your FXML “Cancel Reservation” button.
-     * It simply sends “cancel_reservation;<id>” to the server.
-     */
+/*
     @FXML
     public void handleCancelReservation(ActionEvent event) {
         System.out.println("[TakeAwayOrReservationController] Cancel Reservation clicked, ID = " + IDtextField.getText());
@@ -242,10 +291,7 @@ public class TakeAwayOrReservationController {
         }
     }
 
-    /**
-     * New “Cancel Order” button handler.
-     * It sends “cancel_order;<id>” to the server.
-     */
+
     @FXML
     public void handleCancelOrder(ActionEvent event) {
         String id = IDtextField.getText().trim();
@@ -260,7 +306,58 @@ public class TakeAwayOrReservationController {
             e.printStackTrace();
             showError("Failed to send order‐cancellation request to server.");
         }
+    }*/
+
+
+
+    //mohammad update for cancelling + reservation number
+    @FXML
+    public void handleCancelReservation(ActionEvent event) {
+        String idNumber = IDtextField.getText().trim();
+        String resIdStr = reservationIdField.getText().trim();
+
+        if (!idNumber.matches("\\d{9}")) {
+            showError("Invalid ID number. Please enter 9 digits.");
+            return;
+        }
+        if (!resIdStr.matches("\\d+")) {
+            showError("Invalid Order Number. Please enter numbers only.");
+            return;
+        }
+
+        // send BOTH idNumber and reservationId
+        try {
+            Client.getClient().sendToServer("cancel_reservation_exact;" + idNumber + ";" + resIdStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Could not send cancellation request.");
+        }
     }
+
+    @FXML
+    public void handleCancelOrder(ActionEvent event) {
+        String idNumber = IDtextField.getText().trim();
+        String resIdStr = reservationIdField.getText().trim();
+
+        if (!idNumber.matches("\\d{9}")) {
+            showError("Invalid ID number. Please enter 9 digits.");
+            return;
+        }
+        if (!resIdStr.matches("\\d+")) {
+            showError("Invalid Order Number. Please enter numbers only.");
+            return;
+        }
+
+        // send BOTH idNumber and reservationId
+        try {
+            Client.getClient().sendToServer("cancel_order_exact;" + idNumber + ";" + resIdStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Could not send cancellation request.");
+        }
+    }
+
+
 
     // ─────────(2) Listen for "confirm_order_cancellation;<fee>;<idNumber>"
     @Subscribe
@@ -306,6 +403,13 @@ public class TakeAwayOrReservationController {
             Platform.runLater(() -> {
                 showAlert("Your order was cancelled successfully.\nYou have been charged " + fee + "₪.");
                 cancelButton1.setDisable(true);
+
+                // go home
+                try {
+                    EventBus.getDefault().unregister(this);
+                } catch (Exception ignore) {}
+                isActive = false;
+                App.switchScreen("Main Page");
             });
 
         } else if (payload.equals("order_cancellation_failed;visa_error")) {
@@ -318,6 +422,7 @@ public class TakeAwayOrReservationController {
                 showError("No active order found for this ID.");
             });
         }
+
         // Anything else is ignored here.
     }
 
@@ -415,6 +520,10 @@ public class TakeAwayOrReservationController {
                             " under ID: " + customerId
             );
             alert.showAndWait();
+            try { EventBus.getDefault().unregister(this); } catch (Exception ignore) {}
+            isActive = false;
+            App.switchScreen("Main Page");
+
         });
     }
 

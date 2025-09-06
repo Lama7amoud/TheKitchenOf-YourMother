@@ -942,6 +942,9 @@
                         System.out.println("Restaurant is null! Cannot set restaurant in reservation.");
                     }
 
+                    reservation.setSittingType("TAKEAWAY");              // avoid "sitting type is null"
+                    reservation.setReservationTime(LocalDateTime.now()); // not used for seats, but must be non-null
+
                     if (paymentType.equals("Cash")) {
                         // tell the server “this is a cash order” by leaving Visa = null:
                         reservation.setVisa(null);

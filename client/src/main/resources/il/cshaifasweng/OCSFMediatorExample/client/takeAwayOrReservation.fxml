@@ -52,30 +52,33 @@
                 </Button>
 
                 <!-- “Cancel Reservation” button -->
-                <Button fx:id="cancelButton" layoutX="14.0" layoutY="335.0" onAction="#handleCancelReservation" prefHeight="51.0" prefWidth="152.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Cancel Reservation" textFill="WHITE">
+                <Button fx:id="cancelButton" layoutX="17.0" layoutY="343.0" onAction="#handleCancelReservation" prefHeight="42.0" prefWidth="140.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Cancel Reservation" textFill="WHITE">
                     <font>
                         <Font size="13.0" />
                     </font>
                 </Button>
 
                 <!-- “Cancel Order” button -->
-                <Button fx:id="cancelButton1" layoutX="189.0" layoutY="335.0" onAction="#handleCancelOrder" prefHeight="51.0" prefWidth="152.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Cancel Order" textFill="WHITE">
+                <Button fx:id="cancelButton1" layoutX="187.0" layoutY="341.0" onAction="#handleCancelOrder" prefHeight="46.0" prefWidth="138.0" style="-fx-background-color: #ffa500; -fx-font-style: italic; -fx-font-weight: bold; -fx-background-radius: 5em;" text="Cancel Order" textFill="WHITE">
                     <font>
                         <Font size="13.0" />
                     </font>
                 </Button>
 
                 <!-- ID input field -->
-                <TextField fx:id="IDtextField" layoutX="96.0" layoutY="286.0" />
+                <TextField fx:id="IDtextField" layoutX="146.0" layoutY="265.0" />
+
+                <Label alignment="CENTER" layoutX="24.0" layoutY="301.0" prefHeight="23.0" prefWidth="110.0" text="Order Number:" textAlignment="CENTER" />
+                <TextField fx:id="reservationIdField" layoutX="146.0" layoutY="300.0" />
 
                 <!-- “Enter Your ID:” label -->
-                <Label layoutX="4.0" layoutY="287.0" prefHeight="23.0" prefWidth="83.0" text="Enter Your ID:" textAlignment="CENTER" />
+                <Label layoutX="38.0" layoutY="266.0" prefHeight="23.0" prefWidth="83.0" text="Enter Your ID:" textAlignment="CENTER" />
 
                 <!-- Decorative line -->
                 <Line endX="262.2" endY="225.0" layoutX="101.0" layoutY="7.0" startX="-105.0" startY="225.0" />
 
                 <!-- Instruction label -->
-                <Label layoutX="4.0" layoutY="242.0" prefHeight="36.0" prefWidth="350.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="If you have an Order/Reservation you can cancel it:" textAlignment="CENTER" textFill="#fa930c">
+                <Label layoutX="7.0" layoutY="233.0" prefHeight="36.0" prefWidth="350.0" style="-fx-font-style: italic; -fx-font-weight: bold;" text="If you have an Order/Reservation you can cancel it:" textAlignment="CENTER" textFill="#fa930c">
                     <font>
                         <Font size="14.0" />
                     </font>

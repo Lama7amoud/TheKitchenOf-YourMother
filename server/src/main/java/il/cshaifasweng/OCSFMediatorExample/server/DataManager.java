@@ -1919,31 +1919,80 @@ public class DataManager {
         session.beginTransaction();
 
         if (reservation.getCancellationStatus() == null) reservation.setCancellationStatus("on");
-        try {
-            // Reject if there is another ACTIVE reservation for this ID within ±90 minutes
-            boolean timeClash = hasActiveReservationAround(
-                    reservation.getIdNumber(),
-                    reservation.getReservationTime(),
-                    90
-            );
-            if (timeClash) {
-                System.out.println("User has another active reservation within ±90 minutes. Rejecting.");
-                session.getTransaction().rollback();
-                return false;
-            }
+        if (reservation.getStatus() == null) reservation.setStatus("on");
 
+        try {
+
+            if (!reservation.isTakeAway()) {
+                // Reject if there is another ACTIVE reservation for this ID within ±90 minutes
+                boolean timeClash = hasActiveReservationAround(
+                        reservation.getIdNumber(),
+                        reservation.getReservationTime(),
+                        90
+                );
+                if (timeClash) {
+                    System.out.println("User has another active reservation within ±90 minutes. Rejecting.");
+                    session.getTransaction().rollback();
+                    return false;
+                }
+
+                //Bagin of update for double click for reservation
+                LocalDateTime start = reservation.getReservationTime();
+                LocalDateTime windowStart = start.minusMinutes(60);
+                LocalDateTime windowEnd   = start.plusMinutes(60);
+
+                List<HostingTable> picked = reservation.getReservedTables();
+                if (picked == null || picked.isEmpty()) {
+                    // server-side fallback: compute a combo now
+                    List<HostingTable> freeNow = getAvailableTables(reservation);
+                    picked = pickMinimalTablesServer(freeNow, reservation.getTotalGuests());
+                    if (picked == null) picked = new ArrayList<>();
+                    reservation.setReservedTables(picked);
+                    if (picked.isEmpty()) {
+                        session.getTransaction().rollback();
+                        return false; // genuinely no capacity
+                    }
+                }
+
+                List<Integer> ids = picked.stream()
+                        .map(t -> Integer.valueOf(t.getId()))
+                        .collect(java.util.stream.Collectors.toList());
+
+                // Lock the selected tables
+                session.createQuery(
+                                "select t from HostingTable t where t.id in :ids", HostingTable.class)
+                        .setParameter("ids", ids)
+                        .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                        .getResultList();
+
+                // Re-check overlap
+                Long conflicts = session.createQuery(
+                                "select count(rt.id) from ReservedTime rt " +
+                                        "where rt.table.id in :ids " +
+                                        "and rt.reservedTime between :ws and :we", Long.class)
+                        .setParameter("ids", ids)
+                        .setParameter("ws", windowStart)
+                        .setParameter("we", windowEnd)
+                        .getSingleResult();
+
+                if (conflicts != null && conflicts > 0) {
+                    session.getTransaction().rollback();
+                    return false;
+                }
+            }
 
             // Save the reservation FIRST to assign its ID
             session.save(reservation);
 
-            // Save ReservedTime instances using the now-persistent reservation
-            if (reservation.getReservedTables() != null) {
+            // Save ReservedTime only for sit-in reservations
+            if (!reservation.isTakeAway() && reservation.getReservedTables() != null) {
                 LocalDateTime startTime = reservation.getReservationTime();
                 for (HostingTable table : reservation.getReservedTables()) {
                     ReservedTime rt = new ReservedTime(table, startTime, reservation);
                     session.save(rt);
                 }
             }
+
 
             session.getTransaction().commit();
             System.out.println(">>> Reservation and reserved times committed");
@@ -2009,6 +2058,35 @@ public class DataManager {
 
         return true;
     }
+
+    private static List<HostingTable> pickMinimalTablesServer(List<HostingTable> free, int need) {
+        free.sort(java.util.Comparator.comparingInt(HostingTable::getSeatsNumber).reversed());
+        List<HostingTable> best = new ArrayList<>();
+        backtrackPickServer(free, 0, new ArrayList<>(), 0, need, best);
+        return best;
+    }
+
+    private static void backtrackPickServer(List<HostingTable> arr, int i,
+                                            List<HostingTable> cur, int seats, int need,
+                                            List<HostingTable> best) {
+        if (seats >= need) {
+            if (best.isEmpty() || cur.size() < best.size()) {
+                best.clear();
+                best.addAll(cur);
+            }
+            return;
+        }
+        if (i >= arr.size()) return;
+        if (!best.isEmpty() && cur.size() >= best.size()) return; // prune
+
+        cur.add(arr.get(i));
+        backtrackPickServer(arr, i + 1, cur, seats + arr.get(i).getSeatsNumber(), need, best);
+        cur.remove(cur.size() - 1);
+
+        backtrackPickServer(arr, i + 1, cur, seats, need, best);
+    }
+
+
 
 
     public static List<String[]> findOverlappingReservations(String[] details) {
@@ -2588,6 +2666,101 @@ public static Reservation getActiveReservationById(String idNumber, int restaura
             }
         }
     }
+    public static boolean cancelReservationByIdAndReservationId(String idNumber, long reservationId) {
+        SessionFactory sessionFactory = getSessionFactory(password);
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        try {
+            Reservation res = session.createQuery(
+                            "FROM Reservation r WHERE r.id = :rid AND r.idNumber = :idnum AND lower(r.status) = 'on'",
+                            Reservation.class)
+                    .setParameter("rid", reservationId)   // Reservation.id property
+                    .setParameter("idnum", idNumber)
+                    .uniqueResult();
+
+            if (res == null) {
+                session.getTransaction().rollback();
+                return false;
+            }
+
+            res.setStatus("off");
+            res.setCancellationStatus("cancelled");
+            session.update(res);
+
+            // Delete ReservedTime rows linked to this reservation
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaDelete<ReservedTime> del = cb.createCriteriaDelete(ReservedTime.class);
+            Root<ReservedTime> rt = del.from(ReservedTime.class);
+            del.where(cb.equal(rt.get("reservation").get("id"), res.getId()));
+            session.createQuery(del).executeUpdate();
+
+            session.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            if (session.getTransaction().isActive()) session.getTransaction().rollback();
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
+    }
+
+    public static boolean cancelOrderByIdAndReservationId(String idNumber, long reservationId) {
+        SessionFactory sessionFactory = getSessionFactory(password);
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        try {
+            Reservation res = session.createQuery(
+                            "FROM Reservation r WHERE r.id = :rid AND r.idNumber = :idnum AND r.isTakeAway = true AND lower(r.status) = 'on'",
+                            Reservation.class)
+                    .setParameter("rid", reservationId)   // Reservation.id property
+                    .setParameter("idnum", idNumber)
+                    .uniqueResult();
+
+            if (res == null) {
+                session.getTransaction().rollback();
+                return false;
+            }
+
+            res.setStatus("off");
+            res.setCancellationStatus("cancelled");
+            session.update(res);
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaDelete<ReservedTime> del = cb.createCriteriaDelete(ReservedTime.class);
+            Root<ReservedTime> rt = del.from(ReservedTime.class);
+            del.where(cb.equal(rt.get("reservation").get("id"), res.getId()));
+            session.createQuery(del).executeUpdate();
+
+            session.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            if (session.getTransaction().isActive()) session.getTransaction().rollback();
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
+    }
+    public static Reservation getActiveReservationByIdAndReservationId(String idNumber, long reservationId) {
+        SessionFactory sf = getSessionFactory(password);
+        Session s = sf.openSession();
+        try {
+            return s.createQuery(
+                            "FROM Reservation r " +
+                                    "WHERE r.id = :rid " +
+                                    "AND r.idNumber = :idnum " +
+                                    "AND lower(r.status) = 'on'",
+                            Reservation.class)
+                    .setParameter("rid", reservationId)
+                    .setParameter("idnum", idNumber)
+                    .uniqueResult();
+        } finally {
+            s.close();
+        }
+    }
+
+
 
 
 }

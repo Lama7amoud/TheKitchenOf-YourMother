@@ -149,7 +149,7 @@ public class SimpleServer extends AbstractServer {
 			} catch (Exception exception) {
 				exception.printStackTrace();
 			}
-		}else if (msgString.startsWith("cancel_order;")) {
+		}else if (msgString.startsWith("cancel_order;")) { //can remove but keeping to make sure other is good
 			System.out.println("[SimpleServer] → Entered cancel_order branch");
 			String idNumber = msgString.split(";")[1].trim();
 
@@ -231,6 +231,36 @@ public class SimpleServer extends AbstractServer {
 					}
 				}
 			}
+			sendToAllClients("Monthly report updated");
+		}
+		else if (msgString.startsWith("cancel_order_exact;")) {
+			String[] p = msgString.split(";");
+			String idNumber = p[1].trim();
+			long resId = Long.parseLong(p[2].trim());
+
+			boolean ok = DataManager.cancelOrderByIdAndReservationId(idNumber, resId); // your helper
+			try {
+				if (ok) {
+					client.sendToClient("order_cancellation_success;0");
+				} else {
+					client.sendToClient("no_order_found");
+				}
+			} catch (IOException e) { e.printStackTrace(); }
+			sendToAllClients("Monthly report updated");
+		}
+		else if (msgString.startsWith("cancel_reservation_exact;")) {
+			String[] p = msgString.split(";");
+			String idNumber = p[1].trim();
+			long resId = Long.parseLong(p[2].trim());
+
+			boolean ok = DataManager.cancelReservationByIdAndReservationId(idNumber, resId); // your helper
+			try {
+				if (ok) {
+					client.sendToClient("cancellation_success;0");
+				} else {
+					client.sendToClient("no_reservation_found");
+				}
+			} catch (IOException e) { e.printStackTrace(); }
 			sendToAllClients("Monthly report updated");
 		}
 		else if (msgString.startsWith("process_order_cancellation;")) {
@@ -801,33 +831,36 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 		}*/
-		else if (msg instanceof ReservationRequest) {
+		/*else if (msg instanceof ReservationRequest) {
 			ReservationRequest request = (ReservationRequest) msg;
 			Reservation reservation = request.getReservation();
 			boolean shouldSave = request.isShouldSave();
 
 			if (shouldSave) {
 				System.out.println("Saving reservation to DB...");
-
-				// Only block if there's an active reservation for this ID within ±90 minutes
-				boolean clash = DataManager.hasActiveReservationAround(
-						reservation.getIdNumber(),
-						reservation.getReservationTime(),
-						90
-				);
-				if (clash) {
-					try {
-						client.sendToClient("Reservation failed: ID already used.");
-					} catch (IOException e) {
-						throw new RuntimeException(e);
+				// Only enforce the 90-minute overlap rule for sit-in reservations.
+				// For take-away (reservation.isTakeAway() == true), skip the check entirely.
+				if (!reservation.isTakeAway()) {
+					boolean clash = DataManager.hasActiveReservationAround(
+							reservation.getIdNumber(),
+							reservation.getReservationTime(),
+							90
+					);
+					if (clash) {
+						try {
+							client.sendToClient("Reservation failed: ID already used.");
+						} catch (IOException e) {
+							throw new RuntimeException(e);
+						}
+						return;
 					}
-					return;
 				}
+
 
 				try {
 					boolean ok = DataManager.saveReservation(reservation);
 					if (!ok) {
-						client.sendToClient("Reservation failed: ID already used.");
+						client.sendToClient("Reservation failed: time conflict");
 						return;
 					}
 
@@ -859,8 +892,93 @@ public class SimpleServer extends AbstractServer {
 					throw new RuntimeException(e);
 				}
 			}
-		}
+		}*/
+		//cancelled the upper and adding this instead:
+		else if (msg instanceof ReservationRequest) {
+			ReservationRequest request = (ReservationRequest) msg;
+			Reservation reservation = request.getReservation();
+			boolean shouldSave = request.isShouldSave();
 
+			if (shouldSave) {
+				System.out.println("Saving reservation to DB...");
+
+				// ─── TAKE-AWAY: skip 90-min rule and any seat/availability logic ───
+				if (reservation.isTakeAway()) {
+					try {
+						boolean ok = DataManager.saveReservation(reservation); // DB insert only (no ReservedTime)
+						if (!ok) {
+							client.sendToClient("Reservation failed: time conflict");
+							return;
+						}
+
+						// Tell just this client
+						client.sendToClient("Reservation saved successfully");
+						client.sendToClient(reservation);
+
+						// Update reports if you want
+						DataManager.updateDailyReport(reservation);
+						sendToAllClients("Monthly report updated");
+
+						// NOTE: do NOT call getAvailableTables(...) or broadcast availability for take-away
+						return;
+					} catch (IOException e) {
+						e.printStackTrace();
+						return;
+					}
+				}
+
+				// ─── SIT-IN: keep your original checks ───
+				// Only enforce the 90-minute overlap rule for sit-in reservations.
+				boolean clash = DataManager.hasActiveReservationAround(
+						reservation.getIdNumber(),
+						reservation.getReservationTime(),
+						90
+				);
+				if (clash) {
+					try {
+						client.sendToClient("Reservation failed: ID already used.");
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+					return;
+				}
+
+				try {
+					boolean ok = DataManager.saveReservation(reservation);
+					if (!ok) {
+						client.sendToClient("Reservation failed: time conflict");
+						return;
+					}
+
+					// Notify only this client
+					client.sendToClient("Reservation saved successfully");
+
+					DataManager.updateDailyReport(reservation);
+					sendToAllClients("Monthly report updated");
+
+					// Send reservation to this client only
+					client.sendToClient(reservation);
+
+					// Notify others (optional)
+					sendToAllClientsExceptSender(new Message("reservation_update", reservation), client);
+
+					// For sit-in we can refresh availability
+					List<HostingTable> updatedAvailability = DataManager.getAvailableTables(reservation);
+					sendToAllClients(updatedAvailability);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Checking availability for reservation...");
+				List<HostingTable> availability = DataManager.getAvailableTables(reservation);
+				System.out.println("Available tables: " + availability.size());
+				try {
+					client.sendToClient(availability);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 		else if (msg instanceof Reservation) {
 			System.out.println("Received raw Reservation (availability check assumed)");
 			List<HostingTable> availability = DataManager.getAvailableTables((Reservation) msg);
@@ -945,7 +1063,7 @@ public class SimpleServer extends AbstractServer {
 				sendToAllClients(updatePriceConfirmation);
 			}
 		}
-		else if (msgString.startsWith("check_id_type:")) {
+		else if (msgString.startsWith("check_id_type:")) { //updated but keeping for checking
 			System.out.println("Inside check_id_type: " + msgString);
 
 			String[] parts = msgString.split(":");
@@ -965,7 +1083,30 @@ public class SimpleServer extends AbstractServer {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}else if (msgString.startsWith("check_id_type_exact:")) {
+			// format: check_id_type_exact:<idNumber>:<reservationId>
+			String[] parts = msgString.split(":");
+			if (parts.length < 3) {
+				try { client.sendToClient("id_type:not_found"); } catch (IOException ignored) {}
+				return;
+			}
+			String idNumber = parts[1].trim();
+			long reservationId = Long.parseLong(parts[2].trim());
+
+			Reservation r = DataManager.getActiveReservationByIdAndReservationId(idNumber, reservationId);
+			try {
+				if (r == null) {
+					client.sendToClient("id_type:not_found");
+				} else if (r.isTakeAway()) {
+					client.sendToClient("id_type:takeaway");
+				} else {
+					client.sendToClient("id_type:reservation");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+
 		else if (msgString.startsWith("Confirm Discount")) {
 			String details = msgString.substring("Confirm Discount".length()).trim();
 			String[] parts = details.split("\"");
