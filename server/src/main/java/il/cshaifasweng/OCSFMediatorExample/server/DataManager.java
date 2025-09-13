@@ -2666,61 +2666,24 @@ public static Reservation getActiveReservationById(String idNumber, int restaura
             }
         }
     }
-    public static boolean cancelReservationByIdAndReservationId(String idNumber, long reservationId) {
+
+    public static boolean cancelReservationByIdAndReservationId(String idNumber, long reservationId, int restaurantId) {
         SessionFactory sessionFactory = getSessionFactory(password);
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         try {
             Reservation res = session.createQuery(
-                            "FROM Reservation r WHERE r.id = :rid AND r.idNumber = :idnum AND lower(r.status) = 'on'",
+                            "FROM Reservation r WHERE r.id = :rid " +
+                                    "AND r.idNumber = :idnum " +
+                                    "AND r.restaurant.id = :restId " +
+                                    "AND lower(r.status) = 'on'",
                             Reservation.class)
-                    .setParameter("rid", reservationId)   // Reservation.id property
+                    .setParameter("rid", reservationId)
                     .setParameter("idnum", idNumber)
+                    .setParameter("restId", restaurantId)
                     .uniqueResult();
 
-            if (res == null) {
-                session.getTransaction().rollback();
-                return false;
-            }
-
-            res.setStatus("off");
-            res.setCancellationStatus("cancelled");
-            session.update(res);
-
-            // Delete ReservedTime rows linked to this reservation
-            CriteriaBuilder cb = session.getCriteriaBuilder();
-            CriteriaDelete<ReservedTime> del = cb.createCriteriaDelete(ReservedTime.class);
-            Root<ReservedTime> rt = del.from(ReservedTime.class);
-            del.where(cb.equal(rt.get("reservation").get("id"), res.getId()));
-            session.createQuery(del).executeUpdate();
-
-            session.getTransaction().commit();
-            return true;
-        } catch (Exception e) {
-            if (session.getTransaction().isActive()) session.getTransaction().rollback();
-            e.printStackTrace();
-            return false;
-        } finally {
-            session.close();
-        }
-    }
-
-    public static boolean cancelOrderByIdAndReservationId(String idNumber, long reservationId) {
-        SessionFactory sessionFactory = getSessionFactory(password);
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            Reservation res = session.createQuery(
-                            "FROM Reservation r WHERE r.id = :rid AND r.idNumber = :idnum AND r.isTakeAway = true AND lower(r.status) = 'on'",
-                            Reservation.class)
-                    .setParameter("rid", reservationId)   // Reservation.id property
-                    .setParameter("idnum", idNumber)
-                    .uniqueResult();
-
-            if (res == null) {
-                session.getTransaction().rollback();
-                return false;
-            }
+            if (res == null) { session.getTransaction().rollback(); return false; }
 
             res.setStatus("off");
             res.setCancellationStatus("cancelled");
@@ -2742,7 +2705,50 @@ public static Reservation getActiveReservationById(String idNumber, int restaura
             session.close();
         }
     }
-    public static Reservation getActiveReservationByIdAndReservationId(String idNumber, long reservationId) {
+
+    public static boolean cancelOrderByIdAndReservationId(String idNumber, long reservationId, int restaurantId) {
+        SessionFactory sessionFactory = getSessionFactory(password);
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        try {
+            Reservation res = session.createQuery(
+                            "FROM Reservation r WHERE r.id = :rid " +
+                                    "AND r.idNumber = :idnum " +
+                                    "AND r.restaurant.id = :restId " +
+                                    "AND r.isTakeAway = true " +
+                                    "AND lower(r.status) = 'on'",
+                            Reservation.class)
+                    .setParameter("rid", reservationId)
+                    .setParameter("idnum", idNumber)
+                    .setParameter("restId", restaurantId)
+                    .uniqueResult();
+
+            if (res == null) { session.getTransaction().rollback(); return false; }
+
+            res.setStatus("off");
+            res.setCancellationStatus("cancelled");
+            session.update(res);
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaDelete<ReservedTime> del = cb.createCriteriaDelete(ReservedTime.class);
+            Root<ReservedTime> rt = del.from(ReservedTime.class);
+            del.where(cb.equal(rt.get("reservation").get("id"), res.getId()));
+            session.createQuery(del).executeUpdate();
+
+            session.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            if (session.getTransaction().isActive()) session.getTransaction().rollback();
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
+    }
+
+
+
+    public static Reservation getActiveReservationByIdAndReservationId(String idNumber, long reservationId, int restaurantId) {
         SessionFactory sf = getSessionFactory(password);
         Session s = sf.openSession();
         try {
@@ -2750,15 +2756,18 @@ public static Reservation getActiveReservationById(String idNumber, int restaura
                             "FROM Reservation r " +
                                     "WHERE r.id = :rid " +
                                     "AND r.idNumber = :idnum " +
+                                    "AND r.restaurant.id = :restId " +
                                     "AND lower(r.status) = 'on'",
                             Reservation.class)
                     .setParameter("rid", reservationId)
                     .setParameter("idnum", idNumber)
+                    .setParameter("restId", restaurantId)
                     .uniqueResult();
         } finally {
             s.close();
         }
     }
+
 
 
 

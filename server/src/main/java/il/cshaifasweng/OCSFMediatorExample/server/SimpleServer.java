@@ -237,8 +237,9 @@ public class SimpleServer extends AbstractServer {
 			String[] p = msgString.split(";");
 			String idNumber = p[1].trim();
 			long resId = Long.parseLong(p[2].trim());
+			int restaurantId = Integer.parseInt(p[3].trim());
 
-			boolean ok = DataManager.cancelOrderByIdAndReservationId(idNumber, resId); // your helper
+			boolean ok = DataManager.cancelOrderByIdAndReservationId(idNumber, resId, restaurantId);
 			try {
 				if (ok) {
 					client.sendToClient("order_cancellation_success;0");
@@ -252,8 +253,9 @@ public class SimpleServer extends AbstractServer {
 			String[] p = msgString.split(";");
 			String idNumber = p[1].trim();
 			long resId = Long.parseLong(p[2].trim());
+			int restaurantId = Integer.parseInt(p[3].trim());
 
-			boolean ok = DataManager.cancelReservationByIdAndReservationId(idNumber, resId); // your helper
+			boolean ok = DataManager.cancelReservationByIdAndReservationId(idNumber, resId, restaurantId);
 			try {
 				if (ok) {
 					client.sendToClient("cancellation_success;0");
@@ -950,8 +952,10 @@ public class SimpleServer extends AbstractServer {
 						return;
 					}
 
+
 					// Notify only this client
-					client.sendToClient("Reservation saved successfully");
+					long id = reservation.getId();
+					client.sendToClient("Reservation saved successfully#" + id);
 
 					DataManager.updateDailyReport(reservation);
 					sendToAllClients("Monthly report updated");
@@ -1086,14 +1090,13 @@ public class SimpleServer extends AbstractServer {
 		}else if (msgString.startsWith("check_id_type_exact:")) {
 			// format: check_id_type_exact:<idNumber>:<reservationId>
 			String[] parts = msgString.split(":");
-			if (parts.length < 3) {
-				try { client.sendToClient("id_type:not_found"); } catch (IOException ignored) {}
-				return;
-			}
+			if (parts.length < 4) { try { client.sendToClient("id_type:not_found"); } catch (IOException ignored) {} return; }
+
 			String idNumber = parts[1].trim();
 			long reservationId = Long.parseLong(parts[2].trim());
+			int restaurantId = Integer.parseInt(parts[3].trim());
 
-			Reservation r = DataManager.getActiveReservationByIdAndReservationId(idNumber, reservationId);
+			Reservation r = DataManager.getActiveReservationByIdAndReservationId(idNumber, reservationId, restaurantId);
 			try {
 				if (r == null) {
 					client.sendToClient("id_type:not_found");

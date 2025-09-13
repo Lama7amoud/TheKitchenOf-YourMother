@@ -301,7 +301,7 @@ public class ConfirmOrderController {
     }
 
 
-    @Subscribe
+/*    @Subscribe old confrimation!!
     public void handleReservationSuccess(MessageEvent evt) {
         if (!isActive || !evt.getMessage().equals("Reservation saved successfully")) return;
 
@@ -316,7 +316,36 @@ public class ConfirmOrderController {
             App.switchScreen("Main Page");
 
         });
+    }*/
+
+    //new confirmation:
+    @Subscribe
+    public void handleReservationSuccess(MessageEvent evt) {
+        if (!isActive) return;
+
+        String msg = evt.getMessage();
+        if (msg == null || !msg.startsWith("Reservation saved successfully")) return;
+
+        String idText = "unknown";
+        int hash = msg.indexOf('#');
+        if (hash != -1 && hash + 1 < msg.length()) {
+            idText = msg.substring(hash + 1).trim();
+        }
+
+        final String idForDialog = idText;
+
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Reservation Confirmed");
+            alert.setHeaderText(null);
+            alert.setContentText("Your reservation has been saved.\nReservation ID: " + idForDialog);
+            alert.showAndWait();
+            EventBus.getDefault().unregister(this);
+            isActive = false;
+            App.switchScreen("Main Page");
+        });
     }
+
 
     //added later for +-90 hours reservations
 /*

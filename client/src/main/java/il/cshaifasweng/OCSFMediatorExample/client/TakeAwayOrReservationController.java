@@ -132,7 +132,9 @@ public class TakeAwayOrReservationController {
 
         // ONLY when both are valid, ask the server exactly for that pair
         if (idOk && ridOk) {
-            Client.getClient().sendToServer("check_id_type_exact:" + idNumber + ":" + resIdStr);
+            int restaurantId = Client.getClientAttributes().getRestaurantInterest();
+            Client.getClient().sendToServer("check_id_type_exact:" + idNumber + ":" + resIdStr + ":" + restaurantId);
+
         }
     }
 
@@ -325,9 +327,10 @@ public class TakeAwayOrReservationController {
             return;
         }
 
-        // send BOTH idNumber and reservationId
+        int restaurantId = Client.getClientAttributes().getRestaurantInterest();
+        // send idNumber and reservationId and RestaurantID
         try {
-            Client.getClient().sendToServer("cancel_reservation_exact;" + idNumber + ";" + resIdStr);
+            Client.getClient().sendToServer("cancel_reservation_exact;" + idNumber + ";" + resIdStr+ ";" + restaurantId);
         } catch (Exception e) {
             e.printStackTrace();
             showError("Could not send cancellation request.");
@@ -348,9 +351,11 @@ public class TakeAwayOrReservationController {
             return;
         }
 
-        // send BOTH idNumber and reservationId
+        int restaurantId = Client.getClientAttributes().getRestaurantInterest();
+        // send idNumber and reservationId and RestaurantID
+
         try {
-            Client.getClient().sendToServer("cancel_order_exact;" + idNumber + ";" + resIdStr);
+            Client.getClient().sendToServer("cancel_order_exact;" + idNumber + ";" + resIdStr+ ";" + restaurantId);
         } catch (Exception e) {
             e.printStackTrace();
             showError("Could not send cancellation request.");
