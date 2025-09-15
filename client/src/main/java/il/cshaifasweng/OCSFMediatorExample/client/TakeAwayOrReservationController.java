@@ -536,7 +536,7 @@ public class TakeAwayOrReservationController {
     public void goToOrderTables(ActionEvent event) throws IOException {
         isActive = false;
         EventBus.getDefault().unregister(this);
-        root = FXMLLoader.load(getClass().getResource("OrderTablesPage.fxml"));
+        root = FXMLLoader.load(getClass().getResource("orderTablesPage.fxml"));
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         scene = new Scene(root);
         stage.setScene(scene);
