@@ -28,6 +28,41 @@ public class SimpleServer extends AbstractServer {
 
 	private Timer reportTimer;
 
+
+	//added by mohammad
+	//fee helpers
+	private int computeOrderCancellationFee(Reservation r) {
+		// For take-away orders: use your total price and time-to-pickup rule
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime pickupTime = r.getReceivingTime();
+		long minutesToPickup = java.time.Duration.between(now, pickupTime).toMinutes();
+
+		double totalOrderPrice = DataManager.getTotalOrderPriceForReservation(r.getId());
+		double feeAmount;
+
+		if (minutesToPickup >= 180) {            // >= 3 hours
+			feeAmount = 0.0;
+		} else if (minutesToPickup >= 60) {      // 1–3 hours
+			feeAmount = totalOrderPrice * 0.50;
+		} else if (minutesToPickup >= 0) {       // 0–59 minutes
+			feeAmount = totalOrderPrice;
+		} else {                                 // already past – treat as full fee
+			feeAmount = totalOrderPrice;
+		}
+		return (int) Math.ceil(feeAmount);
+	}
+
+	private int computeReservationCancellationFee(Reservation r) {
+		// Your existing reservation rule (example: 10 shekels per guest if within 60 minutes)
+		long minutesToReservation =
+				java.time.Duration.between(LocalDateTime.now(), r.getReservationTime()).toMinutes();
+		if (minutesToReservation <= 60) {
+			return r.getTotalGuests() * 10;
+		}
+		return 0;
+	}
+
+
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 
@@ -239,15 +274,42 @@ public class SimpleServer extends AbstractServer {
 			long resId = Long.parseLong(p[2].trim());
 			int restaurantId = Integer.parseInt(p[3].trim());
 
-			boolean ok = DataManager.cancelOrderByIdAndReservationId(idNumber, resId, restaurantId);
+			// Get the exact active take-away reservation
+			Reservation r = DataManager.getActiveReservationByIdAndReservationId(idNumber, resId, restaurantId);
+			if (r == null || !r.isTakeAway()) {
+				try { client.sendToClient("no_order_found"); } catch (IOException ignored) {}
+				return;
+			}
+
+			int fee = computeOrderCancellationFee(r);
+			boolean paidByVisa = r.getVisa() != null && !r.getVisa().trim().isEmpty();
+
 			try {
-				if (ok) {
-					client.sendToClient("order_cancellation_success;0");
+				if (fee > 0) {
+					if (paidByVisa) {
+						// Ask the client to confirm charging Visa (client shows confirm dialog and, if OK, sends process_order_cancellation;id;fee)
+						client.sendToClient("confirm_order_cancellation;" + fee + ";" + idNumber);
+					} else {
+						// CASH: cancel right away and record the debt
+						r.setAmountDue(fee);
+						r.setStatus("off");
+						r.setCancellationStatus("cancelled");
+						r.setPayed(false);
+						DataManager.updateReservation(r);
+						client.sendToClient("order_cancellation_debt;" + fee + ";" + idNumber);
+						sendToAllClients("Monthly report updated");
+					}
 				} else {
-					client.sendToClient("no_order_found");
+					// No fee — cancel immediately and report success
+					r.setStatus("off");
+					r.setCancellationStatus("cancelled");
+					DataManager.updateReservation(r);
+					client.sendToClient("order_cancellation_success;0");
+					sendToAllClients("Monthly report updated");
 				}
-			} catch (IOException e) { e.printStackTrace(); }
-			sendToAllClients("Monthly report updated");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		else if (msgString.startsWith("cancel_reservation_exact;")) {
 			String[] p = msgString.split(";");
@@ -255,15 +317,41 @@ public class SimpleServer extends AbstractServer {
 			long resId = Long.parseLong(p[2].trim());
 			int restaurantId = Integer.parseInt(p[3].trim());
 
-			boolean ok = DataManager.cancelReservationByIdAndReservationId(idNumber, resId, restaurantId);
+			Reservation r = DataManager.getActiveReservationByIdAndReservationId(idNumber, resId, restaurantId);
+			if (r == null || r.isTakeAway()) { // not a sit-in reservation
+				try { client.sendToClient("no_reservation_found"); } catch (IOException ignored) {}
+				return;
+			}
+
+			int fee = computeReservationCancellationFee(r);
+			boolean paidByVisa = r.getVisa() != null && !r.getVisa().trim().isEmpty();
+
 			try {
-				if (ok) {
-					client.sendToClient("cancellation_success;0");
+				if (fee > 0) {
+					if (paidByVisa) {
+						// Ask the client to confirm charging Visa (client shows confirm dialog and, if OK, sends process_cancellation;id;fee)
+						client.sendToClient("confirm_cancellation;" + fee + ";" + idNumber);
+					} else {
+						// CASH: cancel immediately and record the debt
+						r.setAmountDue(fee);
+						r.setStatus("off");
+						r.setCancellationStatus("cancelled");
+						r.setPayed(false);
+						DataManager.updateReservation(r);
+						client.sendToClient("reservation_cancellation_debt;" + fee + ";" + idNumber);
+						sendToAllClients("Monthly report updated");
+					}
 				} else {
-					client.sendToClient("no_reservation_found");
+					// No fee
+					r.setStatus("off");
+					r.setCancellationStatus("cancelled");
+					DataManager.updateReservation(r);
+					client.sendToClient("cancellation_success;0");
+					sendToAllClients("Monthly report updated");
 				}
-			} catch (IOException e) { e.printStackTrace(); }
-			sendToAllClients("Monthly report updated");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		else if (msgString.startsWith("process_order_cancellation;")) {
 			String[] parts = msgString.split(";");
@@ -1065,27 +1153,6 @@ public class SimpleServer extends AbstractServer {
 			if (x) {
 				List<PriceConfirmation> updatePriceConfirmation = DataManager.getPriceConfirmations();
 				sendToAllClients(updatePriceConfirmation);
-			}
-		}
-		else if (msgString.startsWith("check_id_type:")) { //updated but keeping for checking
-			System.out.println("Inside check_id_type: " + msgString);
-
-			String[] parts = msgString.split(":");
-			String idNumber = parts[1].trim();
-			int restaurantId = Integer.parseInt(parts[2].trim());
-
-			Reservation reservation = DataManager.getActiveReservationById(idNumber, restaurantId);
-
-			try {
-				if (reservation == null) {
-					client.sendToClient("id_type:not_found");
-				} else if (reservation.isTakeAway()) {
-					client.sendToClient("id_type:takeaway");
-				} else {
-					client.sendToClient("id_type:reservation");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}else if (msgString.startsWith("check_id_type_exact:")) {
 			// format: check_id_type_exact:<idNumber>:<reservationId>
