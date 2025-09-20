@@ -23,27 +23,14 @@ import static il.cshaifasweng.OCSFMediatorExample.client.Client.userAtt;
 
 public class TakeAwayController implements Initializable {
 
-    @FXML
-    private TextField addressField, nameField, phoneField, idField;
-
-    @FXML
-    private ComboBox<String> favTimeComboBox;
-
-    @FXML
-    private Button viewMapButton, branchDetailsButton, backToMainPageButton, backToOrderTablesButton, ContinueButton;
-
-    @FXML
-    private Label fullNameLabel, numberLabel, iDLabel, addressLabel, favTimeLabel;
-
+    @FXML private TextField addressField, nameField, phoneField, idField;
+    @FXML private ComboBox<String> favTimeComboBox;
+    @FXML private Button viewMapButton, branchDetailsButton, backToMainPageButton, backToOrderTablesButton, ContinueButton;
+    @FXML private Label fullNameLabel, numberLabel, iDLabel, addressLabel, favTimeLabel;
     private boolean waitingForIdCheck = false;
     private boolean idAlreadyUsed = false;
-
-    @FXML
-    private TextField emailField;
-
-    @FXML
-    private Label emailErrorLabel;
-
+    @FXML private TextField emailField;
+    @FXML private Label emailErrorLabel;
     @FXML private Label branchNameLabel;
 
     private LocalTime convertDoubleToLocalTime(double time) {
@@ -51,7 +38,6 @@ public class TakeAwayController implements Initializable {
         int minutes = (int) Math.round((time - hours) * 100);
         return LocalTime.of(hours, minutes);
     }
-
 
     private String nameForInterest() {
         short id = Client.getClientAttributes().getRestaurantInterest();
@@ -63,14 +49,13 @@ public class TakeAwayController implements Initializable {
         };
     }
 
-
     private void setBranchLabel(Restaurant r) {
         Platform.runLater(() -> {
             if (branchNameLabel != null) {
                 branchNameLabel.setText(
                         (r != null && r.getName() != null && !r.getName().isEmpty())
                                 ? r.getName()
-                                : nameForInterest()  // fallback until entity arrives
+                                : nameForInterest()
                 );
             }
         });
@@ -85,7 +70,6 @@ public class TakeAwayController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Platform.runLater(() -> {
-            //EventBus.getDefault().register(this);
             LocalTime now = LocalTime.now().withSecond(0).withNano(0);
 
             Restaurant res = Client.getClientAttributes().getRestaurantInterestEntity();
@@ -106,26 +90,12 @@ public class TakeAwayController implements Initializable {
                 slot = slot.plusMinutes(30);
             }
 
-
-            // Initially hide all error labels
             hideAllErrorLabels();
-
-            // Set buttons that should not be visible
             viewMapButton.setVisible(false);
             branchDetailsButton.setVisible(false);
-
-            // Display the selected restaurant from userAtt (if available)
-            short restaurantInterest = userAtt.getRestaurantInterest();
-            String restaurantName = switch (restaurantInterest) {
-                case 1 -> "Haifa Branch";
-                case 2 -> "Tel-Aviv Branch";
-                case 3 -> "Nahariya Branch";
-                default -> "Unknown";
-            };
         });
     }
 
-    // Hide all error labels
     private void hideAllErrorLabels() {
         fullNameLabel.setVisible(false);
         numberLabel.setVisible(false);
@@ -135,13 +105,11 @@ public class TakeAwayController implements Initializable {
         emailErrorLabel.setVisible(false);
     }
 
-    // Show specific error message
     private void showError(Label label, String message) {
         label.setText(message);
         label.setVisible(true);
     }
 
-    // Full name validation: At least 2 words and no digits
     private boolean validateFullName(String name) {
         if (name.isEmpty()) {
             showError(fullNameLabel, "Full name is required.");
@@ -154,7 +122,6 @@ public class TakeAwayController implements Initializable {
         return true;
     }
 
-    // Phone number validation: Must start with '05' and have 10 digits
     private boolean validatePhoneNumber(String phone) {
         if (phone.isEmpty()) {
             showError(numberLabel, "Phone number is required.");
@@ -167,7 +134,6 @@ public class TakeAwayController implements Initializable {
         return true;
     }
 
-    // ID validation: Exactly 9 digits
     private boolean validateID(String id) {
         if (id.isEmpty()) {
             showError(iDLabel, "ID is required.");
@@ -180,7 +146,6 @@ public class TakeAwayController implements Initializable {
         return true;
     }
 
-    // Address validation: Non-empty
     private boolean validateAddress(String address) {
         if (address.isEmpty()) {
             showError(addressLabel, "Address is required.");
@@ -189,7 +154,6 @@ public class TakeAwayController implements Initializable {
         return true;
     }
 
-    // Favorite time validation: Must be selected
     private boolean validateFavoriteTime(String favoriteTime) {
         if (favoriteTime == null) {
             showError(favTimeLabel, "Please select a favorite time.");
@@ -200,7 +164,7 @@ public class TakeAwayController implements Initializable {
 
     @FXML
     void handleContinue(ActionEvent event) {
-        hideAllErrorLabels(); // Hide all errors at the start
+        hideAllErrorLabels();
 
         boolean isValid = true;
         String name = nameField.getText().trim();
@@ -209,98 +173,34 @@ public class TakeAwayController implements Initializable {
         String address = addressField.getText().trim();
         String favoriteTime = favTimeComboBox.getValue();
 
-
-
-        // Perform all validations and update the flag
-
         if (!validateFavoriteTime(favoriteTime)) isValid = false;
         if (!validateFullName(name)) isValid = false;
         if (!validatePhoneNumber(phone)) isValid = false;
-        if (!validateID(id)) {
-            isValid = false;
-        }/* else {
-            waitingForIdCheck = true;
-            Client.getClient().sendToServer("check_reservation_id;" + id);
-        }*/
+        if (!validateID(id)) isValid = false;
         if (!validateAddress(address)) isValid = false;
 
-
-        if (isValid /*&& !waitingForIdCheck*/) {
-            continueIfValid(name, phone, id, address, favoriteTime);
-        }
-
-        // Only proceed if all fields are valid
-/*
         if (isValid) {
-            OrderData.getInstance().setFullName(name);
-            OrderData.getInstance().setPhoneNumber(phone);
-            OrderData.getInstance().setIdNumber(id);
-            OrderData.getInstance().setAddress(address);
-            OrderData.getInstance().setPreferredTime(favoriteTime.toString());
-
-            // Switch to the next page
-            App.switchScreen("Menu Page");
-*/
-         else {
+            continueIfValid(name, phone, id, address, favoriteTime);
+        } else {
             System.out.println("Validation failed: Please fix the highlighted errors.");
         }
     }
 
     private void continueIfValid(String name, String phone, String id, String address, String favoriteTime) {
-        OrderData.getInstance().setFullName(name);
-        OrderData.getInstance().setPhoneNumber(phone);
-        OrderData.getInstance().setIdNumber(id);
-        OrderData.getInstance().setAddress(address);
-        OrderData.getInstance().setPreferredTime(favoriteTime);
-        OrderData.getInstance().setDate(LocalDate.now()); // or the selected date
-        OrderData.getInstance().setEmail(emailField.getText().trim());
-
+        OrderData od = OrderData.getInstance();
+        od.setFullName(name);
+        od.setPhoneNumber(phone);
+        od.setIdNumber(id);
+        od.setAddress(address);
+        od.setPreferredTime(favoriteTime);
+        od.setPickupTime(LocalTime.parse(favoriteTime));   // <-- CRITICAL
+        od.setDate(LocalDate.now());                       // or a chosen date
+        od.setEmail(emailField.getText().trim());
 
         int restaurantId = userAtt.getRestaurantInterest();
         Client.getClient().sendToServer("Get branch details;" + restaurantId);
-        // EventBus.getDefault().unregister(this);
         App.switchScreen("Menu Page");
     }
-
-/*    @Subscribe
-    public void handleRestaurantResponse(Object msg) {
-        if (msg instanceof Restaurant restaurant) {
-            Platform.runLater(() -> {
-                userAtt.setRestaurant(restaurant);  //  Set it in userAtt
-                System.out.println("Restaurant set in userAtt: " + restaurant.getId());
-                App.switchScreen("Menu Page");      //  Now switch to menu
-            });
-        }
-    }*/
-
-
-
-   /* @Subscribe
-    public void handleIdCheck(IdCheckEvent event) {
-        Platform.runLater(() -> {
-            waitingForIdCheck = false;
-            idAlreadyUsed = event.doesExist();
-
-            if (idAlreadyUsed) {
-                showError(iDLabel, "This ID is already used.");
-            } else {
-                // Re-validate other fields in case of UI delay
-                String name = nameField.getText().trim();
-                String phone = phoneField.getText().trim();
-                String id = idField.getText().trim();
-                String address = addressField.getText().trim();
-                String favoriteTime = favTimeComboBox.getValue();
-
-                boolean stillValid = validateFullName(name) && validatePhoneNumber(phone)
-                        && validateID(id) && validateAddress(address) && validateFavoriteTime(favoriteTime);
-
-                if (stillValid) {
-                    continueIfValid(name, phone, id, address, favoriteTime);
-                }
-            }
-        });
-    }*/
-
 
     @FXML
     void switchPage(ActionEvent event) {
@@ -314,7 +214,6 @@ public class TakeAwayController implements Initializable {
             default -> "";
         };
         if (!page.isEmpty()) {
-            // EventBus.getDefault().unregister(this);
             App.switchScreen(page);
         }
     }

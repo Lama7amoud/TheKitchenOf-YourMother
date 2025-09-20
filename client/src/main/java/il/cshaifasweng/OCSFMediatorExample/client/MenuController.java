@@ -920,50 +920,45 @@
                     reservation.setAddress(data.getAddress());
                     reservation.setEmail(data.getEmail());
                     reservation.setTakeAway(true);
-                    reservation.setSittingType(data.getSittingType());
+                    reservation.setSittingType("TAKEAWAY");
                     reservation.setTotalGuests(data.getGuestCount());
-                    reservation.setReservationTime(LocalDateTime.of(data.getDate(), LocalTime.parse(data.getPreferredTime())));
                     reservation.setStatus("on");
-                    reservation.setVisa(OrderData.getInstance().getVisa());
-                    reservation.setExpirationMonth(OrderData.getInstance().getExpirationMonth());
-                    reservation.setExpirationYear(OrderData.getInstance().getExpirationYear());
-                    reservation.setCvv(OrderData.getInstance().getCvv());
 
+                    // Use the *chosen pickup time* for receivingTime
+                    LocalTime pickupTime = (data.getPickupTime() != null)
+                            ? data.getPickupTime()
+                            : LocalTime.parse(data.getPreferredTime());
+                    LocalDateTime pickupDateTime = LocalDateTime.of(data.getDate(), pickupTime);
 
-                    // Receiving time
-                    LocalDateTime receivingTime = LocalDateTime.now();
-                    reservation.setReceivingTime(receivingTime);
+                    // It’s OK if reservationTime is creation time, but fee code uses receivingTime anyway.
+                    reservation.setReservationTime(LocalDateTime.now());      // (or keep as you like)
+                    reservation.setReceivingTime(pickupDateTime);             // <-- critical
+
+                    // Payment
+                    if ("Cash".equals(paymentType)) {
+                        reservation.setVisa(null);
+                        reservation.setPayed(false);
+                    } else {
+                        reservation.setVisa(data.getVisa());
+                        reservation.setExpirationMonth(data.getExpirationMonth());
+                        reservation.setExpirationYear(data.getExpirationYear());
+                        reservation.setCvv(data.getCvv());
+                        reservation.setPayed(true);
+                    }
 
                     // Restaurant
                     Restaurant restaurant = Client.getClientAttributes().getRestaurant();
-                    if (restaurant != null) {
-                        reservation.setRestaurant(restaurant);
-                    } else {
-                        System.out.println("Restaurant is null! Cannot set restaurant in reservation.");
-                    }
-
-                    reservation.setSittingType("TAKEAWAY");              // avoid "sitting type is null"
-
-
-                    if (paymentType.equals("Cash")) {
-                        // tell the server “this is a cash order” by leaving Visa = null:
-                        reservation.setVisa(null);
-                        reservation.setPayed(false);   // not paid yet, we’ll collect on pickup
-                    } else {
-                        // card‐path
-                        reservation.setVisa(data.getVisa());
-                        reservation.setPayed(true);
-                    }
+                    if (restaurant != null) reservation.setRestaurant(restaurant);
 
                     if (!alreadySentReservation) {
                         Client.getClient().sendToServer(new ReservationRequest(reservation, true));
                         alreadySentReservation = true;
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
+
 
 
             @Subscribe

@@ -1,6 +1,7 @@
 package il.cshaifasweng.OCSFMediatorExample.entities;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,8 @@ public class OrderData {
 
     private static OrderData instance = null;
 
-    private String preferredTime;
+    private String preferredTime;              // UI string (kept for display if you want)
+    private LocalTime pickupTime;              // <-- add: the real LocalTime used on server
     private String sittingType;
     private int guestCount;
     private String generalNote;
@@ -27,7 +29,6 @@ public class OrderData {
     private int expirationMonth;
     private int expirationYear;
     private String cvv;
-
 
     private OrderData() {}
 
@@ -57,14 +58,18 @@ public class OrderData {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
 
-    public String getEmail() { return email; }  // ✅ Getter
-    public void setEmail(String email) { this.email = email; }  // ✅ Setter
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
     public String getVisa() { return visa; }
     public void setVisa(String visa) { this.visa = visa; }
 
     public String getPreferredTime() { return preferredTime; }
     public void setPreferredTime(String preferredTime) { this.preferredTime = preferredTime; }
+
+    /** NEW: explicit pickup time */
+    public LocalTime getPickupTime() { return pickupTime; }
+    public void setPickupTime(LocalTime pickupTime) { this.pickupTime = pickupTime; }
 
     public String getSittingType() { return sittingType; }
     public void setSittingType(String sittingType) { this.sittingType = sittingType; }
@@ -81,41 +86,21 @@ public class OrderData {
     public Restaurant getSelectedRestaurant() { return selectedRestaurant; }
     public void setSelectedRestaurant(Restaurant selectedRestaurant) { this.selectedRestaurant = selectedRestaurant; }
 
-    public int getExpirationMonth() {
-        return expirationMonth;
-    }
+    public int getExpirationMonth() { return expirationMonth; }
+    public void setExpirationMonth(int expirationMonth) { this.expirationMonth = expirationMonth; }
 
-    public void setExpirationMonth(int expirationMonth) {
-        this.expirationMonth = expirationMonth;
-    }
+    public int getExpirationYear() { return expirationYear; }
+    public void setExpirationYear(int expirationYear) { this.expirationYear = expirationYear; }
 
-    public int getExpirationYear() {
-        return expirationYear;
-    }
+    public String getCvv() { return cvv; }
+    public void setCvv(String cvv) { this.cvv = cvv; }
 
-    public void setExpirationYear(int expirationYear) {
-        this.expirationYear = expirationYear;
-    }
-
-    public String getCvv() {
-        return cvv;
-    }
-
-    public void setCvv(String cvv) {
-        this.cvv = cvv;
-    }
-
-
-    public void addMealOrder(MealOrder order) {
-        this.mealOrders.add(order);
-    }
-
-    public List<MealOrder> getMealOrders() {
-        return mealOrders;
-    }
+    public void addMealOrder(MealOrder order) { this.mealOrders.add(order); }
+    public List<MealOrder> getMealOrders() { return mealOrders; }
 
     public void reset() {
         this.preferredTime = null;
+        this.pickupTime = null;           // <- reset new field
         this.sittingType = null;
         this.guestCount = 0;
         this.generalNote = null;
@@ -128,7 +113,9 @@ public class OrderData {
         this.expirationMonth = 0;
         this.expirationYear = 0;
         this.cvv = null;
-
+        this.mealOrders.clear();
+        this.date = null;
+        this.selectedRestaurant = null;
     }
 
     @Override
@@ -140,9 +127,11 @@ public class OrderData {
                 ", address='" + address + '\'' +
                 ", email='" + email + '\'' +
                 ", preferredTime='" + preferredTime + '\'' +
+                ", pickupTime=" + pickupTime +
                 ", sittingType='" + sittingType + '\'' +
                 ", guestCount=" + guestCount +
                 ", generalNote='" + generalNote + '\'' +
+                ", date=" + date +
                 '}';
     }
 }
